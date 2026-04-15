@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}UrbPay | Simulacao de Catraca{% endblock %}
+
+{% block content %}
+  <main class="gate-shell">
+    <section class="gate-card gate-card--simulator" data-qr-simulator-root data-status-url="{{ qr_status_url }}">
+      <div class="gate-simulator__top">
+        <div>
+          <span class="eyebrow">Simulacao de catraca</span>
+          <h1>Acompanhe a solicitacao do QR Code</h1>
+          <p>Deixe esta pagina aberta. Quando o cliente abrir o QR e tocar em Comprar passagem, a resposta aparece aqui.</p>
+        </div>
+
+        <span class="gate-status-badge gate-status-badge--{{ qr_status.appearance }}" data-qr-status-label>{{ qr_status.label }}</span>
+      </div>
+
+      <div class="gate-turnstile gate-turnstile--{{ qr_status.appearance }}" data-qr-turnstile>
+        <div class="gate-turnstile__arms" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <strong data-qr-status-title>{{ qr_status.title }}</strong>
+        <p data-qr-status-message>{{ qr_status.message }}</p>
+      </div>
+
+      <div class="gate-simulator__stats">
+        <article>
+          <span>Passagem</span>
+          <strong>{{ amount }}</strong>
+        </article>
+        <article>
+          <span>Saldo atual</span>
+          <strong data-qr-status-balance>{{ qr_status.balance }}</strong>
+        </article>
+        <article>
+          <span>Status da janela</span>
+          <strong data-qr-status-expiry>
+            {% if qr_status.code in ["created", "opened"] %}
+              {{ "%02d:%02d"|format(qr_status.remaining_seconds // 60, qr_status.remaining_seconds % 60) }}
+            {% else %}
+              {{ qr_status.label }}
+            {% endif %}
+          </strong>
+        </article>
+      </div>
+
+      <div class="gate-user">
+        <img src="{{ url_for('static', path=profile_image) }}" alt="Foto do usuario" class="gate-user__avatar" />
+        <div>
+          <strong>{{ current_user.nome }}</strong>
+          <p>Cartao {{ card_number }}</p>
+          <p>Solicitacao vinculada a este passageiro</p>
+        </div>
+      </div>
+
+      <div class="gate-simulator__timeline">
+        <article class="gate-timeline-card" data-qr-stage-card="created">
+          <span>01</span>
+          <div>
+            <strong>QR gerado</strong>
+            <p>Token temporario emitido e pronto para leitura.</p>
+          </div>
+        </article>
+
+        <article class="gate-timeline-card" data-qr-stage-card="opened">
+          <span>02</span>
+          <div>
+            <strong>Solicitacao aberta</strong>
+            <p>O cliente abriu o QR e a catraca aguarda a compra.</p>
+          </div>
+        </article>
+
+        <article class="gate-timeline-card" data-qr-stage-card="result">
+          <span>03</span>
+          <div>
+            <strong data-qr-result-heading>Resultado da validacao</strong>
+            <p data-qr-result-copy>A autorizacao final aparece aqui assim que o cliente concluir a compra.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="gate-simulator__actions">
+        <a href="{{ qr_customer_url }}" class="secondary-action" target="_blank" rel="noopener">Abrir tela do passageiro</a>
+        <a href="/dashboard" class="secondary-action">Voltar ao painel</a>
+      </div>
+    </section>
+  </main>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}UrbPay | Historico e Extrato{% endblock %}
+
+{% block content %}
+  <div class="dashboard-shell dashboard-shell--history">
+    <header class="dashboard-topbar">
+      <div class="dashboard-brand">
+        <img src="{{ url_for('static', path='imgs/logo_urbpay.png') }}" alt="Logo UrbPay" class="brand-logo" />
+      </div>
+
+      <div class="dashboard-topbar__actions">
+        <a href="/dashboard" class="secondary-action" data-i18n="history.backLink">Voltar ao painel</a>
+        {% include "_utility_toolbar.html" %}
+      </div>
+    </header>
+
+    <main class="dashboard-main dashboard-main--history">
+      <section class="history-hero history-hero--separate">
+        <article class="dashboard-card history-hero__summary">
+          <div class="dashboard-card__head">
+            <span class="eyebrow">Visao geral</span>
+            <h1>Extrato visual do cliente</h1>
+            <p>Ative apenas os dashboards que fazem sentido para a leitura do momento.</p>
+          </div>
+
+          <div class="history-summary-grid">
+            <div class="metric-card">
+              <span class="metric-card__label">Movimentacoes</span>
+              <strong>{{ analytics_summary.total_movements }}</strong>
+              <p>Eventos totais encontrados no cartao.</p>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__label">Aprovadas</span>
+              <strong>{{ analytics_summary.approved_count }}</strong>
+              <p>Operacoes processadas com sucesso.</p>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__label">Falhas</span>
+              <strong>{{ analytics_summary.failed_count }}</strong>
+              <p>Tentativas com saldo insuficiente ou recusas.</p>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__label">Gasto acumulado</span>
+              <strong>R$ {{ analytics_summary.spent_total }}</strong>
+              <p>Valor total consumido em debitos.</p>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__label">Recargas</span>
+              <strong>R$ {{ analytics_summary.topup_total }}</strong>
+              <p>Valores que entraram no saldo.</p>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card__label">Ticket medio</span>
+              <strong>R$ {{ analytics_summary.average_ticket }}</strong>
+              <p>Media por uso aprovado do cartao.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="dashboard-card history-hero__profile">
+          <div class="dashboard-card__head">
+            <span class="eyebrow">Cliente</span>
+            <h2>{{ current_user.nome }}</h2>
+            <p>{{ membership_id }}  |  Saldo atual R$ {{ current_balance }}</p>
+          </div>
+
+          <div class="history-profile-card">
+            <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil" class="history-profile-card__avatar" />
+            <div>
+              <strong>{{ current_user.nome }}</strong>
+              <p>Cartao {{ formatted_card_number }}</p>
+              <p>Conta {{ card_preview.status }}  |  Validade {{ card_preview.data_validade.strftime('%m/%Y') }}</p>
+            </div>
+          </div>
+
+          <div class="widget-picker">
+            <span class="widget-picker__label">Escolha o que aparece na tela</span>
+            <label class="widget-toggle"><input type="checkbox" value="monthly" checked data-widget-toggle /> Fluxo mensal</label>
+            <label class="widget-toggle"><input type="checkbox" value="status" checked data-widget-toggle /> Status das operacoes</label>
+            <label class="widget-toggle"><input type="checkbox" value="locations" checked data-widget-toggle /> Locais recorrentes</label>
+            <label class="widget-toggle"><input type="checkbox" value="timeline" checked data-widget-toggle /> Linha recente</label>
+            <label class="widget-toggle"><input type="checkbox" value="table" checked data-widget-toggle /> Extrato detalhado</label>
+          </div>
+        </article>
+      </section>
+
+      <section class="history-dashboard history-dashboard--separate">
+        <article class="dashboard-card chart-card" data-widget="monthly">
+          <div class="dashboard-card__head">
+            <span class="eyebrow">Dashboard</span>
+            <h2>Fluxo mensal</h2>
+            <p>Comparativo visual entre debitos e recargas dos ultimos meses.</p>
+          </div>
+          <div class="chart-area chart-area--bars" data-chart-monthly></div>
+        </article>
+
+        <article class="dashboard-card chart-card" data-widget="status">
+          <div class="dashboard-card__head">
+            <span class="eyebrow">Dashboard</span>
+            <h2>Status das operacoes</h2>
+            <p>Distribuicao de aprovacoes e falhas no uso do cartao.</p>
+          </div>
+          <div class="chart-area chart-area--progress" data-chart-status></div>
+        </article>
+
+        <article class="dashboard-card chart-card" data-widget="locations">
+          <div class="dashboard-card__head">
+            <span class="eyebrow">Dashboard</span>
+            <h2>Locais mais frequentes</h2>
+            <p>Leitura de onde o cartao aparece com mais recorrencia.</p>
+          </div>
+          <div class="chart-area chart-area--progress" data-chart-locations></div>
+        </article>
+
+        <article class="dashboard-card chart-card" data-widget="timeline">
+          <div class="dashboard-card__head">
+            <span class="eyebrow">Dashboard</span>
+            <h2>Linha recente</h2>
+            <p>Ultimos eventos do cartao com data, valor e contexto.</p>
+          </div>
+          <div class="chart-area chart-area--timeline" data-chart-timeline></div>
+        </article>
+      </section>
+
+      <section class="dashboard-card history-table-card history-table-card--separate" data-widget="table">
+        <div class="dashboard-card__head">
+          <span class="eyebrow">Extrato detalhado</span>
+          <h2>Historico completo do cartao</h2>
+          <p>Registro operacional organizado para conferencia do cliente.</p>
+        </div>
+
+        <div class="history-table">
+          <div class="history-table__head">
+            <span>Local</span>
+            <span>Tipo</span>
+            <span>Status</span>
+            <span>Valor</span>
+            <span>Data</span>
+          </div>
+          {% for row in movement_rows %}
+            <div class="history-table__row">
+              <strong>{{ row.location }}</strong>
+              <span>{{ row.type }}</span>
+              <span>{{ row.status }}</span>
+              <span>{{ row.amount_prefix }} R$ {{ row.amount }}</span>
+              <span>{{ row.created_at }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+
+    <script type="application/json" data-history-charts>{{ analytics_charts_json|safe }}</script>
+  </div>
+{% endblock %}

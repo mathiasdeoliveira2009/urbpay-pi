@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}UrbPay | Catraca Digital{% endblock %}
+
+{% block content %}
+  <main class="gate-shell">
+    <section class="gate-card">
+      <span class="eyebrow">Compra por QR Code</span>
+      <h1>Comprar passagem</h1>
+      <p>Ao confirmar, a simulacao da catraca recebe a autorizacao e o saldo do cartao e atualizado na hora.</p>
+
+      <div class="gate-user">
+        <img src="{{ url_for('static', path=profile_image) }}" alt="Foto do usuario" class="gate-user__avatar" />
+        <div>
+          <strong>{{ current_user.nome }}</strong>
+          <p>Cartao {{ card_number }}</p>
+          <p>Saldo atual R$ {{ current_balance }}</p>
+        </div>
+      </div>
+
+      <div class="gate-amount">
+        <span>Valor da passagem</span>
+        <strong>R$ {{ amount }}</strong>
+      </div>
+
+      <form action="/passagem/{{ token }}/confirmar" method="post" class="gate-form">
+        <button type="submit" class="primary-action gate-confirm">Comprar passagem</button>
+      </form>
+    </section>
+  </main>
+{% endblock %}
