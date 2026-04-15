@@ -1,0 +1,550 @@
+{% extends "base.html" %}
+
+{% block title %}UrbPay | Painel do Cliente{% endblock %}
+
+{% block content %}
+  <div class="dashboard-shell dashboard-shell--experience">
+    <header class="dashboard-topbar">
+      <div class="dashboard-brand">
+        <img src="{{ url_for('static', path='imgs/logo_urbpay.png') }}" alt="Logo UrbPay" class="brand-logo" />
+      </div>
+
+      <div class="dashboard-topbar__actions">
+        <a href="/dashboard/extrato" class="secondary-action" data-i18n="dashboard.historyLink">Historico e extrato</a>
+        {% include "_utility_toolbar.html" %}
+      </div>
+    </header>
+
+    <main class="dashboard-main dashboard-main--experience">
+      {% include "_status_modal.html" %}
+
+      <section class="qr-landing full-bleed">
+        <article class="qr-landing__media">
+          <video class="qr-landing__video" autoplay muted loop playsinline>
+            <source src="{{ url_for('static', path='imgs/ler-qrcode.mp4') }}" type="video/mp4" />
+          </video>
+          <div class="qr-landing__overlay">
+            <span>Validacao visual</span>
+            <strong>Leitura do QR Code em ambiente de embarque</strong>
+            <p>Fluxo exibido ao cliente como referencia de uso da passagem digital.</p>
+          </div>
+        </article>
+
+        <article class="dashboard-card qr-landing__content">
+          <div class="dashboard-card__head dashboard-card__head--split qr-reading-head">
+            <div>
+              <span class="eyebrow">Passagem digital</span>
+              <h1>Como funciona a leitura do QR Code</h1>
+              <p>O cliente gera uma passagem temporaria, apresenta o codigo para leitura e confirma o embarque com rastreabilidade da operacao.</p>
+            </div>
+
+            <details class="qr-help-card">
+              <summary>
+                <span class="qr-help-card__icon">?</span>
+                <span>Como funciona</span>
+              </summary>
+
+              <div class="qr-help-card__body">
+                <article>
+                  <strong>Quando a solicitacao aparece na catraca?</strong>
+                  <p>A tela da simulacao acompanha este mesmo token e muda o status assim que o QR for aberto.</p>
+                </article>
+                <article>
+                  <strong>O que acontece ao clicar em comprar?</strong>
+                  <p>A compra aprova a passagem, libera a catraca e o saldo do cartao ja e debitado no mesmo fluxo.</p>
+                </article>
+                <article>
+                  <strong>Se o tempo acabar?</strong>
+                  <p>O QR expira em poucos minutos e voce pode gerar um novo codigo pelo botao logo abaixo.</p>
+                </article>
+              </div>
+            </details>
+          </div>
+
+          <div class="qr-reading-grid">
+            <div class="qr-reading-grid__intro">
+                <div class="qr-reading-grid__stats">
+                  <div>
+                    <span>Passagem</span>
+                    <strong>R$ {{ passage_value }}</strong>
+                  </div>
+                  <div>
+                    <span>Saldo atual</span>
+                    <strong data-current-balance-display data-current-card-id="{{ current_card_id }}">R$ {{ current_balance }}</strong>
+                  </div>
+                  <div>
+                    <span>Validade</span>
+                    <strong data-countdown data-expires-at="{{ qr_expires_at }}">Carregando...</strong>
+                  </div>
+              </div>
+
+              <div class="qr-reading-grid__security">
+                <div class="security-pill">Token assinado</div>
+                <div class="security-pill">Expiracao em {{ qr_validity_minutes }} minutos</div>
+                <div class="security-pill">Uso unico por leitura</div>
+              </div>
+            </div>
+
+            <div class="qr-reading-grid__steps">
+              <div class="qr-step">
+                <span>01</span>
+                <div>
+                  <strong>Geracao segura</strong>
+                  <p>Ao clicar em gerar passagem, o sistema cria um token temporario associado ao usuario, cartao e valor da viagem.</p>
+                </div>
+              </div>
+              <div class="qr-step">
+                <span>02</span>
+                <div>
+                  <strong>Leitura operacional</strong>
+                  <p>O leitor reconhece o QR Code, abre a validacao e confere se o codigo ainda esta dentro da janela ativa.</p>
+                </div>
+              </div>
+              <div class="qr-step">
+                <span>03</span>
+                <div>
+                  <strong>Confirmacao e registro</strong>
+                  <p>Com saldo disponivel, a passagem e confirmada e a movimentacao passa a integrar o historico do cartao.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="qr-reading-actions">
+            <a href="{{ qr_url }}" class="qr-reading-actions__code" target="_blank" rel="noopener" aria-label="Abrir pagina do QR Code">
+              <img src="{{ qr_image_url }}" alt="QR Code UrbPay" class="qr-simulator__image" />
+            </a>
+
+            <div class="qr-reading-actions__cta">
+              <div class="qr-reading-actions__buttons">
+                <form action="/dashboard/qr/new" method="post">
+                  <button type="submit" class="primary-action">Gerar novo</button>
+                </form>
+                <a href="{{ qr_simulator_url }}" class="secondary-action" target="_blank" rel="noopener">Simulacao de catraca</a>
+              </div>
+              <p>O QR fica centralizado para leitura e tambem pode ser clicado para abrir a tela do passageiro neste navegador.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="identity-strip full-bleed">
+        <article class="dashboard-card my-cards-panel">
+          <div class="my-cards-layout">
+            <div class="my-cards-layout__cards">
+              <div class="my-cards-panel__head">
+                <div>
+                  <span class="eyebrow">Carteira digital</span>
+                </div>
+              </div>
+
+              <div class="my-cards-grid">
+                {% for item in my_cards %}
+                  <article class="my-card-tile official-card-showcase__card-field" data-card-kind="{{ item.service_key }}" data-card-id="{{ item.id }}">
+                    <img
+                      src="{{ url_for('static', path='imgs/1.png') }}"
+                      alt="Cartao UrbPay {{ item.display_name }}"
+                      class="my-card-tile__image"
+                    />
+                    <div class="my-card-tile__overlay">
+                      <div class="my-card-tile__body">
+                        <div class="my-card-tile__detail my-card-tile__detail--name">
+                          <span>Nome</span>
+                          <strong class="my-card-tile__name">{{ item.display_name }}</strong>
+                        </div>
+
+                        <div class="my-card-tile__detail my-card-tile__detail--balance">
+                          <span>Saldo</span>
+                          <strong class="my-card-tile__balance-value" data-card-balance-id="{{ item.id }}" data-balance-amount="{{ item.balance_value }}">{{ item.balance }} R$</strong>
+                        </div>
+
+                        <div class="my-card-tile__detail my-card-tile__detail--cvv">
+                          <span>CVV</span>
+                          <strong class="my-card-tile__cvv">{{ item.cvv }}</strong>
+                        </div>
+
+                        <div class="my-card-tile__detail my-card-tile__detail--date">
+                          <span>Data</span>
+                          <strong class="my-card-tile__validity">{{ item.validity }}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                {% else %}
+                  <article class="my-card-empty">
+                    <strong>Nenhum cartao vinculado</strong>
+                    <p>Quando houver mais de um cartao associado ao usuario, eles serao exibidos aqui automaticamente.</p>
+                  </article>
+                {% endfor %}
+              </div>
+            </div>
+
+            <aside class="my-cards-layout__services">
+              <div class="service-menu">
+                <div class="service-menu__cluster">
+                  <div class="service-menu__head">
+                    <div>
+                      <span class="eyebrow">Menu de servicos</span>
+                    </div>
+                  </div>
+
+                  <div class="service-menu__list">
+                    <button type="button" class="service-item service-item--action" data-service-trigger="credit-home">
+                      <div class="service-item__icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"></path>
+                          <path d="M3 9.5h18"></path>
+                          <path d="M7 14h4"></path>
+                          <path d="M16.5 13a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5Z"></path>
+                          <path d="M16.5 11.5v1"></path>
+                        </svg>
+                      </div>
+                      <strong>Compra de credito</strong>
+                    </button>
+
+                    <button type="button" class="service-item service-item--action" data-service-trigger="common">
+                      <div class="service-item__icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M5.5 4.5h13A1.5 1.5 0 0 1 20 6v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18V6a1.5 1.5 0 0 1 1.5-1.5Z"></path>
+                          <path d="M4 9h16"></path>
+                          <path d="M7 15h5"></path>
+                        </svg>
+                      </div>
+                      <strong>Comum</strong>
+                    </button>
+
+                    <button type="button" class="service-item service-item--action" data-service-trigger="student">
+                      <div class="service-item__icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 9.5L12 5l9 4.5L12 14L3 9.5Z"></path>
+                          <path d="M6.5 11.2v4.2L12 18l5.5-2.6v-4.2"></path>
+                          <path d="M21 9.5v4.7"></path>
+                        </svg>
+                      </div>
+                      <strong>Estudante</strong>
+                    </button>
+
+                    <button type="button" class="service-item service-item--action" data-service-trigger="teacher">
+                      <div class="service-item__icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M6 5.5h10a2 2 0 0 1 2 2v7H8a2 2 0 0 0-2 2V5.5Z"></path>
+                          <path d="M8 16.5a2 2 0 0 0-2-2H4.5V8A2.5 2.5 0 0 1 7 5.5"></path>
+                          <path d="M10.5 9h4.5"></path>
+                          <path d="M10.5 12h3.5"></path>
+                          <path d="M15.8 18.5l1.1-2.3 2.3-1.1-2.3-1.1-1.1-2.3-1.1 2.3-2.3 1.1 2.3 1.1 1.1 2.3Z"></path>
+                        </svg>
+                      </div>
+                      <strong>Professor</strong>
+                    </button>
+                  </div>
+
+                </div>
+
+                <section class="request-history">
+                  <div class="request-history__head">
+                    <span class="eyebrow">Menu de solicitacoes</span>
+                    <h3>Solicitacoes recentes</h3>
+                  </div>
+
+                  <div class="request-board">
+                    <div class="request-board__filters">
+                      <label class="request-board__search">
+                        <span class="sr-only">Buscar por protocolo ou servico</span>
+                        <input type="search" placeholder="Buscar por protocolo ou servico" />
+                      </label>
+
+                      <label class="request-board__status">
+                        <span class="sr-only">Filtrar por status</span>
+                        <select>
+                          <option>Em andamento</option>
+                          <option>Concluidas</option>
+                          <option>Todas</option>
+                        </select>
+                      </label>
+
+                      <button type="button" class="request-board__action" aria-label="Atualizar solicitacoes">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M20 12a8 8 0 1 1-2.34-5.66"></path>
+                          <path d="M20 4v6h-6"></path>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div class="request-board__table">
+                      <div class="request-board__head">
+                        <span>Protocolo</span>
+                        <span>Servico</span>
+                        <span>Status</span>
+                      </div>
+
+                      <article class="request-row">
+                        <div class="request-row__protocol">
+                          <span>8068074</span>
+                        </div>
+                        <div class="request-row__service">
+                          <strong>Bilhete Unico - Compra de Credito</strong>
+                          <p>Atualizado em 23/03/2026 09:33</p>
+                        </div>
+                        <div class="request-row__status">
+                          <span class="request-badge request-badge--pending">Aguardando revisao de pedido</span>
+                        </div>
+                      </article>
+
+                      <article class="request-row">
+                        <div class="request-row__protocol">
+                          <span>8068052</span>
+                        </div>
+                        <div class="request-row__service">
+                          <strong>Bilhete Unico - Compra de Credito</strong>
+                          <p>Atualizado em 23/03/2026 09:32</p>
+                        </div>
+                        <div class="request-row__status">
+                          <span class="request-badge request-badge--pending">Aguardando revisao de pedido</span>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+                </section>
+
+                <div class="service-flow" data-service-flow hidden>
+                  <section class="service-flow__panel" data-service-panel="credit-home" hidden>
+                    <div class="service-flow__crumbs">
+                      <span>Inicio</span>
+                      <span>Servicos</span>
+                    </div>
+                    <div class="service-flow__head">
+                      <h4>Compra de credito</h4>
+                      <p>Gerencie suas solicitacoes e servicos relacionados ao compra de credito.</p>
+                    </div>
+                    <button type="button" class="service-option-card" data-service-trigger="credit-choose">
+                      <div class="service-option-card__icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"></path>
+                          <path d="M3 9.5h18"></path>
+                          <path d="M7 14h4"></path>
+                          <path d="M16.5 13a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5Z"></path>
+                          <path d="M16.5 11.5v1"></path>
+                        </svg>
+                      </div>
+                      <strong>Bilhete unico - compra de credito</strong>
+                    </button>
+                  </section>
+
+                  <section class="service-flow__panel" data-service-panel="credit-choose" hidden>
+                    <div class="service-flow__crumbs">
+                      <span>Inicio</span>
+                      <span>Escolher bilhete</span>
+                    </div>
+                    <div class="service-flow__chooser">
+                      <div class="service-flow__head">
+                        <h4>Escolher cartao</h4>
+                        <p>Selecione um dos cartoes ja vinculados ao seu perfil para comprar creditos.</p>
+                      </div>
+
+                      <div class="service-card-grid">
+                        {% for item in my_cards %}
+                          <button
+                            type="button"
+                            class="service-mini-card service-mini-card--selectable"
+                            data-card-kind="{{ item.service_key }}"
+                            data-credit-card
+                            data-credit-card-id="{{ item.id }}"
+                            data-credit-card-name="{{ item.display_name }}"
+                            data-credit-card-number="{{ item.card_number_masked }}"
+                            data-credit-card-label="{{ item.badge }}"
+                            data-credit-card-balance="{{ item.balance_value }}"
+                          >
+                            <span>{{ item.badge }}</span>
+                            <strong>{{ item.card_number_masked }}</strong>
+                            <p>{{ item.display_name }}</p>
+                          </button>
+                        {% else %}
+                          <article class="service-mini-card service-mini-card--empty">
+                            <span>Nenhum cartao</span>
+                            <strong>Cadastre um cartao para recarga</strong>
+                          </article>
+                        {% endfor %}
+                      </div>
+
+                      <div class="service-flow__actions">
+                        <button type="button" class="service-back-button" data-service-trigger="credit-home">Voltar</button>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="service-flow__panel" data-service-panel="credit-type" hidden>
+                    <div class="service-flow__crumbs">
+                      <span>Inicio</span>
+                      <span>Escolher bilhete</span>
+                      <span>Tipo de credito</span>
+                    </div>
+                    <div class="service-flow__head">
+                      <h4>Selecione o tipo de credito</h4>
+                      <p>Escolha a modalidade da recarga para o cartao selecionado.</p>
+                    </div>
+
+                    <div class="recharge-overview">
+                      <article class="recharge-overview__item">
+                        <span>Cartao selecionado</span>
+                        <strong data-credit-selected-card-name>--</strong>
+                        <p data-credit-selected-card-number>--</p>
+                      </article>
+                    </div>
+
+                    <div class="service-selection-grid">
+                      <button type="button" class="service-choice-card" data-credit-type="Comum">
+                        <div class="service-choice-card__icon" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5.5 4.5h13A1.5 1.5 0 0 1 20 6v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18V6a1.5 1.5 0 0 1 1.5-1.5Z"></path>
+                            <path d="M4 9h16"></path>
+                            <path d="M7 15h5"></path>
+                          </svg>
+                        </div>
+                        <div class="service-choice-card__copy">
+                          <strong>Comum</strong>
+                          <p>Recarga de credito tradicional com escolha livre de valor e pagamento via Pix.</p>
+                        </div>
+                      </button>
+
+                      <button type="button" class="service-choice-card" data-credit-type="Estudante">
+                        <div class="service-choice-card__icon" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9.5L12 5l9 4.5L12 14L3 9.5Z"></path>
+                            <path d="M6.5 11.2v4.2L12 18l5.5-2.6v-4.2"></path>
+                            <path d="M21 9.5v4.7"></path>
+                          </svg>
+                        </div>
+                        <div class="service-choice-card__copy">
+                          <strong>Estudante</strong>
+                          <p>Segue a mesma mecanica de recarga, com os mesmos valores e confirmacao em Pix.</p>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div class="service-flow__actions">
+                      <button type="button" class="service-back-button" data-service-trigger="credit-choose">Voltar</button>
+                    </div>
+                  </section>
+
+                  <section class="service-flow__panel" data-service-panel="credit-amount" hidden>
+                    <div class="service-flow__crumbs">
+                      <span>Inicio</span>
+                      <span>Escolher bilhete</span>
+                      <span>Tipo de credito</span>
+                      <span>Valor</span>
+                    </div>
+                    <div class="service-flow__head">
+                      <h4>Escolha o valor da recarga</h4>
+                      <p>Selecione um valor rapido ou informe outro valor para seguir com o Pix.</p>
+                    </div>
+
+                    <div class="recharge-overview recharge-overview--double">
+                      <article class="recharge-overview__item">
+                        <span>Cartao</span>
+                        <strong data-credit-selected-card-name>--</strong>
+                        <p data-credit-selected-card-number>--</p>
+                      </article>
+                      <article class="recharge-overview__item">
+                        <span>Tipo escolhido</span>
+                        <strong data-credit-selected-credit-type>--</strong>
+                        <p>Pagamento por Pix</p>
+                      </article>
+                    </div>
+
+                    <div class="amount-grid">
+                      <button type="button" class="amount-chip" data-credit-amount="10">R$ 10,00</button>
+                      <button type="button" class="amount-chip" data-credit-amount="15">R$ 15,00</button>
+                      <button type="button" class="amount-chip" data-credit-amount="20">R$ 20,00</button>
+                      <button type="button" class="amount-chip" data-credit-amount="30">R$ 30,00</button>
+                      <button type="button" class="amount-chip" data-credit-amount="50">R$ 50,00</button>
+                      <button type="button" class="amount-chip" data-credit-amount="75">R$ 75,00</button>
+                      <button type="button" class="amount-chip" data-credit-amount="100">R$ 100,00</button>
+                      <button type="button" class="amount-chip" data-credit-amount="150">R$ 150,00</button>
+                    </div>
+
+                    <div class="custom-amount-card">
+                      <label for="credit-custom-amount">Ou recarregue outro valor</label>
+                      <div class="custom-amount-card__controls">
+                        <span class="custom-amount-card__currency">R$</span>
+                        <input id="credit-custom-amount" type="text" inputmode="decimal" placeholder="0,00" data-credit-custom-input />
+                        <button type="button" class="secondary-action" data-credit-custom-confirm>Usar este valor</button>
+                      </div>
+                      <p>Depois da selecao, a proxima etapa abre a confirmacao via Pix.</p>
+                    </div>
+
+                    <div class="service-flow__actions">
+                      <button type="button" class="service-back-button" data-service-trigger="credit-type">Voltar</button>
+                      <button type="button" class="primary-action" data-credit-go-pix disabled>Continuar no Pix</button>
+                    </div>
+                  </section>
+
+                  <section class="service-flow__panel" data-service-panel="credit-pix" hidden>
+                    <div class="service-flow__crumbs">
+                      <span>Inicio</span>
+                      <span>Escolher bilhete</span>
+                      <span>Tipo de credito</span>
+                      <span>Pix</span>
+                    </div>
+                    <div class="service-flow__head">
+                      <h4>Pague com Pix</h4>
+                      <p>Revise os dados da recarga e avance para a confirmacao visual do pagamento.</p>
+                    </div>
+
+                    <div class="payment-alert">
+                      <strong>Atencao</strong>
+                      <p>Esta etapa esta pronta no visual, mas o botao final ainda nao processa o pagamento de verdade.</p>
+                    </div>
+
+                    <div class="payment-layout">
+                      <article class="payment-method-card">
+                        <div class="payment-method-card__icon" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8.5 5.5 12 9l3.5-3.5"></path>
+                            <path d="M8.5 18.5 12 15l3.5 3.5"></path>
+                            <path d="M5.5 8.5 9 12l-3.5 3.5"></path>
+                            <path d="M18.5 8.5 15 12l3.5 3.5"></path>
+                            <rect x="4.5" y="4.5" width="15" height="15" rx="4"></rect>
+                          </svg>
+                        </div>
+                        <div class="payment-method-card__copy">
+                          <span>Forma de pagamento</span>
+                          <strong>Pix</strong>
+                          <p>Pagamento instantaneo para a recarga escolhida neste cartao.</p>
+                        </div>
+                      </article>
+
+                      <article class="payment-summary-card">
+                        <span class="payment-summary-card__eyebrow">Resumo da recarga</span>
+                        <div class="payment-summary-card__row">
+                          <span>Cartao</span>
+                          <strong data-credit-selected-card-name>--</strong>
+                        </div>
+                        <div class="payment-summary-card__row">
+                          <span>Numero</span>
+                          <strong data-credit-selected-card-number>--</strong>
+                        </div>
+                        <div class="payment-summary-card__row">
+                          <span>Tipo</span>
+                          <strong data-credit-selected-credit-type>--</strong>
+                        </div>
+                        <div class="payment-summary-card__row">
+                          <span>Valor</span>
+                          <strong data-credit-selected-amount>R$ 0,00</strong>
+                        </div>
+
+                        <button type="button" class="primary-action primary-action--full" data-credit-confirm>Confirmar</button>
+                        <button type="button" class="service-back-button" data-service-trigger="credit-amount">Voltar</button>
+                      </article>
+                    </div>
+                  </section>
+
+                </div>
+              </div>
+            </aside>
+          </div>
+        </article>
+      </section>
+
+    </main>
+  </div>
+{% endblock %}

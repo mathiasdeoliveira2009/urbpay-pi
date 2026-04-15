@@ -1,0 +1,17 @@
+{% if status_message %}
+  <div class="status-floating is-open" data-status-modal aria-hidden="false">
+    <div class="status-floating__surface status-card status-card--{{ status_kind or 'info' }}" role="dialog" aria-live="polite" aria-modal="false">
+      <div class="status-floating__head">
+        <strong>
+          {% if status_kind == 'error' %}
+            Aviso
+          {% else %}
+            Atualizacao
+          {% endif %}
+        </strong>
+        <button type="button" class="status-floating__close" data-status-close aria-label="Fechar aviso">Fechar</button>
+      </div>
+      <p>{{ status_message }}</p>
+    </div>
+  </div>
+{% endif %}

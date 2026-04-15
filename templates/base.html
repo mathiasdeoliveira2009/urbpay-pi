@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem("urbpay-theme") || "light";
+        var language = localStorage.getItem("urbpay-language") || "pt-BR";
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.lang = language;
+      } catch (error) {
+        document.documentElement.dataset.theme = "light";
+        document.documentElement.lang = "pt-BR";
+      }
+    })();
+  </script>
+  <title>{% block title %}UrbPay | Portal do Estudante{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=20260415-7" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+  {% block content %}{% endblock %}
+  <script src="{{ url_for('static', path='js/app.js') }}?v=20260415-7" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
