@@ -1,28 +1,286 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UrbPay</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}UrbPay | Portal de Acesso{% endblock %}
+
+{% block content %}
   <div class="page-shell">
-    <header class="topbar">
-      <nav class="menu" aria-label="Menu principal">
-        <a href="#" class="menu-link active">Inicio</a>
-        <a href="#" class="menu-link">Sobre</a>
-        <a href="#" class="menu-link">Preços</a>
-        <a href="#" class="menu-link">Suporte</a>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <div class="grid-glow"></div>
+
+    <div class="signup-modal{% if open_signup_modal %} is-open{% endif %}" data-signup-modal aria-hidden="{% if open_signup_modal %}false{% else %}true{% endif %}">
+      <div class="signup-modal__backdrop" data-signup-close></div>
+      <div class="signup-modal__surface">
+        <button type="button" class="signup-modal__close" data-signup-close aria-label="Fechar cadastro">Fechar</button>
+        <div class="signup-modal__copy">
+          <span class="eyebrow">Criar conta</span>
+          <h2>Cadastre-se na UrbPay</h2>
+          <p>Preencha seus dados, envie uma foto e deixe seu cartao digital pronto para acesso.</p>
+        </div>
+
+        <form class="signup-form" action="/signup" method="post" enctype="multipart/form-data">
+          <label>
+            <span>Nome completo</span>
+            <input type="text" name="nome" placeholder="Seu nome completo" required />
+          </label>
+          <label>
+            <span>CPF</span>
+            <input type="text" name="cpf" placeholder="000.000.000-00" required />
+          </label>
+          <label>
+            <span>E-mail</span>
+            <input type="email" name="email" placeholder="voce@email.com" required />
+          </label>
+          <label>
+            <span>Data de nascimento</span>
+            <input type="date" name="data_nascimento" required />
+          </label>
+          <label>
+            <span>Telefone</span>
+            <input type="text" name="telefone" placeholder="11999999999" />
+          </label>
+          <label>
+            <span>Endereco</span>
+            <input type="text" name="endereco" placeholder="Rua, numero e bairro" />
+          </label>
+          <label>
+            <span>Senha</span>
+            <input type="password" name="senha" placeholder="Crie uma senha" minlength="6" required />
+          </label>
+          <label class="file-field">
+            <span>Foto de perfil</span>
+            <input type="file" name="foto_perfil" accept=".jpg,.jpeg,.png,.webp" />
+          </label>
+          <button type="submit" class="login-submit">Cadastrar</button>
+        </form>
+      </div>
+    </div>
+
+    <header class="topbar" id="inicio">
+      <a href="#inicio" class="brand-block" aria-label="UrbPay">
+        <img src="{{ url_for('static', path='imgs/logo_urbpay.png') }}" alt="Logo UrbPay" class="brand-logo" />
+      </a>
+
+      <nav class="site-menu" aria-label="Menu principal">
+        <a href="#inicio" class="site-menu__link" data-i18n="landing.navHome">Inicio</a>
+        <a href="#acesso" class="site-menu__link" data-i18n="landing.navLogin">Login</a>
+        <a href="#como-funciona" class="site-menu__link" data-i18n="landing.navHowItWorks">Como funciona</a>
+        <a href="#tipos" class="site-menu__link" data-i18n="landing.navServices">Servicos</a>
+        {% if current_user %}
+          <a href="#perfil" class="site-menu__link" data-i18n="landing.navProfile">Meu perfil</a>
+        {% endif %}
+      </nav>
+
+      <nav class="topbar-nav" aria-label="Acoes">
+        {% if current_user %}
+          {% include "_utility_toolbar.html" %}
+        {% else %}
+          {% include "_utility_toolbar.html" %}
+          <button type="button" class="nav-pill" data-signup-open data-i18n="landing.signupButton">Cadastrar</button>
+        {% endif %}
       </nav>
     </header>
 
-    <main class="blank-stage" aria-label="Area principal vazia">
-      <div class="blank-panel"></div>
+    <main class="main-landing">
+      {% include "_status_modal.html" %}
+
+      <section class="hero-banner reveal" data-reveal>
+        <div class="hero-copy">
+          <span class="eyebrow">Portal URBPAY</span>
+          <h1>Cadastro, login e cartao digital conectados ao seu banco.</h1>
+          <p class="hero-text">
+            Agora o portal pode registrar usuarios de verdade, salvar acesso por CPF e gerar um cartao visual
+            com a foto de perfil enviada no cadastro.
+          </p>
+
+          <div class="hero-actions">
+            {% if current_user %}
+              <a href="#perfil" class="primary-action">Ver meu perfil</a>
+              <form action="/logout" method="post" class="inline-form">
+                <button type="submit" class="secondary-action">Encerrar sessao</button>
+              </form>
+            {% else %}
+              <a href="#acesso" class="primary-action">Entrar</a>
+              <button type="button" class="secondary-action" data-signup-open>Criar conta</button>
+            {% endif %}
+          </div>
+
+          <div class="hero-points">
+            <span>Cadastro salvo no MySQL</span>
+            <span>Foto de perfil</span>
+            <span>Cartao simulado por usuario</span>
+          </div>
+        </div>
+
+        <div class="hero-showcase">
+          <div class="city-visual">
+            <img src="{{ url_for('static', path='imgs/urbpay-urbanizacao.webp') }}" alt="Vista urbana para ambientacao da plataforma UrbPay" />
+            <div class="traffic-lanes" aria-hidden="true">
+              <span class="traffic-lane lane-one"></span>
+              <span class="traffic-lane gold lane-two"></span>
+              <span class="traffic-lane teal lane-three"></span>
+            </div>
+          </div>
+
+          <article class="glass-stat floating-card card-a">
+            <span class="eyebrow small">Dados persistidos</span>
+            <strong>Conta conectada</strong>
+            <p>Cadastro, login e cartao agora podem ficar associados ao usuario salvo no banco.</p>
+          </article>
+
+          <article class="login-card magnetic" id="acesso" data-magnetic>
+            <div class="login-card__head">
+              <span class="eyebrow small">Entrar na plataforma</span>
+              <h2>Area de acesso</h2>
+              <p>Use seu CPF e senha para entrar no portal e recuperar seu perfil.</p>
+            </div>
+
+            <form class="login-form" action="/login" method="post">
+              <label>
+                <span>CPF</span>
+                <input type="text" name="cpf" placeholder="000.000.000-00" required />
+              </label>
+              <label>
+                <span>Senha</span>
+                <input type="password" name="senha" placeholder="Digite sua senha" required />
+              </label>
+              <button type="submit" class="login-submit">Entrar agora</button>
+            </form>
+
+            <div class="login-meta">
+              <span>Recarga</span>
+              <span>2a via</span>
+              <span>Perfil salvo</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="feature-strip reveal" data-reveal>
+        <article class="feature-card">
+          <span class="eyebrow small">Recarga</span>
+          <strong>Pagamento agil</strong>
+          <p>Fluxos mais curtos, acesso autenticado e base pronta para registrar operacoes reais.</p>
+        </article>
+
+        <article class="feature-card">
+          <span class="eyebrow small">Atendimento</span>
+          <strong>Conta personalizada</strong>
+          <p>O usuario entra com CPF, visualiza o proprio perfil e ja encontra o cartao vinculado.</p>
+        </article>
+
+        <article class="feature-card qr-feature">
+          <span class="eyebrow small">Mobilidade</span>
+          <div class="qr-box" aria-label="QR code ilustrativo">
+            {% for row in qr_pattern %}
+              {% for cell in row %}
+                <span class="qr-pixel{% if cell %} filled{% endif %}"></span>
+              {% endfor %}
+            {% endfor %}
+          </div>
+          <p>Uma plataforma pensada para cidade, circulacao, identidade visual e acesso digital.</p>
+        </article>
+      </section>
+
+      {% if current_user %}
+        <section class="profile-section reveal" id="perfil" data-reveal>
+          <div class="section-head">
+            <span class="eyebrow">Perfil do usuario</span>
+            <h2>Seu cadastro e seu cartao digital agora ficam salvos no banco.</h2>
+          </div>
+
+          <div class="profile-grid">
+            <article class="profile-panel">
+              <div class="profile-panel__header">
+                <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil de {{ current_user.nome }}" class="profile-avatar" />
+                <div>
+                  <h3>{{ current_user.nome }}</h3>
+                  <p>{{ current_user.email }}</p>
+                </div>
+              </div>
+
+              <dl class="profile-details">
+                <div>
+                  <dt>CPF</dt>
+                  <dd>{{ current_user.cpf }}</dd>
+                </div>
+                <div>
+                  <dt>Telefone</dt>
+                  <dd>{{ current_user.telefone or 'Nao informado' }}</dd>
+                </div>
+                <div>
+                  <dt>Endereco</dt>
+                  <dd>{{ current_user.endereco or 'Nao informado' }}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{{ current_user.status }}</dd>
+                </div>
+              </dl>
+            </article>
+
+            <article class="user-card-preview magnetic" data-magnetic>
+              <span class="user-card-preview__brand">URBPAY PASS</span>
+              <div class="user-card-preview__body">
+                <div>
+                  <p class="user-card-preview__label">Cartao virtual</p>
+                  <strong>{{ current_user.nome }}</strong>
+                  <p class="user-card-preview__number">{{ formatted_card_number }}</p>
+                </div>
+                <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil no cartao" class="user-card-preview__photo" />
+              </div>
+              <div class="user-card-preview__footer">
+                <span>Validade {{ card_preview.data_validade.strftime('%m/%Y') if card_preview else '--/----' }}</span>
+                <span>CVV {{ card_preview.cvv if card_preview else '---' }}</span>
+                <span>Saldo R$ {{ '%.2f'|format(card_preview.saldo) if card_preview else '0.00' }}</span>
+              </div>
+            </article>
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="section-block reveal" id="como-funciona" data-reveal>
+        <div class="section-head section-head-centered">
+          <span class="eyebrow">Como funciona</span>
+          <h2>Entrar, salvar, carregar perfil e continuar sem perder os dados.</h2>
+        </div>
+
+        <div class="steps-grid steps-grid-wide">
+          {% for step in how_it_works %}
+            <article class="step-card">
+              <span class="step-number">0{{ loop.index }}</span>
+              <div class="step-copy">
+                <h3>{{ step.title }}</h3>
+                <p>{{ step.description }}</p>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section-block reveal" id="tipos" data-reveal>
+        <div class="section-head">
+          <span class="eyebrow">Servicos UrbPay</span>
+          <h2>Uma experiencia digital para transporte, emissao e operacao urbana.</h2>
+        </div>
+
+        <div class="cards-grid">
+          {% for card in card_types %}
+            <article class="product-card magnetic" data-magnetic>
+              <img
+                src="{{ url_for('static', path=card.image) }}"
+                alt="{{ card.title }}"
+                class="product-image"
+              />
+              <div class="product-copy">
+                <span class="eyebrow small">UrbPay</span>
+                <h3>{{ card.title }}</h3>
+                <p>{{ card.description }}</p>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
     </main>
   </div>
-</body>
-</html>
+{% endblock %}

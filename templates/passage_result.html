@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}UrbPay | Resultado da Passagem{% endblock %}
+
+{% block content %}
+  <main class="gate-shell">
+    <section class="gate-card gate-card--result">
+      <div class="status-card status-card--{{ status_kind }}">
+        {{ status_message }}
+      </div>
+
+      <div class="gate-user">
+        <img src="{{ url_for('static', path=profile_image) }}" alt="Foto do usuario" class="gate-user__avatar" />
+        <div>
+          <strong>{{ current_user.nome }}</strong>
+          <p>Valor debitado R$ {{ amount }}</p>
+          <p>Saldo restante R$ {{ current_balance }}</p>
+        </div>
+      </div>
+
+      <h1 class="gate-result-title">
+        {% if status_kind == 'success' %}
+          PAGAMENTO EFETUADO, PASSAGEM LIBERADA!
+        {% else %}
+          PASSAGEM NAO AUTORIZADA
+        {% endif %}
+      </h1>
+    </section>
+  </main>
+{% endblock %}
