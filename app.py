@@ -1,6 +1,8 @@
 import hashlib
 import json
+import os
 import secrets
+import socket
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -1144,7 +1146,19 @@ def db_check(db: Session = Depends(get_db)) -> dict:
     return {"ok": True}
 
 
+def get_local_ip() -> str:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect(("8.8.8.8", 80))
+            return sock.getsockname()[0]
+    except OSError:
+        return "127.0.0.1"
+
+
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app:app", host="10.32.46.32", port=8000, reload=True)
+    host = os.getenv("UVICORN_HOST", get_local_ip())
+    port = int(os.getenv("UVICORN_PORT", "8000"))
+
+    uvicorn.run("app:app", host=host, port=port, reload=True)
