@@ -23,12 +23,15 @@ def _require_env(name: str, value: str | None) -> str:
 MYSQL_USER = _require_env("MYSQL_USER", MYSQL_USER)
 MYSQL_DB = _require_env("MYSQL_DB", MYSQL_DB)
 safe_password = quote_plus(MYSQL_PASSWORD or "")
-DATABASE_URL = (
+MYSQL_DATABASE_URL = (
     f"mysql+pymysql://{MYSQL_USER}:{safe_password}"
     f"@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
 )
+# Render may inject DATABASE_URL for a PostgreSQL test database. The main app
+# intentionally keeps using MySQL through MYSQL_* variables.
+POSTGRES_TEST_DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(MYSQL_DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

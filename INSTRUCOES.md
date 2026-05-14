@@ -63,5 +63,7 @@ Se estiver tudo certo, a resposta sera:
 
 ## Observacoes
 
-- O projeto usa apenas um banco configurado via `.env`.
+- O banco principal da aplicacao e o MySQL configurado por `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD` e `MYSQL_DB`.
+- No Render, `DATABASE_URL` pode existir por causa do Postgres de teste, mas a aplicacao nao usa essa variavel como banco principal.
 - O schema principal esperado e `urbpay`.
+- Em deploy no Render com `python app.py`, a aplicacao usa automaticamente a porta `PORT`; se ela nao existir, usa `10000`.

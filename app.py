@@ -34,13 +34,6 @@ UPLOADS_DIR = BASE_DIR / "static" / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_SUPPORT_EMAIL_RECIPIENT = "mathiasdeoliveira2009@gmail.com"
 
-import os
-from sqlalchemy import create_engine
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-engine = create_engine(DATABASE_URL)
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     ensure_database_schema()
@@ -1658,7 +1651,14 @@ def get_local_ip() -> str:
 if __name__ == "__main__":
     import uvicorn
 
-    host = os.getenv("UVICORN_HOST", get_local_ip())
-    port = int(os.getenv("UVICORN_PORT", "8000"))
+    render_port = os.getenv("PORT")
+    is_render = os.getenv("RENDER", "").strip().lower() == "true"
+    host = os.getenv("UVICORN_HOST") or ("0.0.0.0" if render_port or is_render else get_local_ip())
+    port = int(render_port or os.getenv("UVICORN_PORT", "10000" if is_render else "8000"))
+    reload = os.getenv("UVICORN_RELOAD", "false" if render_port or is_render else "true").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }
 
-    uvicorn.run("app:app", host=host, port=port, reload=True)
+    uvicorn.run("app:app", host=host, port=port, reload=reload)
