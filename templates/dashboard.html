@@ -189,7 +189,7 @@
                   </div>
 
                   <div class="service-menu__list">
-                    <button type="button" class="service-item service-item--action" data-service-trigger="credit-home">
+                    <button type="button" class="service-item service-item--action" data-service-trigger="credit-home" data-service-button>
                       <div class="service-item__icon">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"></path>
@@ -202,7 +202,7 @@
                       <strong>Compra de credito</strong>
                     </button>
 
-                    <button type="button" class="service-item service-item--action" data-service-trigger="common">
+                    <button type="button" class="service-item service-item--action" data-service-trigger="common" data-service-button>
                       <div class="service-item__icon">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M5.5 4.5h13A1.5 1.5 0 0 1 20 6v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18V6a1.5 1.5 0 0 1 1.5-1.5Z"></path>
@@ -213,7 +213,7 @@
                       <strong>Comum</strong>
                     </button>
 
-                    <button type="button" class="service-item service-item--action" data-service-trigger="student">
+                    <button type="button" class="service-item service-item--action" data-service-trigger="student" data-service-button>
                       <div class="service-item__icon">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 9.5L12 5l9 4.5L12 14L3 9.5Z"></path>
@@ -224,7 +224,7 @@
                       <strong>Estudante</strong>
                     </button>
 
-                    <button type="button" class="service-item service-item--action" data-service-trigger="teacher">
+                    <button type="button" class="service-item service-item--action" data-service-trigger="teacher" data-service-button>
                       <div class="service-item__icon">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M6 5.5h10a2 2 0 0 1 2 2v7H8a2 2 0 0 0-2 2V5.5Z"></path>
@@ -246,23 +246,24 @@
                     <h3>Solicitacoes recentes</h3>
                   </div>
 
-                  <div class="request-board">
+                  {% set initial_request_items = request_items | selectattr("status_group", "equalto", "in_progress") | list %}
+                  <div class="request-board" data-request-board data-request-endpoint="/dashboard/requests">
                     <div class="request-board__filters">
                       <label class="request-board__search">
                         <span class="sr-only">Buscar por protocolo ou servico</span>
-                        <input type="search" placeholder="Buscar por protocolo ou servico" />
+                        <input type="search" placeholder="Buscar por protocolo ou servico" data-request-search />
                       </label>
 
                       <label class="request-board__status">
                         <span class="sr-only">Filtrar por status</span>
-                        <select>
-                          <option>Em andamento</option>
-                          <option>Concluidas</option>
-                          <option>Todas</option>
+                        <select data-request-status>
+                          <option value="in_progress" selected>Em andamento</option>
+                          <option value="completed">Concluidas</option>
+                          <option value="all">Todas</option>
                         </select>
                       </label>
 
-                      <button type="button" class="request-board__action" aria-label="Atualizar solicitacoes">
+                      <button type="button" class="request-board__action" aria-label="Atualizar solicitacoes" data-request-refresh>
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M20 12a8 8 0 1 1-2.34-5.66"></path>
                           <path d="M20 4v6h-6"></path>
@@ -277,36 +278,173 @@
                         <span>Status</span>
                       </div>
 
-                      <article class="request-row">
-                        <div class="request-row__protocol">
-                          <span>8068074</span>
-                        </div>
-                        <div class="request-row__service">
-                          <strong>Bilhete Unico - Compra de Credito</strong>
-                          <p>Atualizado em 23/03/2026 09:33</p>
-                        </div>
-                        <div class="request-row__status">
-                          <span class="request-badge request-badge--pending">Aguardando revisao de pedido</span>
-                        </div>
-                      </article>
-
-                      <article class="request-row">
-                        <div class="request-row__protocol">
-                          <span>8068052</span>
-                        </div>
-                        <div class="request-row__service">
-                          <strong>Bilhete Unico - Compra de Credito</strong>
-                          <p>Atualizado em 23/03/2026 09:32</p>
-                        </div>
-                        <div class="request-row__status">
-                          <span class="request-badge request-badge--pending">Aguardando revisao de pedido</span>
-                        </div>
-                      </article>
+                      <div class="request-board__body" data-request-body>
+                        {% for item in initial_request_items %}
+                          <article class="request-row">
+                            <div class="request-row__protocol">
+                              <span>{{ item.protocol }}</span>
+                            </div>
+                            <div class="request-row__service">
+                              <strong>{{ item.service }}</strong>
+                              <p>Atualizado em {{ item.updated_at_display }}</p>
+                            </div>
+                            <div class="request-row__status">
+                              <span class="request-badge request-badge--{{ item.appearance }}">{{ item.status_text }}</span>
+                            </div>
+                          </article>
+                        {% else %}
+                          <div class="request-board__empty">Nenhuma solicitacao encontrada com esse filtro.</div>
+                        {% endfor %}
+                      </div>
                     </div>
+                    <p class="request-board__feedback" data-request-feedback>Mostrando solicitacoes em andamento.</p>
+                    <script type="application/json" data-request-items>{{ request_items | tojson }}</script>
                   </div>
                 </section>
 
                 <div class="service-flow" data-service-flow hidden>
+                  {% set initial_common_case = common_support_cases[0] if common_support_cases else None %}
+
+                  <section class="service-flow__panel service-flow__panel--common" data-service-panel="common" hidden>
+                    <div class="service-flow__crumbs">
+                      <span>Inicio</span>
+                      <span>Comum</span>
+                      <span>Central de suporte</span>
+                    </div>
+
+                    <div class="service-flow__head service-flow__head--common">
+                      <div>
+                        <h4>Atendimento do bilhete comum</h4>
+                        <p>Escolha um assunto abaixo para abrir um atendimento visual, todo em verde, no mesmo padrao da sua referencia.</p>
+                      </div>
+
+                      <div class="common-support-online">
+                        <span class="common-support-online__dot"></span>
+                        <div>
+                          <strong>Suporte simulado online</strong>
+                          <p>Um analista acompanha o protocolo assim que voce escolhe a solicitacao.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="common-support-grid">
+                      {% for item in common_support_cases %}
+                        <button
+                          type="button"
+                          class="common-support-card"
+                          data-common-support-card
+                          data-common-support-id="{{ item.id }}"
+                          aria-pressed="false"
+                        >
+                          <div class="common-support-card__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M5.5 4.5h13A1.5 1.5 0 0 1 20 6v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18V6a1.5 1.5 0 0 1 1.5-1.5Z"></path>
+                              <path d="M4 9h16"></path>
+                              <path d="M7 15h5"></path>
+                            </svg>
+                          </div>
+                          <strong>{{ item.title }}</strong>
+                          <p>{{ item.description }}</p>
+                          <div class="common-support-card__meta">
+                            <span class="common-support-card__badge">{{ item.status }}</span>
+                            <span>{{ item.response_time }}</span>
+                          </div>
+                        </button>
+                      {% endfor %}
+                    </div>
+
+                    <div class="common-support-placeholder" data-common-support-placeholder>
+                      <strong>Selecione uma opcao acima</strong>
+                      <p data-common-support-placeholder-text>O suporte guiado aparece somente quando voce clicar em um dos cards de atendimento.</p>
+                    </div>
+
+                    <section class="common-support-console" data-common-support-root data-common-support-endpoint="/dashboard/support/common/email" hidden>
+                      <div class="common-support-console__toolbar">
+                        <span class="eyebrow">Suporte guiado</span>
+                        <button type="button" class="common-support-console__toggle" data-common-support-toggle>Minimizar</button>
+                      </div>
+
+                      <div class="common-support-console__summary">
+                        <div class="common-support-console__copy">
+                          <h5 data-common-support-title>{{ initial_common_case.title if initial_common_case else "Atendimento do bilhete comum" }}</h5>
+                          <p data-common-support-description>{{ initial_common_case.description if initial_common_case else "Selecione um assunto para abrir o suporte simulado." }}</p>
+                        </div>
+
+                        <div class="common-support-console__stats">
+                          <article class="common-support-stat">
+                            <span>Protocolo</span>
+                            <strong data-common-support-protocol>{{ initial_common_case.protocol if initial_common_case else "--" }}</strong>
+                          </article>
+                          <article class="common-support-stat">
+                            <span>Status</span>
+                            <strong data-common-support-status>{{ initial_common_case.status if initial_common_case else "--" }}</strong>
+                          </article>
+                          <article class="common-support-stat">
+                            <span>Fila</span>
+                            <strong data-common-support-queue>{{ initial_common_case.queue if initial_common_case else "--" }}</strong>
+                          </article>
+                          <article class="common-support-stat">
+                            <span>Retorno</span>
+                            <strong data-common-support-response-time>{{ initial_common_case.response_time if initial_common_case else "--" }}</strong>
+                          </article>
+                        </div>
+                      </div>
+
+                      <div class="common-support-console__body">
+                        <div class="common-support-steps" data-common-support-steps>
+                          {% if initial_common_case %}
+                            {% for step in initial_common_case.steps %}
+                              <article class="common-support-step">
+                                <span>0{{ loop.index }}</span>
+                                <p>{{ step }}</p>
+                              </article>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+
+                        <div class="common-support-chat">
+                          <div class="common-support-chat__head">
+                            <div class="common-support-chat__agent">
+                              <span class="common-support-chat__avatar">SU</span>
+                              <div>
+                                <strong data-common-support-agent-name>{{ initial_common_case.agent_name if initial_common_case else "Suporte UrbPay" }}</strong>
+                                <p data-common-support-agent-role>{{ initial_common_case.agent_role if initial_common_case else "Atendimento digital" }}</p>
+                              </div>
+                            </div>
+
+                            <span class="common-support-chat__availability">Online</span>
+                          </div>
+
+                          <div class="common-support-chat__messages" data-common-support-messages>
+                            {% if initial_common_case %}
+                              {% for message in initial_common_case.messages %}
+                                <article class="common-support-message common-support-message--{{ message.role }}">
+                                  <span>{{ initial_common_case.agent_name if message.role == "agent" else "Voce" }}</span>
+                                  <p>{{ message.text }}</p>
+                                </article>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+
+                          <form class="common-support-chat__composer" data-common-support-form>
+                            <input
+                              type="text"
+                              name="support_message"
+                              placeholder="Descreva o que aconteceu para simular o atendimento"
+                              data-common-support-input
+                            />
+                            <div class="common-support-chat__actions">
+                              <button type="submit" class="primary-action" data-common-support-submit>Enviar</button>
+                              <button type="button" class="secondary-action common-support-chat__finish" data-common-support-finish disabled>Finalizar chat</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+
+                      <script type="application/json" data-common-support-items>{{ common_support_cases | tojson }}</script>
+                    </section>
+                  </section>
+
                   <section class="service-flow__panel" data-service-panel="credit-home" hidden>
                     <div class="service-flow__crumbs">
                       <span>Inicio</span>

@@ -2,14 +2,19 @@ import hashlib
 import json
 import os
 import secrets
+import smtplib
 import socket
 from collections import defaultdict
+from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+from email.message import EmailMessage
+from email.utils import formataddr
 from io import BytesIO
 from pathlib import Path
 
 import qrcode
+from dotenv import load_dotenv
 from fastapi import Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
@@ -17,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from sqlalchemy import desc, select, text
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import DataError, IntegrityError, OperationalError
 from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -27,8 +32,20 @@ from models import Cartao, Movimentacao, Usuario
 BASE_DIR = Path(__file__).resolve().parent
 UPLOADS_DIR = BASE_DIR / "static" / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+DEFAULT_SUPPORT_EMAIL_RECIPIENT = "mathiasdeoliveira2009@gmail.com"
 
-app = FastAPI(title="UrbPay Portal")
+
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    ensure_database_schema()
+    yield
+
+
+app = FastAPI(title="UrbPay Portal", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, same_site="lax")
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
@@ -104,6 +121,114 @@ DASHBOARD_SERVICE_MENU = [
             "M10.5 9h4.5",
             "M10.5 12h3.5",
             "M15.8 18.5l1.1-2.3 2.3-1.1-2.3-1.1-1.1-2.3-1.1 2.3-2.3 1.1 2.3 1.1 1.1 2.3Z",
+        ],
+    },
+]
+
+COMMON_SUPPORT_CASE_DEFINITIONS = [
+    {
+        "id": "receba-cartao-em-casa",
+        "title": "COMUM - RECEBA SEU CARTAO EM CASA",
+        "description": "Acompanhe a emissao do cartao comum, confirme o endereco e veja a previsao de entrega.",
+        "status": "Em triagem",
+        "response_time": "Retorno em ate 12 min",
+        "queue": "Fila de emissao",
+        "agent_name": "Ana Martins",
+        "agent_role": "Especialista em emissao",
+        "auto_reply": "Vou validar a emissao do cartao, confirmar o endereco e te devolver a previsao mais recente para a entrega.",
+        "steps": [
+            "Validar emissao do cartao comum",
+            "Confirmar endereco cadastrado",
+            "Enviar previsao de entrega no protocolo",
+        ],
+        "messages": [
+            {"role": "agent", "text": "Ola! Posso acompanhar a entrega do seu cartao comum por aqui."},
+            {"role": "user", "text": "Quero receber meu cartao em casa e verificar o prazo."},
+            {"role": "agent", "text": "Perfeito. Vou conferir a emissao e o endereco cadastrado antes de liberar a previsao."},
+        ],
+    },
+    {
+        "id": "analise-bilhete-cancelado",
+        "title": "COMUM - ANALISE DE BILHETE UNICO CANCELADO",
+        "description": "Abra uma revisao para entender cancelamento, bloqueio ou perda de validade do bilhete comum.",
+        "status": "Aguardando analise",
+        "response_time": "Retorno em ate 18 min",
+        "queue": "Fila operacional",
+        "agent_name": "Carlos Nogueira",
+        "agent_role": "Analista operacional",
+        "auto_reply": "Vou revisar o historico do bilhete cancelado e confirmar se houve bloqueio, expiracao ou necessidade de reativacao.",
+        "steps": [
+            "Consultar historico do bilhete",
+            "Identificar motivo do cancelamento",
+            "Orientar reativacao ou nova emissao",
+        ],
+        "messages": [
+            {"role": "agent", "text": "Suporte UrbPay online. Vamos revisar o cancelamento do seu bilhete."},
+            {"role": "user", "text": "Meu bilhete comum apareceu como cancelado e preciso entender o motivo."},
+            {"role": "agent", "text": "Ja estou separando a analise operacional para te orientar sobre reativacao ou substituicao."},
+        ],
+    },
+    {
+        "id": "compra-creditos-incorreta",
+        "title": "COMUM - COMPRA DE CREDITOS INCORRETA",
+        "description": "Use este atendimento quando a recarga entrou com valor diferente ou nao refletiu no saldo.",
+        "status": "Em validacao",
+        "response_time": "Retorno em ate 10 min",
+        "queue": "Fila financeira",
+        "agent_name": "Juliana Costa",
+        "agent_role": "Especialista em recarga",
+        "auto_reply": "Vou confrontar o valor pago com a recarga processada para ajustar o saldo ou registrar a correcao do pedido.",
+        "steps": [
+            "Conferir valor pago e comprovante",
+            "Comparar com a recarga processada",
+            "Atualizar saldo ou abrir correcao financeira",
+        ],
+        "messages": [
+            {"role": "agent", "text": "Oi! Posso analisar a compra de creditos com voce agora."},
+            {"role": "user", "text": "A recarga foi feita, mas o valor entrou incorreto no meu cartao comum."},
+            {"role": "agent", "text": "Entendi. Vou validar o pagamento, o valor creditado e o saldo atual para seguir com a correcao."},
+        ],
+    },
+    {
+        "id": "pedido-restituicao-creditos",
+        "title": "COMUM - PEDIDO DE RESTITUICAO DE CREDITOS",
+        "description": "Solicite estorno ou recuperacao dos creditos comuns quando houver cobranca indevida ou duplicidade.",
+        "status": "Em revisao",
+        "response_time": "Retorno em ate 20 min",
+        "queue": "Fila de restituicao",
+        "agent_name": "Patricia Lima",
+        "agent_role": "Atendimento financeiro",
+        "auto_reply": "Vou validar a cobranca, abrir a solicitacao de restituicao e te atualizar com o protocolo financeiro.",
+        "steps": [
+            "Registrar protocolo de restituicao",
+            "Validar cobranca ou debito indevido",
+            "Encaminhar retorno financeiro",
+        ],
+        "messages": [
+            {"role": "agent", "text": "Seu pedido de restituicao pode ser acompanhado por esta central."},
+            {"role": "user", "text": "Preciso pedir restituicao dos creditos porque identifiquei uma cobranca indevida."},
+            {"role": "agent", "text": "Certo. Vou abrir a revisao financeira e organizar a analise do valor para restituicao."},
+        ],
+    },
+    {
+        "id": "cancelamento-bilhete",
+        "title": "COMUM - SOLICITACAO DE CANCELAMENTO DO BILHETE",
+        "description": "Inicie o cancelamento do bilhete comum com suporte guiado e confirmacao de bloqueio no protocolo.",
+        "status": "Pronto para abrir",
+        "response_time": "Retorno em ate 8 min",
+        "queue": "Fila de bloqueio",
+        "agent_name": "Rafael Souza",
+        "agent_role": "Suporte de bloqueio",
+        "auto_reply": "Vou confirmar os dados do titular, registrar o bloqueio preventivo e devolver o numero do protocolo de cancelamento.",
+        "steps": [
+            "Validar titularidade do bilhete",
+            "Registrar bloqueio preventivo",
+            "Emitir protocolo de cancelamento",
+        ],
+        "messages": [
+            {"role": "agent", "text": "Atendimento pronto para registrar o cancelamento do seu bilhete comum."},
+            {"role": "user", "text": "Quero solicitar o cancelamento do meu bilhete e receber o protocolo."},
+            {"role": "agent", "text": "Perfeito. Vou iniciar o bloqueio preventivo e separar os dados necessarios para o protocolo."},
         ],
     },
 ]
@@ -227,7 +352,7 @@ def build_card_number() -> str:
 def build_cvv(user_id: int) -> str:
     seed = f"{SESSION_SECRET_KEY}:{user_id}:cvv".encode("utf-8")
     digest = hashlib.sha256(seed).hexdigest()
-    return f"{int(digest[:16], 16) % (10**10):010d}"
+    return f"{int(digest[:8], 16) % 1000:03d}"
 
 
 def save_profile_image(upload: UploadFile | None) -> str | None:
@@ -358,28 +483,188 @@ def build_dashboard_services(active_service_key: str | None) -> list[dict[str, o
     return services
 
 
+def build_request_protocol(seed: int | str, *, prefix: int = 8068000) -> str:
+    if isinstance(seed, str):
+        digest = hashlib.sha1(seed.encode("utf-8")).hexdigest()
+        numeric_seed = int(digest[:8], 16)
+    else:
+        numeric_seed = int(seed)
+    return str(prefix + (numeric_seed % 100000))
+
+
+def build_common_support_cases() -> list[dict[str, object]]:
+    items: list[dict[str, object]] = []
+    for item in COMMON_SUPPORT_CASE_DEFINITIONS:
+        items.append(
+            {
+                **item,
+                "protocol": build_request_protocol(f"common-support-{item['id']}", prefix=8094000),
+            }
+        )
+    return items
+
+
+def get_common_support_case(case_id: str) -> dict[str, object] | None:
+    for item in build_common_support_cases():
+        if item["id"] == case_id:
+            return item
+    return None
+
+
+def get_support_email_settings() -> dict[str, object]:
+    load_dotenv(".env", override=True)
+
+    smtp_username = os.getenv("SMTP_USERNAME", "").strip()
+    return {
+        "smtp_host": os.getenv("SMTP_HOST", "").strip(),
+        "smtp_port": int(os.getenv("SMTP_PORT", "587")),
+        "smtp_username": smtp_username,
+        "smtp_password": os.getenv("SMTP_PASSWORD", ""),
+        "smtp_use_tls": os.getenv("SMTP_USE_TLS", "true").strip().lower() not in {"0", "false", "no"},
+        "smtp_use_ssl": os.getenv("SMTP_USE_SSL", "false").strip().lower() in {"1", "true", "yes"},
+        "support_email_from": (os.getenv("SUPPORT_EMAIL_FROM") or smtp_username).strip(),
+        "support_email_from_name": os.getenv("SUPPORT_EMAIL_FROM_NAME", "UrbPay Suporte").strip() or "UrbPay Suporte",
+        "support_email_recipient": (
+            os.getenv("SUPPORT_EMAIL_RECIPIENT", DEFAULT_SUPPORT_EMAIL_RECIPIENT).strip()
+            or DEFAULT_SUPPORT_EMAIL_RECIPIENT
+        ),
+    }
+
+
+def format_request_timestamp(value: datetime | None) -> tuple[datetime, str]:
+    normalized = value if isinstance(value, datetime) else datetime.utcnow()
+    return normalized, normalized.strftime("%d/%m/%Y %H:%M")
+
+
+def build_dashboard_requests(user: Usuario, recent_movements: list[Movimentacao]) -> list[dict[str, str]]:
+    items: list[dict[str, object]] = []
+    now = datetime.utcnow()
+    authorization = ACTIVE_QR_AUTHORIZATIONS.get(user.id_usuario)
+
+    if user.cartao:
+        requested_at, requested_at_display = format_request_timestamp(user.data_cadastro)
+        items.append(
+            {
+                "protocol": build_request_protocol(f"card-request-{user.id_usuario}"),
+                "service": "Cartao UrbPay - Solicitacao de emissao",
+                "updated_at_display": requested_at_display,
+                "status_text": "Cartao solicitado",
+                "status_group": "in_progress",
+                "appearance": "pending",
+                "_sort_at": requested_at,
+            }
+        )
+
+    if authorization:
+        expires_at = authorization.get("expires_at")
+        if (
+            isinstance(expires_at, datetime)
+            and now > expires_at
+            and not authorization.get("used")
+        ):
+            authorization["status"] = "expired"
+            authorization["updated_at"] = now
+
+        status_code = str(authorization.get("status") or "created")
+        if status_code in {"created", "opened", "expired", "replaced", "inactive", "invalid"}:
+            updated_at, updated_at_display = format_request_timestamp(
+                authorization.get("updated_at") or authorization.get("issued_at")
+            )
+            auth_seed = str(authorization.get("nonce") or f"{user.id_usuario}-{updated_at.isoformat()}")
+            items.append(
+                {
+                    "protocol": build_request_protocol(auth_seed),
+                    "service": "Passagem digital - leitura de QR Code",
+                    "updated_at_display": updated_at_display,
+                    "status_text": {
+                        "created": "Aguardando leitura do QR Code",
+                        "opened": "Aguardando confirmacao do embarque",
+                        "expired": "QR expirado",
+                        "replaced": "QR substituido",
+                        "inactive": "Solicitacao encerrada",
+                        "invalid": "QR invalido",
+                    }.get(status_code, "Solicitacao em acompanhamento"),
+                    "status_group": "in_progress" if status_code in {"created", "opened"} else "other",
+                    "appearance": "pending" if status_code in {"created", "opened"} else "muted",
+                    "_sort_at": updated_at,
+                }
+            )
+
+    for movement in recent_movements:
+        updated_at, updated_at_display = format_request_timestamp(movement.data_movimentacao)
+
+        if movement.tipo_operacao == "RECARGA":
+            service_name = "Bilhete Unico - Compra de Credito"
+            approved_text = "Recarga concluida"
+        else:
+            service_name = "Passagem digital - Compra de passagem"
+            approved_text = "Passagem aprovada"
+
+        if movement.status_operacao == "APROVADO":
+            status_group = "completed"
+            status_text = approved_text
+            appearance = "success"
+        elif movement.status_operacao == "SALDO_INSUFICIENTE":
+            status_group = "other"
+            status_text = "Saldo insuficiente"
+            appearance = "muted"
+        else:
+            status_group = "other"
+            status_text = "Operacao recusada"
+            appearance = "muted"
+
+        items.append(
+            {
+                "protocol": build_request_protocol(movement.id_movimentacao),
+                "service": service_name,
+                "updated_at_display": updated_at_display,
+                "status_text": status_text,
+                "status_group": status_group,
+                "appearance": appearance,
+                "_sort_at": updated_at,
+            }
+        )
+
+    items.sort(key=lambda item: item["_sort_at"], reverse=True)
+
+    serialized_items: list[dict[str, str]] = []
+    for item in items[:8]:
+        serialized_items.append(
+            {
+                "protocol": str(item["protocol"]),
+                "service": str(item["service"]),
+                "updated_at_display": str(item["updated_at_display"]),
+                "status_text": str(item["status_text"]),
+                "status_group": str(item["status_group"]),
+                "appearance": str(item["appearance"]),
+            }
+        )
+    return serialized_items
+
+
 def ensure_database_schema() -> None:
     from models import Base
 
     Base.metadata.create_all(bind=engine)
 
     with engine.begin() as connection:
-        has_profile_photo = connection.execute(
-            text("SHOW COLUMNS FROM usuarios LIKE 'foto_perfil'")
-        ).fetchone()
-        if not has_profile_photo:
-            connection.execute(text("ALTER TABLE usuarios ADD COLUMN foto_perfil VARCHAR(255)"))
+        user_column_migrations = {
+            "email": "ALTER TABLE usuarios ADD COLUMN email VARCHAR(100) NULL",
+            "telefone": "ALTER TABLE usuarios ADD COLUMN telefone VARCHAR(15) NULL",
+            "endereco": "ALTER TABLE usuarios ADD COLUMN endereco VARCHAR(50) NULL",
+            "data_nascimento": "ALTER TABLE usuarios ADD COLUMN data_nascimento DATE NULL",
+            "data_cadastro": "ALTER TABLE usuarios ADD COLUMN data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP",
+            "senha": "ALTER TABLE usuarios ADD COLUMN senha VARCHAR(255) NULL",
+            "status": "ALTER TABLE usuarios ADD COLUMN status ENUM('ATIVO', 'INATIVO') DEFAULT 'ATIVO'",
+            "foto_perfil": "ALTER TABLE usuarios ADD COLUMN foto_perfil VARCHAR(255) NULL",
+        }
 
-        has_birth_date = connection.execute(
-            text("SHOW COLUMNS FROM usuarios LIKE 'data_nascimento'")
-        ).fetchone()
-        if not has_birth_date:
-            connection.execute(text("ALTER TABLE usuarios ADD COLUMN data_nascimento DATE NULL"))
-
-
-@app.on_event("startup")
-def startup_tasks() -> None:
-    ensure_database_schema()
+        for column_name, alter_statement in user_column_migrations.items():
+            has_column = connection.execute(
+                text(f"SHOW COLUMNS FROM usuarios LIKE '{column_name}'")
+            ).fetchone()
+            if not has_column:
+                connection.execute(text(alter_statement))
 
 
 def get_user_from_session(request: Request, db: Session) -> Usuario | None:
@@ -400,6 +685,163 @@ def require_user(request: Request, db: Session) -> Usuario:
     if not user:
         raise HTTPException(status_code=303, detail="Login required")
     return user
+
+
+def normalize_support_transcript(messages: object) -> list[dict[str, str]]:
+    if not isinstance(messages, list):
+        return []
+
+    transcript: list[dict[str, str]] = []
+    for raw_item in messages[:40]:
+        if not isinstance(raw_item, dict):
+            continue
+
+        role = "user" if str(raw_item.get("role", "")).strip().lower() == "user" else "agent"
+        text_value = str(raw_item.get("text", "")).strip()
+        if not text_value:
+            continue
+
+        normalized_text = " ".join(text_value.split())
+        transcript.append(
+            {
+                "role": role,
+                "text": normalized_text[:2000],
+            }
+        )
+
+    return transcript
+
+
+def build_common_support_email_body(
+    user: Usuario,
+    support_case: dict[str, object],
+    transcript: list[dict[str, str]],
+    settings: dict[str, object],
+) -> str:
+    lines = [
+        "Novo atendimento do suporte guiado UrbPay.",
+        "",
+        "Dados do usuario cadastrado:",
+        f"Nome: {user.nome}",
+        f"E-mail cadastrado: {user.email}",
+        f"CPF: {user.cpf}",
+        f"Telefone: {user.telefone or 'Nao informado'}",
+        f"Endereco: {user.endereco or 'Nao informado'}",
+        "",
+        "Dados do atendimento comum:",
+        f"Assunto: {support_case['title']}",
+        f"Protocolo: {support_case['protocol']}",
+        f"Status visual: {support_case['status']}",
+        f"Fila: {support_case['queue']}",
+        f"Prazo informado: {support_case['response_time']}",
+        f"Agente visual: {support_case['agent_name']} - {support_case['agent_role']}",
+        "",
+        f"Destino configurado: {settings['support_email_recipient']}",
+        f"Gerado em: {datetime.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC",
+        "",
+        "Transcricao completa do suporte guiado:",
+    ]
+
+    for index, item in enumerate(transcript, start=1):
+        author = user.nome if item["role"] == "user" else str(support_case["agent_name"])
+        label = "Usuario" if item["role"] == "user" else "Suporte"
+        lines.extend(
+            [
+                "",
+                f"{index:02d}. {label} - {author}",
+                item["text"],
+            ]
+        )
+
+    return "\n".join(lines)
+
+
+def build_common_support_email_message(
+    user: Usuario,
+    support_case: dict[str, object],
+    transcript: list[dict[str, str]],
+    settings: dict[str, object],
+    *,
+    use_registered_email_as_from: bool,
+) -> EmailMessage:
+    support_email_from = str(settings["support_email_from"])
+    support_email_from_name = str(settings["support_email_from_name"])
+    support_email_recipient = str(settings["support_email_recipient"])
+
+    if not support_email_from:
+        raise RuntimeError("Configure SUPPORT_EMAIL_FROM ou SMTP_USERNAME para enviar os e-mails do suporte.")
+
+    message = EmailMessage()
+    message["To"] = support_email_recipient
+    message["Subject"] = f"[UrbPay][Comum] {support_case['title']} - {user.nome}"
+
+    if use_registered_email_as_from:
+        message["From"] = formataddr((user.nome or "Usuario UrbPay", user.email))
+        message["Sender"] = formataddr((support_email_from_name, support_email_from))
+        message["Reply-To"] = user.email
+    else:
+        message["From"] = formataddr((support_email_from_name, support_email_from))
+        message["Reply-To"] = formataddr((user.nome or "Usuario UrbPay", user.email))
+
+    message.set_content(build_common_support_email_body(user, support_case, transcript, settings))
+    return message
+
+
+def deliver_email_message(message: EmailMessage, settings: dict[str, object]) -> None:
+    smtp_host = str(settings["smtp_host"])
+    smtp_username = str(settings["smtp_username"])
+    smtp_password = str(settings["smtp_password"])
+    smtp_port = int(settings["smtp_port"])
+    smtp_use_tls = bool(settings["smtp_use_tls"])
+    smtp_use_ssl = bool(settings["smtp_use_ssl"])
+
+    if not smtp_host or not smtp_username or not smtp_password:
+        raise RuntimeError(
+            "Configure SMTP_HOST, SMTP_USERNAME e SMTP_PASSWORD no .env para habilitar o envio do suporte."
+        )
+
+    if smtp_use_ssl:
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=20) as client:
+            client.login(smtp_username, smtp_password)
+            client.send_message(message)
+        return
+
+    with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as client:
+        client.ehlo()
+        if smtp_use_tls:
+            client.starttls()
+            client.ehlo()
+        client.login(smtp_username, smtp_password)
+        client.send_message(message)
+
+
+def send_common_support_email(
+    user: Usuario,
+    support_case: dict[str, object],
+    transcript: list[dict[str, str]],
+) -> str:
+    settings = get_support_email_settings()
+    primary_message = build_common_support_email_message(
+        user,
+        support_case,
+        transcript,
+        settings,
+        use_registered_email_as_from=True,
+    )
+
+    try:
+        deliver_email_message(primary_message, settings)
+        return "registered-email-from"
+    except smtplib.SMTPException:
+        fallback_message = build_common_support_email_message(
+            user,
+            support_case,
+            transcript,
+            settings,
+            use_registered_email_as_from=False,
+        )
+        deliver_email_message(fallback_message, settings)
+        return "reply-to-fallback"
 
 
 def currency(value: Decimal | float | None) -> str:
@@ -745,6 +1187,7 @@ def build_dashboard_context(
     expires_iso = expires_at.isoformat() if isinstance(expires_at, datetime) else None
     issued_at = qr_authorization.get("issued_at")
     issued_iso = issued_at.isoformat() if isinstance(issued_at, datetime) else None
+    request_items = build_dashboard_requests(user, recent_movements)
 
     return {
         "request": request,
@@ -754,6 +1197,8 @@ def build_dashboard_context(
         "card_preview": card,
         "my_cards": dashboard_cards,
         "service_menu": build_dashboard_services(active_service_key),
+        "request_items": request_items,
+        "common_support_cases": build_common_support_cases(),
         "formatted_card_number": format_card_number(card.numero_cartao) if card else None,
         "recent_movements": recent_movements,
         "movement_count": len(recent_movements),
@@ -882,7 +1327,9 @@ async def signup(
         telefone=telefone_digits or None,
         endereco=endereco.strip() or None,
         data_nascimento=birth_date,
+        data_cadastro=datetime.utcnow(),
         senha=hash_password(senha),
+        status="ATIVO",
         foto_perfil=image_path,
     )
     db.add(usuario)
@@ -900,11 +1347,11 @@ async def signup(
         db.flush()
         seed_initial_activity(db, cartao)
         db.commit()
-    except IntegrityError:
+    except (DataError, IntegrityError):
         db.rollback()
         context = build_landing_context(
             request,
-            form_error="Nao foi possivel salvar o cadastro. Verifique CPF, e-mail e telefone.",
+            form_error="Nao foi possivel salvar o cadastro. Verifique os dados informados e tente novamente.",
             open_signup_modal=True,
         )
         return templates.TemplateResponse("index.html", context, status_code=409)
@@ -940,6 +1387,57 @@ def dashboard(request: Request, status: str | None = None, db: Session = Depends
 
     context = build_dashboard_context(request, db, user, status=status)
     return templates.TemplateResponse("dashboard.html", context)
+
+
+@app.get("/dashboard/requests")
+def dashboard_requests(request: Request, db: Session = Depends(get_db)) -> dict[str, object]:
+    user = get_user_from_session(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Login required.")
+
+    card = user.cartao
+    recent_movements = get_recent_movements(db, card.id_cartao) if card else []
+    return {
+        "items": build_dashboard_requests(user, recent_movements),
+        "refreshed_at": datetime.utcnow().isoformat(),
+    }
+
+
+@app.post("/dashboard/support/common/email")
+async def send_common_support_transcript(request: Request, db: Session = Depends(get_db)) -> dict[str, str]:
+    user = get_user_from_session(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Login required.")
+
+    try:
+        payload = await request.json()
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=400, detail="Corpo JSON invalido para o suporte.") from exc
+
+    case_id = str(payload.get("case_id", "")).strip()
+    support_case = get_common_support_case(case_id)
+    if not support_case:
+        raise HTTPException(status_code=404, detail="Solicitacao de suporte comum nao encontrada.")
+
+    transcript = normalize_support_transcript(payload.get("messages"))
+    if not transcript:
+        raise HTTPException(status_code=400, detail="Envie pelo menos uma mensagem para o suporte.")
+
+    try:
+        delivery_mode = send_common_support_email(user, support_case, transcript)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except smtplib.SMTPException as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="Nao foi possivel enviar o e-mail do suporte com a configuracao SMTP atual.",
+        ) from exc
+
+    return {
+        "status": "sent",
+        "recipient": str(get_support_email_settings()["support_email_recipient"]),
+        "delivery_mode": delivery_mode,
+    }
 
 
 @app.get("/dashboard/extrato", response_class=HTMLResponse)

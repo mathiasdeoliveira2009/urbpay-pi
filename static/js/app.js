@@ -30,6 +30,33 @@ const creditSelectedAmounts = document.querySelectorAll("[data-credit-selected-a
 const currentBalanceDisplays = document.querySelectorAll("[data-current-balance-display]");
 const cardBalanceDisplays = document.querySelectorAll("[data-card-balance-id]");
 const qrSimulatorRoot = document.querySelector("[data-qr-simulator-root]");
+const requestBoard = document.querySelector("[data-request-board]");
+const requestBoardSearchInput = requestBoard?.querySelector("[data-request-search]");
+const requestBoardStatusSelect = requestBoard?.querySelector("[data-request-status]");
+const requestBoardRefreshButton = requestBoard?.querySelector("[data-request-refresh]");
+const requestBoardBody = requestBoard?.querySelector("[data-request-body]");
+const requestBoardFeedback = requestBoard?.querySelector("[data-request-feedback]");
+const requestBoardSeed = requestBoard?.querySelector("[data-request-items]");
+const serviceMenuButtons = document.querySelectorAll("[data-service-button]");
+const commonSupportRoot = document.querySelector("[data-common-support-root]");
+const commonSupportCards = document.querySelectorAll("[data-common-support-card]");
+const commonSupportDataNode = document.querySelector("[data-common-support-items]");
+const commonSupportTitle = document.querySelector("[data-common-support-title]");
+const commonSupportDescription = document.querySelector("[data-common-support-description]");
+const commonSupportProtocol = document.querySelector("[data-common-support-protocol]");
+const commonSupportStatus = document.querySelector("[data-common-support-status]");
+const commonSupportQueue = document.querySelector("[data-common-support-queue]");
+const commonSupportResponseTime = document.querySelector("[data-common-support-response-time]");
+const commonSupportSteps = document.querySelector("[data-common-support-steps]");
+const commonSupportAgentName = document.querySelector("[data-common-support-agent-name]");
+const commonSupportAgentRole = document.querySelector("[data-common-support-agent-role]");
+const commonSupportMessages = document.querySelector("[data-common-support-messages]");
+const commonSupportForm = document.querySelector("[data-common-support-form]");
+const commonSupportInput = document.querySelector("[data-common-support-input]");
+const commonSupportSubmitButton = document.querySelector("[data-common-support-submit]");
+const commonSupportToggleButton = document.querySelector("[data-common-support-toggle]");
+const commonSupportPlaceholder = document.querySelector("[data-common-support-placeholder]");
+const commonSupportPlaceholderText = document.querySelector("[data-common-support-placeholder-text]");
 
 const settingsStorage = {
   theme: "urbpay-theme",
@@ -109,6 +136,13 @@ const i18n = {
 const getStoredLanguage = () => window.localStorage.getItem(settingsStorage.language) || "pt-BR";
 const getStoredTheme = () => window.localStorage.getItem(settingsStorage.theme) || "light";
 const currencyFormatter = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 const getTranslation = (key) => {
   const language = getStoredLanguage();
@@ -161,6 +195,356 @@ const showToolbarToast = (message) => {
   showToolbarToast.timeoutId = window.setTimeout(() => {
     toast.classList.remove("is-visible");
   }, 2400);
+};
+
+const requestBoardState = {
+  items: [],
+  lastSyncedAt: null,
+  isLoading: false,
+};
+
+const commonSupportState = {
+  items: [],
+  threads: new Map(),
+  activeId: "",
+  responseTimeoutId: null,
+  isOpen: false,
+};
+
+const escapeHtml = (value) => String(value ?? "")
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/\"/g, "&quot;")
+  .replace(/'/g, "&#39;");
+
+const normalizeSearchText = (value) => String(value ?? "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .trim();
+
+const getRequestFilterLabel = (filterValue) => {
+  if (filterValue === "completed") {
+    return "concluidas";
+  }
+
+  if (filterValue === "all") {
+    return "no total";
+  }
+
+  return "em andamento";
+};
+
+const setRequestBoardFeedback = (message, isError = false) => {
+  if (!requestBoardFeedback) {
+    return;
+  }
+
+  requestBoardFeedback.textContent = message;
+  requestBoardFeedback.classList.toggle("is-error", isError);
+};
+
+const getFilteredRequestItems = () => {
+  const searchTerm = normalizeSearchText(requestBoardSearchInput?.value || "");
+  const selectedStatus = requestBoardStatusSelect?.value || "in_progress";
+
+  return requestBoardState.items.filter((item) => {
+    const matchesStatus = selectedStatus === "all" || item.status_group === selectedStatus;
+    if (!matchesStatus) {
+      return false;
+    }
+
+    if (!searchTerm) {
+      return true;
+    }
+
+    const haystack = normalizeSearchText(`${item.protocol} ${item.service} ${item.status_text}`);
+    return haystack.includes(searchTerm);
+  });
+};
+
+const renderRequestRow = (item) => `
+  <article class="request-row">
+    <div class="request-row__protocol">
+      <span>${escapeHtml(item.protocol)}</span>
+    </div>
+    <div class="request-row__service">
+      <strong>${escapeHtml(item.service)}</strong>
+      <p>Atualizado em ${escapeHtml(item.updated_at_display)}</p>
+    </div>
+    <div class="request-row__status">
+      <span class="request-badge request-badge--${escapeHtml(item.appearance || "muted")}">${escapeHtml(item.status_text)}</span>
+    </div>
+  </article>
+`;
+
+const renderRequestBoard = () => {
+  if (!requestBoardBody) {
+    return;
+  }
+
+  const filteredItems = getFilteredRequestItems();
+  if (!filteredItems.length) {
+    requestBoardBody.innerHTML = '<div class="request-board__empty">Nenhuma solicitacao encontrada com esse filtro.</div>';
+  } else {
+    requestBoardBody.innerHTML = filteredItems.map(renderRequestRow).join("");
+  }
+
+  const filterLabel = getRequestFilterLabel(requestBoardStatusSelect?.value || "in_progress");
+  const countLabel = filteredItems.length === 1 ? "solicitacao" : "solicitacoes";
+  let message = filteredItems.length
+    ? `Mostrando ${filteredItems.length} ${countLabel} ${filterLabel}.`
+    : "Nenhuma solicitacao encontrada com esse filtro.";
+
+  if (requestBoardState.lastSyncedAt instanceof Date && !Number.isNaN(requestBoardState.lastSyncedAt.valueOf())) {
+    message += ` Atualizado em ${dateTimeFormatter.format(requestBoardState.lastSyncedAt)}.`;
+  }
+
+  setRequestBoardFeedback(message);
+};
+
+const setRequestBoardLoading = (isLoading) => {
+  requestBoardState.isLoading = isLoading;
+
+  if (!requestBoardRefreshButton) {
+    return;
+  }
+
+  requestBoardRefreshButton.disabled = isLoading;
+  requestBoardRefreshButton.classList.toggle("is-loading", isLoading);
+};
+
+const refreshRequestBoard = async () => {
+  const endpoint = requestBoard?.dataset.requestEndpoint;
+  if (!endpoint || requestBoardState.isLoading) {
+    return;
+  }
+
+  const clickedAt = new Date();
+  setRequestBoardLoading(true);
+
+  try {
+    const response = await window.fetch(endpoint, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Nao foi possivel atualizar as solicitacoes (${response.status}).`);
+    }
+
+    const payload = await response.json();
+    requestBoardState.items = Array.isArray(payload.items) ? payload.items : [];
+    requestBoardState.lastSyncedAt = clickedAt;
+    renderRequestBoard();
+  } catch (error) {
+    console.error(error);
+    setRequestBoardFeedback("Nao foi possivel atualizar as solicitacoes agora.", true);
+    showToolbarToast("Nao foi possivel atualizar as solicitacoes.");
+  } finally {
+    setRequestBoardLoading(false);
+  }
+};
+
+const getServiceMenuTrigger = (panelName) => {
+  if (!panelName) {
+    return "";
+  }
+
+  if (panelName.startsWith("credit")) {
+    return "credit-home";
+  }
+
+  return panelName;
+};
+
+const syncServiceMenuState = (panelName) => {
+  const activeTrigger = getServiceMenuTrigger(panelName);
+
+  serviceMenuButtons.forEach((button) => {
+    const isActive = button.dataset.serviceTrigger === activeTrigger;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+};
+
+const cloneCommonSupportMessages = (messages) => Array.isArray(messages)
+  ? messages.map((message) => ({
+    role: message?.role === "user" ? "user" : "agent",
+    text: String(message?.text ?? ""),
+  }))
+  : [];
+
+const getCommonSupportItem = (itemId) => commonSupportState.items.find((item) => item.id === itemId) || null;
+
+const renderCommonSupportSteps = (item) => {
+  if (!commonSupportSteps || !item) {
+    return;
+  }
+
+  const steps = Array.isArray(item.steps) ? item.steps : [];
+  commonSupportSteps.innerHTML = steps.map((step, index) => `
+    <article class="common-support-step">
+      <span>${String(index + 1).padStart(2, "0")}</span>
+      <p>${escapeHtml(step)}</p>
+    </article>
+  `).join("");
+};
+
+const renderCommonSupportMessages = (item) => {
+  if (!commonSupportMessages || !item) {
+    return;
+  }
+
+  const thread = commonSupportState.threads.get(item.id) || [];
+  commonSupportMessages.innerHTML = thread.map((message) => {
+    const role = message.role === "user" ? "user" : "agent";
+    const author = role === "agent" ? item.agent_name || "Suporte UrbPay" : "Voce";
+
+    return `
+      <article class="common-support-message common-support-message--${role}">
+        <span>${escapeHtml(author)}</span>
+        <p>${escapeHtml(message.text)}</p>
+      </article>
+    `;
+  }).join("");
+
+  commonSupportMessages.scrollTop = commonSupportMessages.scrollHeight;
+};
+
+const setCommonSupportPlaceholderMessage = (message) => {
+  if (!commonSupportPlaceholderText || !message) {
+    return;
+  }
+
+  commonSupportPlaceholderText.textContent = message;
+};
+
+const setCommonSupportVisibility = (isOpen, placeholderMessage = "") => {
+  commonSupportState.isOpen = isOpen;
+
+  if (commonSupportRoot) {
+    commonSupportRoot.hidden = !isOpen;
+  }
+
+  if (commonSupportPlaceholder) {
+    commonSupportPlaceholder.hidden = isOpen;
+  }
+
+  if (!isOpen && placeholderMessage) {
+    setCommonSupportPlaceholderMessage(placeholderMessage);
+  }
+};
+
+const renderCommonSupportPanel = (itemId) => {
+  const item = getCommonSupportItem(itemId);
+  if (!item) {
+    return;
+  }
+
+  commonSupportState.activeId = item.id;
+
+  commonSupportCards.forEach((card) => {
+    const isSelected = card.dataset.commonSupportId === item.id;
+    card.classList.toggle("is-selected", isSelected);
+    card.setAttribute("aria-pressed", String(isSelected));
+  });
+
+  if (!commonSupportState.threads.has(item.id)) {
+    commonSupportState.threads.set(item.id, cloneCommonSupportMessages(item.messages));
+  }
+
+  if (commonSupportTitle) {
+    commonSupportTitle.textContent = item.title || "Atendimento do bilhete comum";
+  }
+
+  if (commonSupportDescription) {
+    commonSupportDescription.textContent = item.description || "";
+  }
+
+  if (commonSupportProtocol) {
+    commonSupportProtocol.textContent = item.protocol || "--";
+  }
+
+  if (commonSupportStatus) {
+    commonSupportStatus.textContent = item.status || "--";
+  }
+
+  if (commonSupportQueue) {
+    commonSupportQueue.textContent = item.queue || "--";
+  }
+
+  if (commonSupportResponseTime) {
+    commonSupportResponseTime.textContent = item.response_time || "--";
+  }
+
+  if (commonSupportAgentName) {
+    commonSupportAgentName.textContent = item.agent_name || "Suporte UrbPay";
+  }
+
+  if (commonSupportAgentRole) {
+    commonSupportAgentRole.textContent = item.agent_role || "Atendimento digital";
+  }
+
+  if (commonSupportInput) {
+    commonSupportInput.placeholder = `Descreva o que aconteceu em ${String(item.title || "seu atendimento").toLowerCase()}`;
+  }
+
+  renderCommonSupportSteps(item);
+  renderCommonSupportMessages(item);
+  setCommonSupportVisibility(true);
+};
+
+const setCommonSupportSendingState = (isSending) => {
+  if (!commonSupportSubmitButton) {
+    return;
+  }
+
+  commonSupportSubmitButton.disabled = isSending;
+  commonSupportSubmitButton.textContent = isSending ? "Enviando..." : "Enviar";
+};
+
+const sendCommonSupportEmail = async (item) => {
+  const endpoint = commonSupportRoot?.dataset.commonSupportEndpoint;
+  if (!endpoint) {
+    throw new Error("Endpoint do suporte nao configurado.");
+  }
+
+  const transcript = (commonSupportState.threads.get(item.id) || []).map((message) => ({
+    role: message.role === "user" ? "user" : "agent",
+    text: String(message.text || ""),
+  }));
+
+  const response = await window.fetch(endpoint, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      case_id: item.id,
+      messages: transcript,
+    }),
+  });
+
+  if (response.ok) {
+    return response.json();
+  }
+
+  let errorMessage = "Nao foi possivel enviar o e-mail do suporte.";
+
+  try {
+    const payload = await response.json();
+    if (payload?.detail) {
+      errorMessage = payload.detail;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  throw new Error(errorMessage);
 };
 
 applyTheme(getStoredTheme());
@@ -298,6 +682,100 @@ profileActionButtons.forEach((button) => {
   });
 });
 
+if (requestBoard) {
+  try {
+    requestBoardState.items = JSON.parse(requestBoardSeed?.textContent || "[]");
+  } catch (error) {
+    console.error(error);
+    requestBoardState.items = [];
+  }
+
+  renderRequestBoard();
+
+  requestBoardSearchInput?.addEventListener("input", renderRequestBoard);
+  requestBoardStatusSelect?.addEventListener("change", renderRequestBoard);
+  requestBoardRefreshButton?.addEventListener("click", refreshRequestBoard);
+}
+
+if (commonSupportRoot) {
+  setCommonSupportVisibility(false);
+
+  try {
+    commonSupportState.items = JSON.parse(commonSupportDataNode?.textContent || "[]");
+  } catch (error) {
+    console.error(error);
+    commonSupportState.items = [];
+  }
+
+  commonSupportState.items.forEach((item) => {
+    commonSupportState.threads.set(item.id, cloneCommonSupportMessages(item.messages));
+  });
+
+  commonSupportCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const itemId = card.dataset.commonSupportId || "";
+      renderCommonSupportPanel(itemId);
+    });
+  });
+
+  commonSupportToggleButton?.addEventListener("click", () => {
+    setCommonSupportVisibility(
+      false,
+      "Atendimento minimizado. Clique no card selecionado ou em outro assunto para abrir novamente.",
+    );
+  });
+
+  commonSupportForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const activeItem = getCommonSupportItem(commonSupportState.activeId);
+    const message = commonSupportInput?.value.trim();
+
+    if (!activeItem || !message) {
+      return;
+    }
+
+    const activeThread = commonSupportState.threads.get(activeItem.id) || [];
+    activeThread.push({
+      role: "user",
+      text: message,
+    });
+    commonSupportState.threads.set(activeItem.id, activeThread);
+
+    if (commonSupportInput) {
+      commonSupportInput.value = "";
+    }
+
+    renderCommonSupportMessages(activeItem);
+
+    setCommonSupportSendingState(true);
+
+    try {
+      await sendCommonSupportEmail(activeItem);
+      showToolbarToast(`Suporte enviado por e-mail para mathiasdeoliveira2009@gmail.com.`);
+    } catch (error) {
+      console.error(error);
+      showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel enviar o e-mail do suporte.");
+    } finally {
+      setCommonSupportSendingState(false);
+    }
+
+    window.clearTimeout(commonSupportState.responseTimeoutId);
+    commonSupportState.responseTimeoutId = window.setTimeout(() => {
+      const followUpThread = commonSupportState.threads.get(activeItem.id) || [];
+      followUpThread.push({
+        role: "agent",
+        text: activeItem.auto_reply || "Recebi sua mensagem e ja estou dando seguimento no atendimento.",
+      });
+      commonSupportState.threads.set(activeItem.id, followUpThread);
+
+      if (commonSupportState.activeId === activeItem.id) {
+        renderCommonSupportMessages(activeItem);
+      }
+    }, 850);
+  });
+}
+
 const setServicePanel = (panelName) => {
   if (!serviceFlow) {
     return;
@@ -308,6 +786,7 @@ const setServicePanel = (panelName) => {
   });
 
   serviceFlow.hidden = !panelName;
+  syncServiceMenuState(panelName);
 };
 
 const scrollServiceFlowIntoView = () => {
@@ -533,21 +1012,25 @@ serviceTriggers.forEach((button) => {
   button.addEventListener("click", () => {
     const panelName = button.dataset.serviceTrigger;
 
-    if (panelName === "credit-home" && !serviceFlow.hidden) {
-      const creditHomePanel = document.querySelector('[data-service-panel="credit-home"]');
-      if (creditHomePanel && !creditHomePanel.hidden) {
+    if ((panelName === "credit-home" || panelName === "common") && !serviceFlow.hidden) {
+      const currentPanel = document.querySelector(`[data-service-panel="${panelName}"]`);
+      if (currentPanel && !currentPanel.hidden) {
         setServicePanel(null);
         return;
       }
     }
 
-    if (panelName === "common" || panelName === "student" || panelName === "teacher") {
+    if (panelName === "student" || panelName === "teacher") {
       showToolbarToast("Este servico entra na proxima etapa.");
       return;
     }
 
     if (panelName === "credit-home" && button.classList.contains("service-item--action")) {
       resetCreditFlow();
+    }
+
+    if (panelName === "common" && commonSupportState.items.length && !commonSupportState.activeId) {
+      renderCommonSupportPanel(commonSupportState.items[0].id);
     }
 
     setServicePanel(panelName);

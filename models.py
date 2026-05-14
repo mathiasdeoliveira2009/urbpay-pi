@@ -33,7 +33,7 @@ class Cartao(Base):
 
     id_cartao: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     numero_cartao: Mapped[str] = mapped_column(CHAR(16), nullable=False, unique=True)
-    cvv: Mapped[str] = mapped_column(CHAR(10), nullable=False)
+    cvv: Mapped[str] = mapped_column(CHAR(3), nullable=False)
     nome_impresso: Mapped[str | None] = mapped_column(String(100))
     saldo: Mapped[float] = mapped_column(DECIMAL(10, 2), default=0.00, nullable=False)
     data_validade: Mapped[date] = mapped_column(Date, nullable=False)
