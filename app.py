@@ -34,10 +34,12 @@ UPLOADS_DIR = BASE_DIR / "static" / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_SUPPORT_EMAIL_RECIPIENT = "mathiasdeoliveira2009@gmail.com"
 
-
-
+import os
+from sqlalchemy import create_engine
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+engine = create_engine(DATABASE_URL)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
