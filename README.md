@@ -2,9 +2,10 @@
 
 ## Banco
 
-- Configure o arquivo `.env` com as credenciais do banco principal MySQL.
-- Rode o script [sql/create_prod.sql](/c:/Users/mathias.oliveira/Desktop/urbpay-pi/sql/create_prod.sql) no MySQL Workbench.
-- No Render, deixe o `DATABASE_URL` do Postgres apenas para testes. A aplicacao usa `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD` e `MYSQL_DB` como banco principal.
+- Configure o arquivo `.env` com `DATABASE_URL` apontando para o PostgreSQL.
+- Configure `SESSION_SECRET_KEY` no `.env`; ela assina a sessao do usuario e os tokens de QR code.
+- No Render, use a `DATABASE_URL` do servico PostgreSQL como banco principal.
+- A aplicacao cria as tabelas pelo SQLAlchemy na inicializacao quando elas ainda nao existem.
 - O comando `python app.py` ja usa a porta `PORT` do Render quando ela existir; se o Render nao enviar `PORT`, usa `10000`.
 
 ## Executando

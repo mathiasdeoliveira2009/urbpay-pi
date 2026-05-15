@@ -2,40 +2,32 @@
 
 ## Estrutura
 
-- `sql/create_prod.sql`: cria e usa o banco `urbpay`
+- `sql/create_prod.sql`: script legado para MySQL
 - `sql/update_profile_photo.sql`: adiciona a coluna `foto_perfil` em bancos ja existentes
 - `.env`: configuracao unica do projeto
 
 ## Criar Banco
 
-1. Abra o MySQL Workbench.
-2. Clique em `File`.
-3. Clique em `Open SQL Script...`.
-4. Abra [create_prod.sql](/c:/Users/mathias.oliveira/Desktop/urbpay-pi/sql/create_prod.sql).
-5. Confirme que o script usa `urbpay`.
-6. Clique no botao de raio para executar.
+1. Crie um banco PostgreSQL local, no Render ou no provedor escolhido.
+2. Copie a URL de conexao do banco.
+3. Coloque essa URL em `DATABASE_URL` no arquivo `.env`.
+4. Suba a aplicacao; as tabelas sao criadas automaticamente pelo SQLAlchemy quando ainda nao existem.
 
 ## Atualizar Banco Ja Existente
 
 Se o banco ja existia antes da funcionalidade de foto de perfil:
 
-1. Abra o MySQL Workbench.
-2. Clique em `File`.
-3. Clique em `Open SQL Script...`.
-4. Abra [update_profile_photo.sql](/c:/Users/mathias.oliveira/Desktop/urbpay-pi/sql/update_profile_photo.sql).
-5. Escolha o schema correto no Workbench.
-6. Execute o script.
+1. Confirme que `DATABASE_URL` aponta para esse banco.
+2. Suba a aplicacao.
+3. O startup verifica as colunas esperadas em `usuarios` e adiciona as colunas antigas que estiverem faltando.
 
 ## Configurar .env
 
 Use um unico arquivo `.env` na raiz do projeto:
 
 ```env
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3306
-MYSQL_USER=urbpay_user
-MYSQL_PASSWORD=ff@123
-MYSQL_DB=urbpay
+DATABASE_URL=postgresql://usuario:senha@host:5432/banco
+SESSION_SECRET_KEY=troque_esta_chave
 ```
 
 ## Subir Aplicacao
@@ -63,7 +55,6 @@ Se estiver tudo certo, a resposta sera:
 
 ## Observacoes
 
-- O banco principal da aplicacao e o MySQL configurado por `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD` e `MYSQL_DB`.
-- No Render, `DATABASE_URL` pode existir por causa do Postgres de teste, mas a aplicacao nao usa essa variavel como banco principal.
-- O schema principal esperado e `urbpay`.
+- O banco principal da aplicacao e o PostgreSQL configurado por `DATABASE_URL`.
+- `SESSION_SECRET_KEY` precisa ficar fixa entre deploys para nao invalidar sessoes e tokens assinados.
 - Em deploy no Render com `python app.py`, a aplicacao usa automaticamente a porta `PORT`; se ela nao existir, usa `10000`.

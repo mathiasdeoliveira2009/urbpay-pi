@@ -21,7 +21,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
-from sqlalchemy import desc, select, text
+from sqlalchemy import desc, inspect, select, text
 from sqlalchemy.exc import DataError, IntegrityError, OperationalError
 from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.sessions import SessionMiddleware
@@ -643,22 +643,23 @@ def ensure_database_schema() -> None:
     Base.metadata.create_all(bind=engine)
 
     with engine.begin() as connection:
+        existing_columns = {
+            column["name"]
+            for column in inspect(connection).get_columns("usuarios")
+        }
         user_column_migrations = {
-            "email": "ALTER TABLE usuarios ADD COLUMN email VARCHAR(100) NULL",
-            "telefone": "ALTER TABLE usuarios ADD COLUMN telefone VARCHAR(15) NULL",
-            "endereco": "ALTER TABLE usuarios ADD COLUMN endereco VARCHAR(50) NULL",
-            "data_nascimento": "ALTER TABLE usuarios ADD COLUMN data_nascimento DATE NULL",
-            "data_cadastro": "ALTER TABLE usuarios ADD COLUMN data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP",
-            "senha": "ALTER TABLE usuarios ADD COLUMN senha VARCHAR(255) NULL",
-            "status": "ALTER TABLE usuarios ADD COLUMN status ENUM('ATIVO', 'INATIVO') DEFAULT 'ATIVO'",
-            "foto_perfil": "ALTER TABLE usuarios ADD COLUMN foto_perfil VARCHAR(255) NULL",
+            "email": "ALTER TABLE usuarios ADD COLUMN email VARCHAR(100)",
+            "telefone": "ALTER TABLE usuarios ADD COLUMN telefone VARCHAR(15)",
+            "endereco": "ALTER TABLE usuarios ADD COLUMN endereco VARCHAR(50)",
+            "data_nascimento": "ALTER TABLE usuarios ADD COLUMN data_nascimento DATE",
+            "data_cadastro": "ALTER TABLE usuarios ADD COLUMN data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+            "senha": "ALTER TABLE usuarios ADD COLUMN senha VARCHAR(255)",
+            "status": "ALTER TABLE usuarios ADD COLUMN status VARCHAR(7) DEFAULT 'ATIVO'",
+            "foto_perfil": "ALTER TABLE usuarios ADD COLUMN foto_perfil VARCHAR(255)",
         }
 
         for column_name, alter_statement in user_column_migrations.items():
-            has_column = connection.execute(
-                text(f"SHOW COLUMNS FROM usuarios LIKE '{column_name}'")
-            ).fetchone()
-            if not has_column:
+            if column_name not in existing_columns:
                 connection.execute(text(alter_statement))
 
 
@@ -1620,18 +1621,21 @@ def db_check(db: Session = Depends(get_db)) -> dict:
     except OperationalError as exc:
         target = get_database_target()
         database_name = target["database"]
-        message = str(exc.orig)
+        host = target["host"] or target["driver"]
+        port = f":{target['port']}" if target["port"] else ""
+        location = f"{host}{port}"
+        message = str(getattr(exc, "orig", exc))
+        lower_message = message.lower()
 
-        if "Unknown database" in message:
+        if "unknown database" in lower_message or "does not exist" in lower_message:
             detail = (
-                f"Database '{database_name}' was not found on "
-                f"{target['host']}:{target['port']}. Create the database or "
-                "update MYSQL_DB in the .env file to an existing one."
+                f"Database '{database_name}' was not found at {location}. "
+                "Create the database or update DATABASE_URL in the .env file."
             )
         else:
             detail = (
-                f"Could not connect to database '{database_name}' on "
-                f"{target['host']}:{target['port']}: {message}"
+                f"Could not connect to database '{database_name}' through "
+                f"DATABASE_URL at {location}: {message}"
             )
 
         raise HTTPException(status_code=503, detail=detail) from exc

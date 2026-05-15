@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from sqlalchemy import CHAR, DATETIME, DECIMAL, Date, Enum, ForeignKey, Integer, String
+from sqlalchemy import CHAR, DECIMAL, Date, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
@@ -16,7 +16,7 @@ class Usuario(Base):
     telefone: Mapped[str | None] = mapped_column(String(15), unique=True)
     endereco: Mapped[str | None] = mapped_column(String(50))
     data_nascimento: Mapped[date | None] = mapped_column(Date)
-    data_cadastro: Mapped[datetime] = mapped_column(DATETIME, default=datetime.utcnow)
+    data_cadastro: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     senha: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[str] = mapped_column(
         Enum("ATIVO", "INATIVO", name="usuarios_status_enum"),
@@ -53,7 +53,7 @@ class Movimentacao(Base):
 
     id_movimentacao: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     valor: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
-    data_movimentacao: Mapped[datetime] = mapped_column(DATETIME, default=datetime.utcnow)
+    data_movimentacao: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     tipo_operacao: Mapped[str] = mapped_column(
         Enum("RECARGA", "DEBITO", name="movimentacoes_tipo_operacao_enum"),
         nullable=False,

@@ -7,3 +7,4 @@ pymysql==1.1.1
 python-multipart==0.0.20
 qrcode==7.4.2
 itsdangerous
+psycopg2-binary==2.9.10
