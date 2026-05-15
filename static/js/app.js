@@ -23,6 +23,7 @@ const creditCustomInput = document.querySelector("[data-credit-custom-input]");
 const creditCustomConfirm = document.querySelector("[data-credit-custom-confirm]");
 const creditGoPixButton = document.querySelector("[data-credit-go-pix]");
 const creditConfirmButton = document.querySelector("[data-credit-confirm]");
+const creditRechargeEndpoint = "/dashboard/credit/recharge";
 const creditSelectedCardNames = document.querySelectorAll("[data-credit-selected-card-name]");
 const creditSelectedCardNumbers = document.querySelectorAll("[data-credit-selected-card-number]");
 const creditSelectedTypes = document.querySelectorAll("[data-credit-selected-credit-type]");
@@ -993,19 +994,54 @@ creditGoPixButton?.addEventListener("click", () => {
   scrollServiceFlowIntoView();
 });
 
-creditConfirmButton?.addEventListener("click", () => {
+creditConfirmButton?.addEventListener("click", async () => {
   if (!creditState.cardId || !creditState.amount) {
     showToolbarToast("Escolha um cartao e um valor antes de confirmar.");
     return;
   }
 
-  creditState.currentBalance += creditState.amount;
-  updateCardBalanceDisplays(creditState.cardId, creditState.currentBalance);
-  showToolbarToast(`Saldo atualizado em ${creditState.amountLabel}.`);
-  clearCreditAmountSelection();
-  updateCreditSummary();
-  setServicePanel("credit-home");
-  scrollServiceFlowIntoView();
+  creditConfirmButton.disabled = true;
+  creditConfirmButton.textContent = "Confirmando...";
+
+  try {
+    const response = await window.fetch(creditRechargeEndpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        card_id: creditState.cardId,
+        amount: creditState.amount.toFixed(2),
+        credit_type: creditState.creditType,
+      }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload.detail || "Nao foi possivel salvar a recarga.");
+    }
+
+    const nextBalance = Number.parseFloat(payload.balance_value || "");
+    if (!Number.isFinite(nextBalance)) {
+      throw new Error("A recarga foi salva, mas o saldo retornado esta invalido.");
+    }
+
+    creditState.currentBalance = nextBalance;
+    updateCardBalanceDisplays(creditState.cardId, nextBalance);
+    showToolbarToast(`Saldo atualizado em ${creditState.amountLabel}.`);
+    clearCreditAmountSelection();
+    updateCreditSummary();
+    setServicePanel("credit-home");
+    scrollServiceFlowIntoView();
+    refreshRequestBoard();
+  } catch (error) {
+    showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel salvar a recarga.");
+  } finally {
+    creditConfirmButton.disabled = false;
+    creditConfirmButton.textContent = "Confirmar";
+  }
 });
 
 serviceTriggers.forEach((button) => {

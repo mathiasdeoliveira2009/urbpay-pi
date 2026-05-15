@@ -8,19 +8,21 @@
 
 ## Criar Banco
 
-1. Crie um banco PostgreSQL local, no Render ou no provedor escolhido.
-2. Copie a URL de conexao do banco.
-3. Coloque essa URL em `DATABASE_URL` no arquivo `.env`.
+1. Localmente, use MySQL e configure `DATABASE_BACKEND=mysql`.
+2. Rode o script [create_prod.sql](/c:/Users/mathias.oliveira/Desktop/urbpay-pi/sql/create_prod.sql) no MySQL.
+3. No Render/PRD, use PostgreSQL e configure `DATABASE_BACKEND=postgresql`.
 4. Suba a aplicacao; as tabelas sao criadas automaticamente pelo SQLAlchemy quando ainda nao existem.
 
 No Render, configure a variavel assim:
 
 ```text
 Key: DATABASE_URL
-Value: postgresql://usuario:senha@host:5432/banco
+Value: postgresql://usuario:senha@host:5432/banco?sslmode=require
 ```
 
 O campo `Value` deve conter somente a URL, sem aspas e sem `DATABASE_URL=`.
+Tambem configure `APP_ENV=production` e `DATABASE_BACKEND=postgresql`.
+Para rodar localmente acessando o banco do Render, copie a External Database URL e mantenha `?sslmode=require`.
 
 ## Atualizar Banco Ja Existente
 
@@ -35,7 +37,13 @@ Se o banco ja existia antes da funcionalidade de foto de perfil:
 Use um unico arquivo `.env` na raiz do projeto:
 
 ```env
-DATABASE_URL=postgresql://usuario:senha@host:5432/banco
+APP_ENV=local
+DATABASE_BACKEND=mysql
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_USER=urbpay_user
+MYSQL_PASSWORD=ff@123
+MYSQL_DB=urbpay
 SESSION_SECRET_KEY=troque_esta_chave
 ```
 
@@ -64,6 +72,7 @@ Se estiver tudo certo, a resposta sera:
 
 ## Observacoes
 
-- O banco principal da aplicacao e o PostgreSQL configurado por `DATABASE_URL`.
+- Localmente, o banco principal da aplicacao e o MySQL configurado por `MYSQL_*`.
+- No Render/PRD, o banco principal e o PostgreSQL configurado por `DATABASE_URL`.
 - `SESSION_SECRET_KEY` precisa ficar fixa entre deploys para nao invalidar sessoes e tokens assinados.
 - Em deploy no Render com `python app.py`, a aplicacao usa automaticamente a porta `PORT`; se ela nao existir, usa `10000`.

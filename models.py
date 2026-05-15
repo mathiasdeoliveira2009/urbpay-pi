@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 
 from sqlalchemy import CHAR, DECIMAL, Date, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -35,7 +36,7 @@ class Cartao(Base):
     numero_cartao: Mapped[str] = mapped_column(CHAR(16), nullable=False, unique=True)
     cvv: Mapped[str] = mapped_column(CHAR(3), nullable=False)
     nome_impresso: Mapped[str | None] = mapped_column(String(100))
-    saldo: Mapped[float] = mapped_column(DECIMAL(10, 2), default=0.00, nullable=False)
+    saldo: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), default=Decimal("0.00"), nullable=False)
     data_validade: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[str] = mapped_column(
         Enum("ATIVO", "BLOQUEADO", "EXPIRADO", name="cartao_status_enum"),
@@ -52,7 +53,7 @@ class Movimentacao(Base):
     __tablename__ = "movimentacoes"
 
     id_movimentacao: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    valor: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
+    valor: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
     data_movimentacao: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     tipo_operacao: Mapped[str] = mapped_column(
         Enum("RECARGA", "DEBITO", name="movimentacoes_tipo_operacao_enum"),

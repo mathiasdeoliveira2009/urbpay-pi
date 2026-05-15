@@ -7,7 +7,7 @@ import socket
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from email.message import EmailMessage
 from email.utils import formataddr
 from io import BytesIO
@@ -845,6 +845,18 @@ def currency(value: Decimal | float | None) -> str:
     return f"{amount:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+def parse_money_amount(value: object, *, field_name: str = "valor") -> Decimal:
+    try:
+        amount = Decimal(str(value)).quantize(Decimal("0.01"))
+    except (InvalidOperation, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=f"Informe um {field_name} valido.") from exc
+
+    if amount <= Decimal("0.00"):
+        raise HTTPException(status_code=400, detail=f"Informe um {field_name} maior que zero.")
+
+    return amount
+
+
 def create_movement(
     db: Session,
     card: Cartao,
@@ -1399,6 +1411,58 @@ def dashboard_requests(request: Request, db: Session = Depends(get_db)) -> dict[
     }
 
 
+@app.post("/dashboard/credit/recharge")
+async def recharge_card_credit(request: Request, db: Session = Depends(get_db)) -> dict[str, str]:
+    user = get_user_from_session(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Login required.")
+
+    try:
+        payload = await request.json()
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=400, detail="Corpo JSON invalido para a recarga.") from exc
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="Corpo JSON invalido para a recarga.")
+
+    try:
+        card_id = int(payload.get("card_id"))
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail="Cartao invalido para recarga.") from exc
+
+    amount = parse_money_amount(payload.get("amount"), field_name="valor de recarga")
+    credit_type = str(payload.get("credit_type") or "Comum").strip()[:40] or "Comum"
+
+    card = db.scalar(
+        select(Cartao)
+        .where(Cartao.id_cartao == card_id)
+        .where(Cartao.id_usuario == user.id_usuario)
+    )
+    if not card:
+        raise HTTPException(status_code=404, detail="Cartao nao encontrado para este usuario.")
+
+    current_balance = Decimal(str(card.saldo)).quantize(Decimal("0.01"))
+    card.saldo = current_balance + amount
+    create_movement(
+        db,
+        card,
+        amount=amount,
+        operation_type="RECARGA",
+        status="APROVADO",
+        location=f"Recarga {credit_type} via Pix UrbPay",
+    )
+    db.commit()
+    db.refresh(card)
+
+    saved_balance = Decimal(str(card.saldo)).quantize(Decimal("0.01"))
+    return {
+        "status": "approved",
+        "card_id": str(card.id_cartao),
+        "amount": f"{amount:.2f}",
+        "balance_value": f"{saved_balance:.2f}",
+        "current_balance": currency(saved_balance),
+    }
+
+
 @app.post("/dashboard/support/common/email")
 async def send_common_support_transcript(request: Request, db: Session = Depends(get_db)) -> dict[str, str]:
     user = get_user_from_session(request, db)
@@ -1624,18 +1688,19 @@ def db_check(db: Session = Depends(get_db)) -> dict:
         host = target["host"] or target["driver"]
         port = f":{target['port']}" if target["port"] else ""
         location = f"{host}{port}"
+        source = target.get("source", "database configuration")
         message = str(getattr(exc, "orig", exc))
         lower_message = message.lower()
 
         if "unknown database" in lower_message or "does not exist" in lower_message:
             detail = (
                 f"Database '{database_name}' was not found at {location}. "
-                "Create the database or update DATABASE_URL in the .env file."
+                f"Create the database or update {source} in the .env file."
             )
         else:
             detail = (
                 f"Could not connect to database '{database_name}' through "
-                f"DATABASE_URL at {location}: {message}"
+                f"{source} at {location}: {message}"
             )
 
         raise HTTPException(status_code=503, detail=detail) from exc
