@@ -5,6 +5,7 @@
 - Configure o arquivo `.env` com `DATABASE_URL` apontando para o PostgreSQL.
 - Configure `SESSION_SECRET_KEY` no `.env`; ela assina a sessao do usuario e os tokens de QR code.
 - No Render, use a `DATABASE_URL` do servico PostgreSQL como banco principal.
+- Em Environment Variables no Render, a key deve ser `DATABASE_URL` e o value deve ser apenas a URL, sem aspas e sem `DATABASE_URL=`.
 - A aplicacao cria as tabelas pelo SQLAlchemy na inicializacao quando elas ainda nao existem.
 - O comando `python app.py` ja usa a porta `PORT` do Render quando ela existir; se o Render nao enviar `PORT`, usa `10000`.
 

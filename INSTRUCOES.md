@@ -13,6 +13,15 @@
 3. Coloque essa URL em `DATABASE_URL` no arquivo `.env`.
 4. Suba a aplicacao; as tabelas sao criadas automaticamente pelo SQLAlchemy quando ainda nao existem.
 
+No Render, configure a variavel assim:
+
+```text
+Key: DATABASE_URL
+Value: postgresql://usuario:senha@host:5432/banco
+```
+
+O campo `Value` deve conter somente a URL, sem aspas e sem `DATABASE_URL=`.
+
 ## Atualizar Banco Ja Existente
 
 Se o banco ja existia antes da funcionalidade de foto de perfil:
