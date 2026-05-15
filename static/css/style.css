@@ -4610,3 +4610,838 @@ html[data-theme="dark"] .common-support-message--agent {
     text-align: left;
   }
 }
+
+@media (max-width: 640px) {
+  body {
+    font-size: 0.94rem;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .brand-logo,
+  .dashboard-brand .brand-logo {
+    width: 118px;
+  }
+
+  .topbar-nav,
+  .dashboard-topbar__actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .topbar-nav .utility-toolbar,
+  .dashboard-topbar__actions .utility-toolbar {
+    width: auto;
+    gap: 8px;
+  }
+
+  .dashboard-topbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+  }
+
+  .dashboard-brand {
+    width: 100%;
+  }
+
+  .dashboard-topbar__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-content: stretch;
+  }
+
+  .dashboard-topbar__actions > .secondary-action {
+    min-width: 0;
+    width: 100%;
+    justify-content: center;
+    overflow: hidden;
+    padding-inline: 10px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-topbar__actions .utility-toolbar {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .utility-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .nav-pill,
+  .primary-action,
+  .secondary-action,
+  .login-submit,
+  .service-back-button {
+    min-height: 42px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .signup-modal {
+    align-items: start;
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+  .signup-modal__surface {
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .signup-modal__close {
+    top: 12px;
+    right: 12px;
+    padding: 7px 10px;
+    font-size: 0.82rem;
+  }
+
+  .signup-modal__copy {
+    padding-right: 58px;
+  }
+
+  .signup-modal__copy h2,
+  .login-card h2 {
+    font-size: 1.28rem;
+    line-height: 1.18;
+    letter-spacing: 0;
+  }
+
+  .signup-form,
+  .login-form {
+    gap: 10px;
+  }
+
+  .signup-form input,
+  .login-form input,
+  .request-board__search input,
+  .request-board__status select,
+  .custom-amount-card input,
+  .common-support-chat__composer input {
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 0.92rem;
+  }
+
+  .hero-banner {
+    min-height: auto;
+    padding: 18px 14px 16px;
+  }
+
+  .hero-copy {
+    padding: 0;
+  }
+
+  .hero-copy h1 {
+    font-size: 2rem;
+    line-height: 1.08;
+    letter-spacing: 0;
+  }
+
+  .hero-text {
+    margin: 12px 0 16px;
+    font-size: 0.9rem;
+    line-height: 1.58;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-bottom: 14px;
+  }
+
+  .hero-actions .primary-action,
+  .hero-actions .secondary-action,
+  .hero-actions .inline-form,
+  .hero-actions .inline-form button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hero-points span,
+  .login-meta span {
+    padding: 7px 10px;
+    font-size: 0.76rem;
+  }
+
+  .hero-showcase {
+    display: grid;
+    gap: 12px;
+    min-height: auto;
+    padding: 12px;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .city-visual {
+    border-radius: 18px;
+  }
+
+  .glass-stat,
+  .login-card {
+    border-radius: 18px;
+  }
+
+  .glass-stat,
+  .login-card,
+  .feature-card,
+  .profile-panel,
+  .section-block,
+  .dashboard-card,
+  .metric-card,
+  .gate-card,
+  .payment-method-card,
+  .payment-summary-card {
+    padding: 16px;
+  }
+
+  .feature-strip,
+  .section-block,
+  .status-strip {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .feature-strip {
+    gap: 12px;
+    padding-top: 14px;
+  }
+
+  .feature-card {
+    min-height: auto;
+  }
+
+  .feature-card strong,
+  .product-copy h3 {
+    font-size: 1.02rem;
+  }
+
+  .section-head {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .section-head h2,
+  .dashboard-card__head h1,
+  .dashboard-card__head h2,
+  .gate-card h1,
+  .service-flow__head h4,
+  .request-history__head h3 {
+    font-size: 1.35rem;
+    line-height: 1.14;
+    letter-spacing: 0;
+  }
+
+  .section-head p,
+  .dashboard-card__head p,
+  .service-flow__head p,
+  .feature-card p,
+  .product-copy p,
+  .step-card p,
+  .gate-card p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .steps-grid,
+  .cards-grid {
+    gap: 12px;
+  }
+
+  .step-card {
+    padding: 16px;
+  }
+
+  .product-image {
+    height: 150px;
+  }
+
+  .profile-section {
+    margin-left: 14px;
+    margin-right: 14px;
+    padding: 16px;
+  }
+
+  .profile-panel__header,
+  .user-card-preview__body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+  }
+
+  .profile-details div {
+    padding: 12px;
+  }
+
+  .user-card-preview {
+    gap: 16px;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .user-card-preview__body strong {
+    margin: 6px 0 12px;
+    font-size: 1.28rem;
+    line-height: 1.14;
+  }
+
+  .user-card-preview__number {
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+  }
+
+  .user-card-preview__photo {
+    width: 84px;
+    height: 96px;
+    border-radius: 18px;
+  }
+
+  .dashboard-topbar {
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .dashboard-main,
+  .dashboard-main--experience,
+  .dashboard-main--history {
+    padding: 14px;
+  }
+
+  .qr-landing {
+    min-height: auto;
+  }
+
+  .qr-landing__media {
+    min-height: 260px;
+  }
+
+  .qr-landing__content {
+    padding: 18px 14px;
+  }
+
+  .qr-landing__overlay {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    padding: 14px;
+  }
+
+  .qr-landing__overlay strong {
+    font-size: 1.2rem;
+    line-height: 1.18;
+  }
+
+  .qr-step {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px 0;
+  }
+
+  .qr-step span {
+    width: 42px;
+    height: 42px;
+    font-size: 0.82rem;
+  }
+
+  .qr-reading-actions__buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .qr-reading-actions__buttons form,
+  .qr-reading-actions__buttons .primary-action,
+  .qr-reading-actions__buttons .secondary-action {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .my-cards-panel {
+    padding: 18px 14px;
+  }
+
+  .my-cards-layout {
+    gap: 18px;
+  }
+
+  .my-card-tile {
+    border-radius: 22px;
+  }
+
+  .my-card-tile__image {
+    border-radius: 22px;
+  }
+
+  .my-card-tile__overlay {
+    padding: 14px;
+  }
+
+  .my-card-tile__body {
+    gap: 10px 12px;
+  }
+
+  .my-card-tile__detail span {
+    font-size: 0.64rem;
+  }
+
+  .my-card-tile__name {
+    font-size: 0.92rem;
+  }
+
+  .my-card-tile__balance-value {
+    font-size: 1rem;
+  }
+
+  .my-card-tile__cvv,
+  .my-card-tile__validity {
+    font-size: 0.78rem;
+  }
+
+  .service-menu {
+    padding: 14px 0 0;
+  }
+
+  .service-menu__list {
+    gap: 14px 10px;
+  }
+
+  .service-item {
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  .service-item__icon {
+    width: 58px;
+    height: 58px;
+    box-shadow: 7px 8px 0 rgba(129, 196, 112, 0.22);
+  }
+
+  .service-item__icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .service-item strong {
+    font-size: 0.8rem;
+  }
+
+  .service-flow__panel,
+  .service-option-card,
+  .common-support-console,
+  .custom-amount-card,
+  .payment-alert,
+  .recharge-overview__item {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .service-flow__crumbs {
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.78rem;
+  }
+
+  .service-flow__crumbs span + span::before {
+    margin-right: 8px;
+  }
+
+  .service-choice-card,
+  .payment-method-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .service-choice-card__icon,
+  .payment-method-card__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .service-choice-card__icon svg,
+  .payment-method-card__icon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .amount-chip {
+    min-height: 48px;
+    padding: 0 12px;
+    border-radius: 14px;
+    font-size: 0.92rem;
+  }
+
+  .service-flow__actions,
+  .common-support-card__meta,
+  .payment-summary-card__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .service-flow__actions .primary-action,
+  .service-flow__actions .service-back-button {
+    width: 100%;
+  }
+
+  .payment-summary-card__row strong {
+    text-align: left;
+  }
+
+  .request-board {
+    border-radius: 18px;
+  }
+
+  .request-board__filters,
+  .request-row,
+  .request-board__feedback,
+  .request-board__empty {
+    padding: 14px;
+  }
+
+  .request-board__action {
+    min-height: 44px;
+  }
+
+  .request-row__protocol span {
+    min-width: 0;
+    width: 100%;
+    justify-content: flex-start;
+    font-size: 0.84rem;
+  }
+
+  .common-support-card {
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .common-support-chat {
+    padding: 16px;
+  }
+
+  .common-support-chat__agent {
+    align-items: flex-start;
+  }
+
+  .common-support-chat__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .common-support-chat__actions .primary-action,
+  .common-support-chat__actions .secondary-action {
+    width: 100%;
+  }
+
+  .history-summary-grid,
+  .history-dashboard {
+    gap: 12px;
+  }
+
+  .history-profile-card {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .history-profile-card__avatar {
+    width: 74px;
+    height: 74px;
+    border-radius: 20px;
+  }
+
+  .history-table__row {
+    gap: 7px;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .chart-area,
+  .chart-empty {
+    min-height: 180px;
+  }
+
+  .mini-bar-group__bars {
+    min-height: 140px;
+  }
+
+  .timeline-row {
+    padding: 12px;
+  }
+
+  .gate-shell {
+    padding: 14px;
+  }
+
+  .gate-card {
+    padding: 18px;
+  }
+
+  .gate-user,
+  .gate-amount,
+  .gate-turnstile,
+  .gate-timeline-card,
+  .gate-simulator__stats article {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .gate-user__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+  }
+
+  .gate-result-title {
+    font-size: 1.42rem;
+    letter-spacing: 0;
+  }
+
+  .gate-turnstile__arms {
+    width: 92px;
+    height: 92px;
+  }
+
+  .gate-timeline-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .gate-timeline-card > span {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .gate-simulator__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
+
+  .gate-simulator__actions .secondary-action {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .eyebrow,
+  .eyebrow.small,
+  .dashboard-profile__meta span,
+  .metric-card__label,
+  .gate-amount span,
+  .qr-reading-grid__stats span,
+  .identity-field span,
+  .widget-picker__label,
+  .statement-teaser__item span,
+  .recharge-overview__item span,
+  .payment-method-card__copy span,
+  .payment-summary-card__eyebrow,
+  .custom-amount-card label {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+  }
+
+  .profile-panel__header h3,
+  .official-card-showcase__customer-copy strong,
+  .metric-card strong,
+  .gate-amount strong,
+  .qr-reading-grid__stats strong,
+  .service-mini-card strong,
+  .recharge-overview__item strong {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .dashboard-card__head h1,
+  .dashboard-card__head h2,
+  .dashboard-card__head p,
+  .service-flow__head h4,
+  .service-flow__head p,
+  .service-choice-card__copy strong,
+  .service-choice-card__copy p,
+  .payment-summary-card__row strong,
+  .payment-summary-card__row span,
+  .profile-panel__header h3,
+  .profile-panel__header p,
+  .history-table__row strong,
+  .history-table__row span,
+  .request-row__service strong,
+  .request-row__service p {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 420px) {
+  body {
+    font-size: 0.9rem;
+  }
+
+  .brand-logo,
+  .dashboard-brand .brand-logo {
+    width: 104px;
+  }
+
+  .topbar-nav,
+  .dashboard-topbar__actions {
+    align-items: stretch;
+  }
+
+  .topbar-nav,
+  .dashboard-topbar__actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
+  .topbar-nav .utility-toolbar,
+  .dashboard-topbar__actions .utility-toolbar {
+    justify-content: flex-start;
+  }
+
+  .dashboard-topbar__actions .utility-toolbar {
+    justify-content: flex-end;
+  }
+
+  .utility-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .utility-button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .nav-pill {
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .hero-copy h1 {
+    font-size: 1.78rem;
+  }
+
+  .section-head h2,
+  .dashboard-card__head h1,
+  .dashboard-card__head h2,
+  .gate-card h1,
+  .service-flow__head h4,
+  .request-history__head h3 {
+    font-size: 1.22rem;
+  }
+
+  .hero-showcase,
+  .login-card,
+  .glass-stat,
+  .feature-card,
+  .section-block,
+  .profile-section,
+  .profile-panel,
+  .dashboard-card,
+  .metric-card,
+  .gate-card {
+    border-radius: 16px;
+  }
+
+  .hero-showcase,
+  .glass-stat,
+  .login-card,
+  .feature-card,
+  .profile-panel,
+  .section-block,
+  .dashboard-card,
+  .metric-card,
+  .gate-card {
+    padding: 14px;
+  }
+
+  .signup-modal__copy {
+    padding-right: 0;
+    padding-top: 38px;
+  }
+
+  .signup-modal__copy h2,
+  .login-card h2 {
+    font-size: 1.18rem;
+  }
+
+  .hero-points,
+  .login-meta {
+    gap: 8px;
+  }
+
+  .hero-points span,
+  .login-meta span {
+    border-radius: 12px;
+  }
+
+  .qr-landing__media {
+    min-height: 220px;
+  }
+
+  .my-card-tile__overlay {
+    padding: 12px;
+  }
+
+  .my-card-tile__body {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "name"
+      "balance"
+      "cvv"
+      "date";
+  }
+
+  .my-card-tile__detail--balance,
+  .my-card-tile__detail--date {
+    align-items: flex-start;
+    justify-self: start;
+    text-align: left;
+  }
+
+  .service-menu__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .service-item__icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .service-item strong {
+    font-size: 0.76rem;
+  }
+
+  .service-choice-card,
+  .payment-method-card {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-area--bars {
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  }
+
+  .progress-row__copy {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
