@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS cartao (
     numero_cartao CHAR(16) NOT NULL,
     cvv CHAR(10) NOT NULL,
     nome_impresso VARCHAR(100),
-    saldo DECIMAL(10,2) DEFAULT 0.00,
+    saldo DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     data_validade DATE NOT NULL,
     status ENUM('ATIVO', 'BLOQUEADO', 'EXPIRADO') DEFAULT 'ATIVO',
     id_usuario INT NOT NULL,

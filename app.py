@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from sqlalchemy import desc, inspect, select, text
-from sqlalchemy.exc import DataError, IntegrityError, OperationalError
+from sqlalchemy.exc import DataError, IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -258,6 +258,7 @@ STATUS_MESSAGES = {
 
 DEFAULT_PASSAGE_VALUE = Decimal("4.40")
 INITIAL_TOPUP = Decimal("50.00")
+MONEY_QUANT = Decimal("0.01")
 QR_TOKEN_MAX_AGE_SECONDS = 300
 ACTIVE_QR_AUTHORIZATIONS: dict[int, dict[str, object]] = {}
 QR_STATUS_DETAILS = {
@@ -450,7 +451,7 @@ def build_dashboard_cards(user: Usuario, cards: list[Cartao]) -> list[dict[str, 
                 "card_number_masked": format_card_number(mask_sensitive(card.numero_cartao, visible_digits=4)),
                 "card_number_full": format_card_number(card.numero_cartao),
                 "balance": currency(card.saldo),
-                "balance_value": f"{Decimal(str(card.saldo)).quantize(Decimal('0.01'))}",
+                "balance_value": f"{money_decimal(card.saldo)}",
                 "validity": card.data_validade.strftime("%m/%Y"),
             }
         )
@@ -643,6 +644,7 @@ def ensure_database_schema() -> None:
     Base.metadata.create_all(bind=engine)
 
     with engine.begin() as connection:
+        inspector = inspect(connection)
         existing_columns = {
             column["name"]
             for column in inspect(connection).get_columns("usuarios")
@@ -661,6 +663,19 @@ def ensure_database_schema() -> None:
         for column_name, alter_statement in user_column_migrations.items():
             if column_name not in existing_columns:
                 connection.execute(text(alter_statement))
+
+        if "cartao" in inspector.get_table_names():
+            existing_card_columns = {
+                column["name"]
+                for column in inspector.get_columns("cartao")
+            }
+            if "saldo" not in existing_card_columns:
+                money_type = "DECIMAL(10, 2)" if connection.dialect.name == "mysql" else "NUMERIC(10, 2)"
+                connection.execute(
+                    text(f"ALTER TABLE cartao ADD COLUMN saldo {money_type} DEFAULT 0.00 NOT NULL")
+                )
+            else:
+                connection.execute(text("UPDATE cartao SET saldo = 0.00 WHERE saldo IS NULL"))
 
 
 def get_user_from_session(request: Request, db: Session) -> Usuario | None:
@@ -840,15 +855,27 @@ def send_common_support_email(
         return "reply-to-fallback"
 
 
-def currency(value: Decimal | float | None) -> str:
-    amount = Decimal(str(value or 0)).quantize(Decimal("0.01"))
+def currency(value: object | None) -> str:
+    amount = money_decimal(value)
     return f"{amount:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def money_decimal(value: object | None) -> Decimal:
+    try:
+        amount = Decimal(str(value if value is not None else "0.00")).quantize(MONEY_QUANT)
+    except (InvalidOperation, ValueError) as exc:
+        raise ValueError("Valor monetario invalido.") from exc
+
+    if not amount.is_finite():
+        raise ValueError("Valor monetario invalido.")
+
+    return amount
 
 
 def parse_money_amount(value: object, *, field_name: str = "valor") -> Decimal:
     try:
-        amount = Decimal(str(value)).quantize(Decimal("0.01"))
-    except (InvalidOperation, ValueError) as exc:
+        amount = money_decimal(value)
+    except ValueError as exc:
         raise HTTPException(status_code=400, detail=f"Informe um {field_name} valido.") from exc
 
     if amount <= Decimal("0.00"):
@@ -877,8 +904,40 @@ def create_movement(
     return movement
 
 
+def apply_card_recharge(
+    db: Session,
+    *,
+    user_id: int,
+    card_id: int,
+    amount: Decimal,
+    credit_type: str,
+) -> tuple[Cartao, Movimentacao]:
+    card = db.scalar(
+        select(Cartao)
+        .where(Cartao.id_cartao == card_id)
+        .where(Cartao.id_usuario == user_id)
+        .with_for_update()
+    )
+    if not card:
+        raise HTTPException(status_code=404, detail="Cartao nao encontrado para este usuario.")
+
+    current_balance = money_decimal(card.saldo)
+    card.saldo = money_decimal(current_balance + amount)
+    movement = create_movement(
+        db,
+        card,
+        amount=amount,
+        operation_type="RECARGA",
+        status="APROVADO",
+        location=f"Recarga {credit_type} via Pix UrbPay",
+    )
+    db.flush()
+    db.refresh(card)
+    return card, movement
+
+
 def seed_initial_activity(db: Session, card: Cartao) -> None:
-    card.saldo = INITIAL_TOPUP - DEFAULT_PASSAGE_VALUE
+    card.saldo = money_decimal(INITIAL_TOPUP - DEFAULT_PASSAGE_VALUE)
     create_movement(
         db,
         card,
@@ -1002,7 +1061,7 @@ def mark_qr_authorization_used(user_id: int, *, status: str, balance: Decimal | 
         authorization["processed_at"] = processed_at
         authorization["updated_at"] = processed_at
         if balance is not None:
-            authorization["result_balance"] = str(balance.quantize(Decimal("0.01")))
+            authorization["result_balance"] = str(money_decimal(balance))
 
 
 def build_qr_status_snapshot(user: Usuario | None, token: str) -> dict[str, object]:
@@ -1039,7 +1098,7 @@ def build_qr_status_snapshot(user: Usuario | None, token: str) -> dict[str, obje
             status_code = str(authorization.get("status") or "created")
 
     descriptor = QR_STATUS_DETAILS.get(status_code, QR_STATUS_DETAILS["inactive"])
-    amount = Decimal(str(payload.get("amount") or DEFAULT_PASSAGE_VALUE)).quantize(Decimal("0.01"))
+    amount = money_decimal(payload.get("amount") or DEFAULT_PASSAGE_VALUE)
     expires_at = authorization.get("expires_at") if authorization else None
     opened_at = authorization.get("opened_at") if authorization else None
     processed_at = authorization.get("processed_at") if authorization else None
@@ -1049,9 +1108,9 @@ def build_qr_status_snapshot(user: Usuario | None, token: str) -> dict[str, obje
         remaining_seconds = max(0, int((expires_at - now).total_seconds()))
 
     if user and user.cartao:
-        balance_value = Decimal(str(user.cartao.saldo)).quantize(Decimal("0.01"))
+        balance_value = money_decimal(user.cartao.saldo)
     elif authorization and authorization.get("result_balance") is not None:
-        balance_value = Decimal(str(authorization["result_balance"])).quantize(Decimal("0.01"))
+        balance_value = money_decimal(authorization["result_balance"])
     else:
         balance_value = Decimal("0.00")
 
@@ -1432,31 +1491,28 @@ async def recharge_card_credit(request: Request, db: Session = Depends(get_db)) 
     amount = parse_money_amount(payload.get("amount"), field_name="valor de recarga")
     credit_type = str(payload.get("credit_type") or "Comum").strip()[:40] or "Comum"
 
-    card = db.scalar(
-        select(Cartao)
-        .where(Cartao.id_cartao == card_id)
-        .where(Cartao.id_usuario == user.id_usuario)
-    )
-    if not card:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado para este usuario.")
+    try:
+        card, movement = apply_card_recharge(
+            db,
+            user_id=user.id_usuario,
+            card_id=card_id,
+            amount=amount,
+            credit_type=credit_type,
+        )
+        movement_id = movement.id_movimentacao
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Nao foi possivel salvar a recarga no banco.") from exc
 
-    current_balance = Decimal(str(card.saldo)).quantize(Decimal("0.01"))
-    card.saldo = current_balance + amount
-    create_movement(
-        db,
-        card,
-        amount=amount,
-        operation_type="RECARGA",
-        status="APROVADO",
-        location=f"Recarga {credit_type} via Pix UrbPay",
-    )
-    db.commit()
     db.refresh(card)
 
-    saved_balance = Decimal(str(card.saldo)).quantize(Decimal("0.01"))
+    saved_balance = money_decimal(card.saldo)
     return {
         "status": "approved",
+        "persisted": "true",
         "card_id": str(card.id_cartao),
+        "movement_id": str(movement_id),
         "amount": f"{amount:.2f}",
         "balance_value": f"{saved_balance:.2f}",
         "current_balance": currency(saved_balance),
@@ -1559,7 +1615,7 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
         "token": token,
         "current_user": user,
         "profile_image": user.foto_perfil if user.foto_perfil else "imgs/EPSTEIN.png",
-        "amount": currency(Decimal(str(payload["amount"]))),
+        "amount": currency(payload["amount"]),
         "card_number": format_card_number(user.cartao.numero_cartao),
         "current_balance": currency(user.cartao.saldo),
         "qr_status": build_qr_status_snapshot(user, token),
@@ -1611,7 +1667,7 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
         "token": token,
         "current_user": user,
         "profile_image": user.foto_perfil if user.foto_perfil else "imgs/EPSTEIN.png",
-        "amount": currency(Decimal(payload["amount"])),
+        "amount": currency(payload["amount"]),
         "card_number": format_card_number(user.cartao.numero_cartao),
         "current_balance": currency(user.cartao.saldo),
     }
@@ -1630,11 +1686,11 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
     if not user or not user.cartao:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
-    amount = Decimal(payload["amount"]).quantize(Decimal("0.01"))
-    balance = Decimal(str(user.cartao.saldo)).quantize(Decimal("0.01"))
+    amount = money_decimal(payload["amount"])
+    balance = money_decimal(user.cartao.saldo)
 
     if balance >= amount:
-        user.cartao.saldo = balance - amount
+        user.cartao.saldo = money_decimal(balance - amount)
         create_movement(
             db,
             user.cartao,
@@ -1644,7 +1700,7 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
             location="Catraca digital QR UrbPay",
         )
         db.commit()
-        mark_qr_authorization_used(user.id_usuario, status="approved", balance=Decimal(str(user.cartao.saldo)))
+        mark_qr_authorization_used(user.id_usuario, status="approved", balance=money_decimal(user.cartao.saldo))
         status = "qr-success"
     else:
         create_movement(
@@ -1656,7 +1712,7 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
             location="Catraca digital QR UrbPay",
         )
         db.commit()
-        mark_qr_authorization_used(user.id_usuario, status="failed", balance=Decimal(str(user.cartao.saldo)))
+        mark_qr_authorization_used(user.id_usuario, status="failed", balance=money_decimal(user.cartao.saldo))
         status = "qr-failed"
 
     status_kind, status_message = STATUS_MESSAGES[status]

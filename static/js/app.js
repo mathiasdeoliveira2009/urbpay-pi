@@ -798,7 +798,7 @@ const creditState = {
   cardId: "",
   cardName: "--",
   cardNumber: "--",
-  currentBalance: 0,
+  currentBalance: null,
   creditType: "--",
   amount: null,
   amountLabel: currencyFormatter.format(0),
@@ -850,7 +850,7 @@ const resetCreditFlow = () => {
   creditState.cardId = "";
   creditState.cardName = "--";
   creditState.cardNumber = "--";
-  creditState.currentBalance = 0;
+  creditState.currentBalance = null;
   creditState.creditType = "--";
   clearCreditAmountSelection();
   setSelectedGroupItem(creditCardButtons, null);
@@ -1030,7 +1030,7 @@ creditConfirmButton?.addEventListener("click", async () => {
 
     creditState.currentBalance = nextBalance;
     updateCardBalanceDisplays(creditState.cardId, nextBalance);
-    showToolbarToast(`Saldo atualizado em ${creditState.amountLabel}.`);
+    showToolbarToast(`Recarga salva no banco. Saldo atual: ${currencyFormatter.format(nextBalance)}.`);
     clearCreditAmountSelection();
     updateCreditSummary();
     setServicePanel("credit-home");
