@@ -650,6 +650,41 @@ def ensure_database_schema() -> None:
 
     with engine.begin() as connection:
         inspector = inspect(connection)
+
+        if connection.dialect.name == "postgresql":
+            for table_name, column_name in (
+                ("usuarios", "id_usuario"),
+                ("cartao", "id_cartao"),
+                ("maquina", "id_maquina"),
+                ("movimentacoes", "id_movimentacao"),
+            ):
+                if table_name not in inspector.get_table_names():
+                    continue
+
+                sequence_name = f"{table_name}_{column_name}_seq"
+                connection.execute(text(f'CREATE SEQUENCE IF NOT EXISTS "{sequence_name}"'))
+                connection.execute(
+                    text(
+                        f'ALTER SEQUENCE "{sequence_name}" '
+                        f'OWNED BY "{table_name}"."{column_name}"'
+                    )
+                )
+                connection.execute(
+                    text(
+                        f'ALTER TABLE "{table_name}" '
+                        f'ALTER COLUMN "{column_name}" SET DEFAULT nextval(\'"{sequence_name}"\'::regclass)'
+                    )
+                )
+                connection.execute(
+                    text(
+                        f'SELECT setval('
+                        f'\'"{sequence_name}"\', '
+                        f'COALESCE((SELECT MAX("{column_name}") FROM "{table_name}"), 0) + 1, '
+                        f'false'
+                        f')'
+                    )
+                )
+
         existing_columns = {
             column["name"]
             for column in inspect(connection).get_columns("usuarios")
