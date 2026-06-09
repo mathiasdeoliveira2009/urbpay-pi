@@ -462,7 +462,7 @@ def get_user_cards(db: Session, user_id: int) -> list[Cartao]:
     statement = (
         select(Cartao)
         .where(Cartao.id_usuario == user_id)
-        .order_by(Cartao.id_cartao)
+        .order_by(desc(Cartao.id_cartao))
     )
     return list(db.scalars(statement))
 
