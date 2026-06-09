@@ -467,6 +467,11 @@ def get_user_cards(db: Session, user_id: int) -> list[Cartao]:
     return list(db.scalars(statement))
 
 
+def get_primary_user_card(db: Session, user_id: int) -> Cartao | None:
+    cards = get_user_cards(db, user_id)
+    return cards[0] if cards else None
+
+
 def build_dashboard_services(active_service_key: str | None) -> list[dict[str, object]]:
     services: list[dict[str, object]] = []
     for item in DASHBOARD_SERVICE_MENU:
@@ -1607,7 +1612,8 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
     if int(payload["user_id"]) != user.id_usuario:
         raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
 
-    if not user.cartao:
+    card = get_primary_user_card(db, user.id_usuario)
+    if not card:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
     context = {
@@ -1616,9 +1622,12 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
         "current_user": user,
         "profile_image": user.foto_perfil if user.foto_perfil else "imgs/EPSTEIN.png",
         "amount": currency(payload["amount"]),
-        "card_number": format_card_number(user.cartao.numero_cartao),
-        "current_balance": currency(user.cartao.saldo),
-        "qr_status": build_qr_status_snapshot(user, token),
+        "card_number": format_card_number(card.numero_cartao),
+        "current_balance": currency(card.saldo),
+        "qr_status": {
+            **build_qr_status_snapshot(user, token),
+            "balance": currency(card.saldo),
+        },
         "qr_status_url": str(request.url_for("dashboard_qr_status", token=token)),
         "qr_customer_url": str(request.url_for("passage_gateway", token=token)),
     }
@@ -1636,7 +1645,10 @@ def dashboard_qr_status(token: str, request: Request, db: Session = Depends(get_
         raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
 
     snapshot = build_qr_status_snapshot(user, token)
-    snapshot["current_balance"] = currency(user.cartao.saldo if user.cartao else Decimal("0.00"))
+    card = get_primary_user_card(db, user.id_usuario)
+    balance_text = currency(card.saldo if card else Decimal("0.00"))
+    snapshot["balance"] = balance_text
+    snapshot["current_balance"] = balance_text
     return snapshot
 
 
@@ -1650,6 +1662,9 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
         .where(Usuario.id_usuario == int(payload["user_id"]))
     )
     if not user or not user.cartao:
+        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+    card = get_primary_user_card(db, user.id_usuario)
+    if not card:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
     authorization = ACTIVE_QR_AUTHORIZATIONS.get(user.id_usuario)
@@ -1668,8 +1683,8 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
         "current_user": user,
         "profile_image": user.foto_perfil if user.foto_perfil else "imgs/EPSTEIN.png",
         "amount": currency(payload["amount"]),
-        "card_number": format_card_number(user.cartao.numero_cartao),
-        "current_balance": currency(user.cartao.saldo),
+        "card_number": format_card_number(card.numero_cartao),
+        "current_balance": currency(card.saldo),
     }
     return templates.TemplateResponse("passage_gate.html", context)
 
@@ -1685,34 +1700,39 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
     )
     if not user or not user.cartao:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+    card = get_primary_user_card(db, user.id_usuario)
+    if not card:
+        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
     amount = money_decimal(payload["amount"])
-    balance = money_decimal(user.cartao.saldo)
+    balance = money_decimal(card.saldo)
 
     if balance >= amount:
-        user.cartao.saldo = money_decimal(balance - amount)
+        card.saldo = money_decimal(balance - amount)
         create_movement(
             db,
-            user.cartao,
+            card,
             amount=amount,
             operation_type="DEBITO",
             status="APROVADO",
             location="Catraca digital QR UrbPay",
         )
         db.commit()
-        mark_qr_authorization_used(user.id_usuario, status="approved", balance=money_decimal(user.cartao.saldo))
+        db.refresh(card)
+        mark_qr_authorization_used(user.id_usuario, status="approved", balance=money_decimal(card.saldo))
         status = "qr-success"
     else:
         create_movement(
             db,
-            user.cartao,
+            card,
             amount=amount,
             operation_type="DEBITO",
             status="SALDO_INSUFICIENTE",
             location="Catraca digital QR UrbPay",
         )
         db.commit()
-        mark_qr_authorization_used(user.id_usuario, status="failed", balance=money_decimal(user.cartao.saldo))
+        db.refresh(card)
+        mark_qr_authorization_used(user.id_usuario, status="failed", balance=money_decimal(card.saldo))
         status = "qr-failed"
 
     status_kind, status_message = STATUS_MESSAGES[status]
@@ -1723,7 +1743,7 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
         "current_user": user,
         "profile_image": user.foto_perfil if user.foto_perfil else "imgs/EPSTEIN.png",
         "amount": currency(amount),
-        "current_balance": currency(user.cartao.saldo),
+        "current_balance": currency(card.saldo),
     }
     return templates.TemplateResponse("passage_result.html", context)
 
