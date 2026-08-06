@@ -6,6 +6,9 @@ const floatingItems = document.querySelectorAll(".floating-card");
 const signupModal = document.querySelector("[data-signup-modal]");
 const signupOpeners = document.querySelectorAll("[data-signup-open]");
 const signupClosers = document.querySelectorAll("[data-signup-close]");
+const qrModal = document.querySelector("[data-qr-modal]");
+const qrModalOpeners = document.querySelectorAll("[data-qr-modal-open]");
+const qrModalClosers = document.querySelectorAll("[data-qr-modal-close]");
 const statusModal = document.querySelector("[data-status-modal]");
 const statusModalClosers = document.querySelectorAll("[data-status-close]");
 const toolbar = document.querySelector("[data-utility-toolbar]");
@@ -58,6 +61,11 @@ const commonSupportSubmitButton = document.querySelector("[data-common-support-s
 const commonSupportToggleButton = document.querySelector("[data-common-support-toggle]");
 const commonSupportPlaceholder = document.querySelector("[data-common-support-placeholder]");
 const commonSupportPlaceholderText = document.querySelector("[data-common-support-placeholder-text]");
+const dashboardShortcutButtons = document.querySelectorAll("[data-dashboard-shortcut]");
+const dashboardViewButtons = document.querySelectorAll("[data-dashboard-view]");
+const dashboardPanels = document.querySelectorAll("[data-dashboard-panel]");
+const dashboardPlaceholder = document.querySelector("[data-dashboard-placeholder]");
+const dashboardWorkspace = document.querySelector(".urb-workspace");
 
 const settingsStorage = {
   theme: "urbpay-theme",
@@ -210,6 +218,10 @@ const commonSupportState = {
   activeId: "",
   responseTimeoutId: null,
   isOpen: false,
+};
+
+const dashboardState = {
+  activeView: "home",
 };
 
 const escapeHtml = (value) => String(value ?? "")
@@ -369,6 +381,37 @@ const syncServiceMenuState = (panelName) => {
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
+};
+
+const syncDashboardViewButtons = (activeView) => {
+  dashboardViewButtons.forEach((button) => {
+    const isActive = button.dataset.dashboardView === activeView;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+};
+
+const setDashboardView = (viewName, { scrollIntoView = true } = {}) => {
+  if (!dashboardPanels.length) {
+    return;
+  }
+
+  const normalizedView = viewName || "home";
+  dashboardState.activeView = normalizedView;
+
+  dashboardPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.dashboardPanel !== normalizedView;
+  });
+
+  if (dashboardPlaceholder) {
+    dashboardPlaceholder.hidden = normalizedView !== "home";
+  }
+
+  syncDashboardViewButtons(normalizedView);
+
+  if (scrollIntoView && normalizedView !== "home" && dashboardWorkspace) {
+    dashboardWorkspace.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 };
 
 const cloneCommonSupportMessages = (messages) => Array.isArray(messages)
@@ -551,6 +594,11 @@ const sendCommonSupportEmail = async (item) => {
 applyTheme(getStoredTheme());
 applyLanguage(getStoredLanguage());
 
+const syncBodyModalState = () => {
+  const hasOpenModal = signupModal?.classList.contains("is-open") || qrModal?.classList.contains("is-open");
+  body.classList.toggle("modal-open", Boolean(hasOpenModal));
+};
+
 const setSignupState = (open) => {
   if (!signupModal) {
     return;
@@ -558,7 +606,18 @@ const setSignupState = (open) => {
 
   signupModal.classList.toggle("is-open", open);
   signupModal.setAttribute("aria-hidden", String(!open));
-  body.classList.toggle("modal-open", open);
+  syncBodyModalState();
+};
+
+const setQrModalState = (open) => {
+  if (!qrModal) {
+    return;
+  }
+
+  qrModal.classList.toggle("is-open", open);
+  qrModal.hidden = !open;
+  qrModal.setAttribute("aria-hidden", String(!open));
+  syncBodyModalState();
 };
 
 const setStatusModalState = (open) => {
@@ -571,7 +630,11 @@ const setStatusModalState = (open) => {
 };
 
 if (signupModal?.classList.contains("is-open")) {
-  body.classList.add("modal-open");
+  syncBodyModalState();
+}
+
+if (qrModal?.classList.contains("is-open")) {
+  syncBodyModalState();
 }
 
 if (statusModal?.classList.contains("is-open")) {
@@ -589,6 +652,14 @@ signupClosers.forEach((button) => {
   button.addEventListener("click", () => setSignupState(false));
 });
 
+qrModalOpeners.forEach((button) => {
+  button.addEventListener("click", () => setQrModalState(true));
+});
+
+qrModalClosers.forEach((button) => {
+  button.addEventListener("click", () => setQrModalState(false));
+});
+
 statusModalClosers.forEach((button) => {
   button.addEventListener("click", () => setStatusModalState(false));
 });
@@ -596,6 +667,7 @@ statusModalClosers.forEach((button) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     setSignupState(false);
+    setQrModalState(false);
     setStatusModalState(false);
     closeToolbarPanels();
   }
@@ -1044,6 +1116,17 @@ creditConfirmButton?.addEventListener("click", async () => {
   }
 });
 
+syncDashboardViewButtons(dashboardState.activeView);
+
+dashboardViewButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const targetView = button.dataset.dashboardView || "home";
+    const hasServiceTrigger = Boolean(button.dataset.serviceTrigger);
+    const shouldCollapse = !hasServiceTrigger && dashboardState.activeView === targetView && targetView !== "home";
+    setDashboardView(shouldCollapse ? "home" : targetView);
+  });
+});
+
 serviceTriggers.forEach((button) => {
   button.addEventListener("click", () => {
     const panelName = button.dataset.serviceTrigger;
@@ -1071,6 +1154,19 @@ serviceTriggers.forEach((button) => {
 
     setServicePanel(panelName);
     scrollServiceFlowIntoView();
+  });
+});
+
+dashboardShortcutButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const shortcut = button.dataset.dashboardShortcut;
+
+    if (shortcut === "billing") {
+      showToolbarToast("A cobranca compartilhada entrou no novo layout e segue para a proxima etapa de backend.");
+      return;
+    }
+
+    showToolbarToast("Este atalho entra na proxima etapa.");
   });
 });
 
@@ -1158,6 +1254,12 @@ const tickCountdowns = () => {
     const remainingSeconds = Math.max(0, Math.floor((Date.parse(expiresAt) - now) / 1000));
     item.textContent = formatCountdown(remainingSeconds);
     item.classList.toggle("is-expired", remainingSeconds <= 0);
+
+    const passageStatus = item.closest(".urb-summary-card--passage")?.querySelector("[data-passage-status]");
+    if (passageStatus) {
+      passageStatus.textContent = remainingSeconds <= 0 ? "Expirada" : "Ativa";
+      passageStatus.classList.toggle("is-expired", remainingSeconds <= 0);
+    }
   });
 };
 
@@ -1178,6 +1280,239 @@ const setQrStageState = (node, state) => {
   }
 };
 
+const qrSimulatorState = {
+  isBusy: false,
+  validationTimerId: null,
+};
+
+const getQrSimulatorCopy = (snapshot) => {
+  if (snapshot.code === "created") {
+    return {
+      heroTitle: "Aproxime o QR Code do leitor",
+      heroMessage: "Posicione o QR digital no leitor da catraca para iniciar a validacao da passagem.",
+      statusLabel: "QR pronto para leitura",
+      summaryTitle: "Leitor aguardando aproximacao",
+      summaryCopy: "Simule a leitura do QR para iniciar o fluxo operacional da catraca.",
+      consoleTitle: "Leitor pronto",
+      consoleCopy: "Clique em simular leitura para reproduzir a aproximacao do QR na catraca, como no uso em estacoes da CPTM e do Metro.",
+    };
+  }
+
+  if (snapshot.code === "opened") {
+    return {
+      heroTitle: "Leitura identificada",
+      heroMessage: "O leitor reconheceu o QR Code e o backend esta conferindo autorizacao e saldo.",
+      statusLabel: "Validando bilhete",
+      summaryTitle: "Validacao em andamento",
+      summaryCopy: "A leitura foi detectada e o sistema esta processando a autorizacao da passagem.",
+      consoleTitle: "Validando bilhete",
+      consoleCopy: "O QR foi lido. A simulacao agora executa a mesma etapa de conferência que antecede a liberacao do bloqueio.",
+    };
+  }
+
+  if (snapshot.code === "approved") {
+    return {
+      heroTitle: "Catraca liberada",
+      heroMessage: snapshot.message,
+      statusLabel: snapshot.label,
+      summaryTitle: snapshot.title,
+      summaryCopy: snapshot.message,
+      consoleTitle: "Bloqueio liberado",
+      consoleCopy: "A autorizacao foi aprovada. Na operacao real, o passageiro tem uma janela curta para ultrapassar a catraca.",
+    };
+  }
+
+  if (snapshot.code === "completed") {
+    return {
+      heroTitle: "Passagem concluida",
+      heroMessage: snapshot.message,
+      statusLabel: snapshot.label,
+      summaryTitle: snapshot.title,
+      summaryCopy: snapshot.message,
+      consoleTitle: "Leitura encerrada",
+      consoleCopy: "A travessia foi concluida e esta simulacao foi encerrada. Gere um novo QR para reiniciar o fluxo.",
+    };
+  }
+
+  if (snapshot.code === "failed") {
+    return {
+      heroTitle: "Validacao nao autorizada",
+      heroMessage: snapshot.message,
+      statusLabel: snapshot.label,
+      summaryTitle: snapshot.title,
+      summaryCopy: snapshot.message,
+      consoleTitle: "Acesso negado",
+      consoleCopy: "O bloqueio nao foi liberado. Com este token, a simulacao foi encerrada e um novo QR deve ser gerado apos ajuste de saldo.",
+    };
+  }
+
+  if (snapshot.code === "expired") {
+    return {
+      heroTitle: "Janela encerrada",
+      heroMessage: snapshot.message,
+      statusLabel: snapshot.label,
+      summaryTitle: snapshot.title,
+      summaryCopy: snapshot.message,
+      consoleTitle: "QR expirado",
+      consoleCopy: "A validade do QR terminou antes da leitura. Gere uma nova passagem para simular novamente.",
+    };
+  }
+
+  if (snapshot.code === "replaced") {
+    return {
+      heroTitle: "QR substituido",
+      heroMessage: snapshot.message,
+      statusLabel: snapshot.label,
+      summaryTitle: snapshot.title,
+      summaryCopy: snapshot.message,
+      consoleTitle: "QR substituido",
+      consoleCopy: "Outro QR ja assumiu o lugar deste token. Reabra o simulador usando a passagem mais recente.",
+    };
+  }
+
+  if (snapshot.code === "inactive") {
+    return {
+      heroTitle: "Acompanhamento indisponivel",
+      heroMessage: snapshot.message,
+      statusLabel: snapshot.label,
+      summaryTitle: snapshot.title,
+      summaryCopy: snapshot.message,
+      consoleTitle: "Sem solicitacao ativa",
+      consoleCopy: "Nao existe mais uma passagem ativa associada a este token.",
+    };
+  }
+
+  if (snapshot.code === "invalid") {
+    return {
+      heroTitle: "Token nao reconhecido",
+      heroMessage: snapshot.message,
+      statusLabel: snapshot.label,
+      summaryTitle: snapshot.title,
+      summaryCopy: snapshot.message,
+      consoleTitle: "QR nao reconhecido",
+      consoleCopy: "Este token nao corresponde a uma passagem valida da simulacao atual.",
+    };
+  }
+
+  return {
+    heroTitle: snapshot.title,
+    heroMessage: snapshot.message,
+    statusLabel: snapshot.label,
+    summaryTitle: snapshot.title,
+    summaryCopy: snapshot.message,
+    consoleTitle: "Fluxo operacional",
+    consoleCopy: snapshot.message,
+  };
+};
+
+const clearQrValidationTimer = () => {
+  if (qrSimulatorState.validationTimerId) {
+    window.clearTimeout(qrSimulatorState.validationTimerId);
+    qrSimulatorState.validationTimerId = null;
+  }
+};
+
+const updateQrSimulatorConsole = (snapshot, copy) => {
+  if (!qrSimulatorRoot) {
+    return;
+  }
+
+  const consoleTitle = qrSimulatorRoot.querySelector("[data-qr-console-title]");
+  const consoleCopy = qrSimulatorRoot.querySelector("[data-qr-console-copy]");
+
+  if (consoleTitle) {
+    consoleTitle.textContent = copy.consoleTitle;
+  }
+
+  if (consoleCopy) {
+    consoleCopy.textContent = copy.consoleCopy;
+  }
+};
+
+const updateQrSimulatorControls = (snapshot) => {
+  if (!qrSimulatorRoot) {
+    return;
+  }
+
+  const scanButton = qrSimulatorRoot.querySelector("[data-qr-scan-action]");
+  const completeButton = qrSimulatorRoot.querySelector("[data-qr-complete-action]");
+  const passengerLink = qrSimulatorRoot.querySelector("[data-qr-passenger-link]");
+  const dashboardLink = qrSimulatorRoot.querySelector("[data-qr-dashboard-link]");
+
+  if (!scanButton || !completeButton || !passengerLink || !dashboardLink) {
+    return;
+  }
+
+  const isWaitingScan = snapshot.code === "created";
+  const isValidating = snapshot.code === "opened";
+  const isReleased = snapshot.code === "approved";
+  const isTerminal = ["completed", "failed", "expired", "replaced", "inactive", "invalid"].includes(snapshot.code);
+
+  scanButton.hidden = !isWaitingScan && !isValidating;
+  scanButton.disabled = !isWaitingScan || qrSimulatorState.isBusy;
+  scanButton.textContent = isValidating ? "Validando bilhete..." : "Simular leitura do QR";
+
+  completeButton.hidden = !isReleased;
+  completeButton.disabled = !isReleased || qrSimulatorState.isBusy;
+  completeButton.textContent = "Simular passagem na catraca";
+
+  passengerLink.hidden = isReleased || isTerminal;
+  dashboardLink.textContent = isTerminal ? "Gerar novo QR no painel" : "Voltar ao painel";
+  dashboardLink.setAttribute("href", "/dashboard");
+};
+
+const postQrSimulatorAction = async (url) => {
+  const response = await window.fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.detail || `Nao foi possivel concluir a operacao (${response.status}).`);
+  }
+
+  return payload;
+};
+
+const runQrSimulatorValidation = async () => {
+  if (!qrSimulatorRoot || qrSimulatorState.isBusy) {
+    return;
+  }
+
+  const validateUrl = qrSimulatorRoot.dataset.validateUrl;
+  if (!validateUrl) {
+    return;
+  }
+
+  clearQrValidationTimer();
+  qrSimulatorState.isBusy = true;
+
+  try {
+    const snapshot = await postQrSimulatorAction(validateUrl);
+    renderQrSimulatorStatus(snapshot);
+  } catch (error) {
+    console.error(error);
+    showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel validar o bilhete.");
+  } finally {
+    qrSimulatorState.isBusy = false;
+    updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
+  }
+};
+
+const scheduleQrSimulatorValidation = (delayMs = 1000) => {
+  if (!qrSimulatorRoot || !qrSimulatorRoot.dataset.validateUrl) {
+    return;
+  }
+
+  clearQrValidationTimer();
+  qrSimulatorState.validationTimerId = window.setTimeout(() => {
+    runQrSimulatorValidation();
+  }, delayMs);
+};
+
 const applyQrTimelineState = (snapshot) => {
   if (!qrSimulatorRoot) {
     return;
@@ -1188,17 +1523,18 @@ const applyQrTimelineState = (snapshot) => {
   const resultCard = qrSimulatorRoot.querySelector('[data-qr-stage-card="result"]');
   const resultHeading = qrSimulatorRoot.querySelector("[data-qr-result-heading]");
   const resultCopy = qrSimulatorRoot.querySelector("[data-qr-result-copy]");
+  const copy = getQrSimulatorCopy(snapshot);
 
   setQrStageState(createdCard, null);
   setQrStageState(openedCard, null);
   setQrStageState(resultCard, null);
 
   if (resultHeading) {
-    resultHeading.textContent = "Resultado da validacao";
+    resultHeading.textContent = copy.summaryTitle;
   }
 
   if (resultCopy) {
-    resultCopy.textContent = "A autorizacao final aparece aqui assim que o cliente concluir a compra.";
+    resultCopy.textContent = copy.summaryCopy;
   }
 
   if (snapshot.code === "created") {
@@ -1212,15 +1548,14 @@ const applyQrTimelineState = (snapshot) => {
     return;
   }
 
+  if (snapshot.code === "approved") {
+    setQrStageState(createdCard, "is-complete");
+    setQrStageState(openedCard, "is-complete");
+    setQrStageState(resultCard, "is-active");
+    return;
+  }
+
   if (snapshot.code === "invalid") {
-    if (resultHeading) {
-      resultHeading.textContent = snapshot.title;
-    }
-
-    if (resultCopy) {
-      resultCopy.textContent = snapshot.message;
-    }
-
     setQrStageState(resultCard, "is-error");
     return;
   }
@@ -1237,10 +1572,7 @@ const applyQrTimelineState = (snapshot) => {
     return;
   }
 
-  resultHeading.textContent = snapshot.title;
-  resultCopy.textContent = snapshot.message;
-
-  if (snapshot.code === "approved") {
+  if (snapshot.code === "completed") {
     setQrStageState(openedCard, "is-complete");
     setQrStageState(resultCard, "is-success");
     return;
@@ -1259,11 +1591,13 @@ const renderQrSimulatorStatus = (snapshot) => {
   const messageNode = qrSimulatorRoot.querySelector("[data-qr-status-message]");
   const balanceNode = qrSimulatorRoot.querySelector("[data-qr-status-balance]");
   const expiryNode = qrSimulatorRoot.querySelector("[data-qr-status-expiry]");
+  const expiryLabelNode = qrSimulatorRoot.querySelector("[data-qr-expiry-label]");
   const turnstileNode = qrSimulatorRoot.querySelector("[data-qr-turnstile]");
   const appearances = ["pending", "active", "success", "error", "warning", "muted"];
+  const copy = getQrSimulatorCopy(snapshot);
 
   if (labelNode) {
-    labelNode.textContent = snapshot.label;
+    labelNode.textContent = copy.statusLabel;
     appearances.forEach((appearance) => {
       labelNode.classList.remove(`gate-status-badge--${appearance}`);
     });
@@ -1271,20 +1605,36 @@ const renderQrSimulatorStatus = (snapshot) => {
   }
 
   if (titleNode) {
-    titleNode.textContent = snapshot.title;
+    titleNode.textContent = copy.heroTitle;
   }
 
   if (messageNode) {
-    messageNode.textContent = snapshot.message;
+    messageNode.textContent = copy.heroMessage;
   }
 
   if (balanceNode) {
-    balanceNode.textContent = snapshot.current_balance || snapshot.balance;
+    const nextBalance = snapshot.current_balance || snapshot.balance || "0,00";
+    balanceNode.textContent = nextBalance.startsWith("R$") ? nextBalance : `R$ ${nextBalance}`;
   }
 
   if (expiryNode) {
-    const isWaiting = snapshot.code === "created" || snapshot.code === "opened";
-    expiryNode.textContent = isWaiting ? formatCountdown(Number(snapshot.remaining_seconds || 0)) : snapshot.label;
+    if (snapshot.code === "approved") {
+      expiryNode.textContent = formatCountdown(Number(snapshot.gate_remaining_seconds || 0));
+    } else if (snapshot.code === "created" || snapshot.code === "opened") {
+      expiryNode.textContent = formatCountdown(Number(snapshot.remaining_seconds || 0));
+    } else {
+      expiryNode.textContent = snapshot.label;
+    }
+  }
+
+  if (expiryLabelNode) {
+    if (snapshot.code === "approved") {
+      expiryLabelNode.textContent = "Janela da catraca";
+    } else if (snapshot.code === "created" || snapshot.code === "opened") {
+      expiryLabelNode.textContent = "Validade do QR";
+    } else {
+      expiryLabelNode.textContent = "Status da janela";
+    }
   }
 
   if (turnstileNode) {
@@ -1294,11 +1644,65 @@ const renderQrSimulatorStatus = (snapshot) => {
     turnstileNode.classList.add(`gate-turnstile--${snapshot.appearance || "muted"}`);
   }
 
+  qrSimulatorRoot.dataset.qrAppearance = snapshot.appearance || "muted";
+  qrSimulatorRoot.dataset.qrCode = snapshot.code || "inactive";
+  updateQrSimulatorConsole(snapshot, copy);
   applyQrTimelineState(snapshot);
+  updateQrSimulatorControls(snapshot);
+
+  if (snapshot.code === "opened") {
+    scheduleQrSimulatorValidation();
+  } else {
+    clearQrValidationTimer();
+  }
 };
 
 if (qrSimulatorRoot) {
   const simulatorStatusUrl = qrSimulatorRoot.dataset.statusUrl;
+  const scanButton = qrSimulatorRoot.querySelector("[data-qr-scan-action]");
+  const completeButton = qrSimulatorRoot.querySelector("[data-qr-complete-action]");
+  const scanUrl = qrSimulatorRoot.dataset.scanUrl;
+  const completeUrl = qrSimulatorRoot.dataset.completeUrl;
+
+  scanButton?.addEventListener("click", async () => {
+    if (!scanUrl || qrSimulatorState.isBusy) {
+      return;
+    }
+
+    qrSimulatorState.isBusy = true;
+    updateQrSimulatorControls({ code: "created" });
+
+    try {
+      const snapshot = await postQrSimulatorAction(scanUrl);
+      renderQrSimulatorStatus(snapshot);
+    } catch (error) {
+      console.error(error);
+      showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel simular a leitura do QR.");
+    } finally {
+      qrSimulatorState.isBusy = false;
+      updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
+    }
+  });
+
+  completeButton?.addEventListener("click", async () => {
+    if (!completeUrl || qrSimulatorState.isBusy) {
+      return;
+    }
+
+    qrSimulatorState.isBusy = true;
+    updateQrSimulatorControls({ code: "approved" });
+
+    try {
+      const snapshot = await postQrSimulatorAction(completeUrl);
+      renderQrSimulatorStatus(snapshot);
+    } catch (error) {
+      console.error(error);
+      showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel concluir a passagem.");
+    } finally {
+      qrSimulatorState.isBusy = false;
+      updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
+    }
+  });
 
   if (simulatorStatusUrl) {
     let qrSimulatorPollId = null;
@@ -1319,6 +1723,7 @@ if (qrSimulatorRoot) {
         renderQrSimulatorStatus(snapshot);
 
         if (snapshot.is_final && qrSimulatorPollId) {
+          clearQrValidationTimer();
           window.clearInterval(qrSimulatorPollId);
           qrSimulatorPollId = null;
         }

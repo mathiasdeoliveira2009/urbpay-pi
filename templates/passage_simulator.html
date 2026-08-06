@@ -3,86 +3,210 @@
 {% block title %}UrbPay | Simulacao de Catraca{% endblock %}
 
 {% block content %}
-  <main class="gate-shell">
-    <section class="gate-card gate-card--simulator" data-qr-simulator-root data-status-url="{{ qr_status_url }}">
-      <div class="gate-simulator__top">
-        <div>
-          <span class="eyebrow">Simulacao de catraca</span>
-          <h1>Acompanhe a solicitacao do QR Code</h1>
-          <p>Deixe esta pagina aberta. Quando o cliente abrir o QR e tocar em Comprar passagem, a resposta aparece aqui.</p>
+  {% set name_parts = current_user.nome.split(' ') %}
+  {% set operator_initials = (name_parts[0][:1] ~ name_parts[-1][:1]) | upper %}
+  {% set current_card_digits = card_number | replace(' ', '') %}
+  <main class="gate-shell gate-shell--operator">
+    <header class="gate-ops-header">
+      <div class="gate-ops-header__inner">
+        <div class="gate-ops-header__brand">
+          <img src="{{ url_for('static', path='imgs/logo_urbpay.png') }}" alt="Logo UrbPay" class="gate-ops-header__logo" />
         </div>
 
-        <span class="gate-status-badge gate-status-badge--{{ qr_status.appearance }}" data-qr-status-label>{{ qr_status.label }}</span>
-      </div>
-
-      <div class="gate-turnstile gate-turnstile--{{ qr_status.appearance }}" data-qr-turnstile>
-        <div class="gate-turnstile__arms" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
+        <div class="gate-ops-header__title">
+          <span class="gate-ops-header__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 20V6.5A1.5 1.5 0 0 1 6.5 5H11"></path>
+              <path d="M13 5h4.5A1.5 1.5 0 0 1 19 6.5V20"></path>
+              <path d="M9 20v-6"></path>
+              <path d="M15 20v-3"></path>
+              <path d="M8 9h8"></path>
+              <path d="M8 13h6"></path>
+            </svg>
+          </span>
+          <div class="gate-ops-header__title-copy">
+            <span>Validacao em tempo real</span>
+            <h1>Simulador de catraca</h1>
+          </div>
         </div>
-        <strong data-qr-status-title>{{ qr_status.title }}</strong>
-        <p data-qr-status-message>{{ qr_status.message }}</p>
-      </div>
 
-      <div class="gate-simulator__stats">
-        <article>
-          <span>Passagem</span>
-          <strong>{{ amount }}</strong>
-        </article>
-        <article>
-          <span>Saldo atual</span>
-          <strong data-qr-status-balance>{{ qr_status.balance }}</strong>
-        </article>
-        <article>
-          <span>Status da janela</span>
-          <strong data-qr-status-expiry>
-            {% if qr_status.code in ["created", "opened"] %}
-              {{ "%02d:%02d"|format(qr_status.remaining_seconds // 60, qr_status.remaining_seconds % 60) }}
-            {% else %}
+        <div class="gate-ops-header__operator">
+          <span class="gate-ops-header__avatar">{{ operator_initials }}</span>
+          <div>
+            <strong>{{ current_user.nome }}</strong>
+            <p>Usuario conectado</p>
+          </div>
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m8 10 4 4 4-4"></path>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <section
+      class="gate-ops-shell"
+      data-qr-simulator-root
+      data-status-url="{{ qr_status_url }}"
+      data-scan-url="{{ qr_scan_url }}"
+      data-validate-url="{{ qr_validate_url }}"
+      data-complete-url="{{ qr_complete_url }}"
+      data-customer-url="{{ qr_customer_url }}"
+      data-qr-appearance="{{ qr_status.appearance }}"
+      data-qr-code="{{ qr_status.code }}"
+    >
+      <div class="gate-ops-grid">
+        <article class="gate-ops-hero gate-turnstile gate-turnstile--{{ qr_status.appearance }}" data-qr-turnstile>
+          <div class="gate-ops-hero__visual" aria-hidden="true">
+            <div class="gate-ops-hero__scan">
+              <span class="gate-ops-hero__corner gate-ops-hero__corner--tl"></span>
+              <span class="gate-ops-hero__corner gate-ops-hero__corner--tr"></span>
+              <span class="gate-ops-hero__corner gate-ops-hero__corner--bl"></span>
+              <span class="gate-ops-hero__corner gate-ops-hero__corner--br"></span>
+              <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M28 28h22v22H28z"></path>
+                <path d="M70 28h22v22H70z"></path>
+                <path d="M28 70h22v22H28z"></path>
+                <path d="M76 76h6"></path>
+                <path d="M86 76v10"></path>
+                <path d="M70 92h8"></path>
+                <path d="M92 88v8"></path>
+                <path d="M70 58h8"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="gate-ops-hero__copy">
+            <h2 data-qr-status-title>{{ qr_status.title }}</h2>
+            <p data-qr-status-message>{{ qr_status.message }}</p>
+          </div>
+
+          <div class="gate-ops-hero__status">
+            <span class="gate-status-badge gate-status-badge--{{ qr_status.appearance }}" data-qr-status-label>
               {{ qr_status.label }}
-            {% endif %}
-          </strong>
+            </span>
+          </div>
         </article>
+
+        <aside class="gate-ops-summary">
+          <div class="gate-ops-summary__rows">
+            <article class="gate-ops-summary__row">
+              <span class="gate-ops-summary__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 8.5h14"></path>
+                  <path d="M7.5 5h9A2.5 2.5 0 0 1 19 7.5v9A2.5 2.5 0 0 1 16.5 19h-9A2.5 2.5 0 0 1 5 16.5v-9A2.5 2.5 0 0 1 7.5 5Z"></path>
+                  <path d="M10 12h4"></path>
+                </svg>
+              </span>
+              <div>
+                <span>Tarifa</span>
+                <strong data-qr-fare>R$ {{ amount }}</strong>
+              </div>
+            </article>
+
+            <article class="gate-ops-summary__row">
+              <span class="gate-ops-summary__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.5 7.5h15"></path>
+                  <path d="M5.5 5h13A1.5 1.5 0 0 1 20 6.5v11A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5v-11A1.5 1.5 0 0 1 5.5 5Z"></path>
+                  <path d="M15 13h2.5"></path>
+                </svg>
+              </span>
+              <div>
+                <span>Saldo atual</span>
+                <strong data-qr-status-balance>R$ {{ qr_status.balance }}</strong>
+              </div>
+            </article>
+
+            <article class="gate-ops-summary__row">
+              <span class="gate-ops-summary__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="8"></circle>
+                  <path d="M12 8v5l3 2"></path>
+                </svg>
+              </span>
+              <div>
+                <span data-qr-expiry-label>
+                  {% if qr_status.code == "approved" %}
+                    Janela da catraca
+                  {% elif qr_status.code in ["created", "opened"] %}
+                    Validade do QR
+                  {% else %}
+                    Status da janela
+                  {% endif %}
+                </span>
+                <strong data-qr-status-expiry>
+                  {% if qr_status.code == "approved" %}
+                    {{ "%02d:%02d"|format(qr_status.gate_remaining_seconds // 60, qr_status.gate_remaining_seconds % 60) }}
+                  {% elif qr_status.code in ["created", "opened"] %}
+                    {{ "%02d:%02d"|format(qr_status.remaining_seconds // 60, qr_status.remaining_seconds % 60) }}
+                  {% else %}
+                    {{ qr_status.label }}
+                  {% endif %}
+                </strong>
+              </div>
+            </article>
+          </div>
+
+          <div class="gate-ops-passenger">
+            <img src="{{ url_for('static', path=profile_image) }}" alt="Foto do passageiro" class="gate-user__avatar gate-ops-passenger__avatar" />
+            <div>
+              <strong>{{ current_user.nome }}</strong>
+              <p>Cartao final {{ current_card_digits[-4:] }}</p>
+            </div>
+          </div>
+        </aside>
       </div>
 
-      <div class="gate-user">
-        <img src="{{ url_for('static', path=profile_image) }}" alt="Foto do usuario" class="gate-user__avatar" />
-        <div>
-          <strong>{{ current_user.nome }}</strong>
-          <p>Cartao {{ card_number }}</p>
-          <p>Solicitacao vinculada a este passageiro</p>
+      <section class="gate-ops-progress">
+        <div class="gate-ops-progress__track">
+          <article class="gate-step-card" data-qr-stage-card="created">
+            <span>01</span>
+            <strong>QR pronto</strong>
+          </article>
+
+          <article class="gate-step-card" data-qr-stage-card="opened">
+            <span>02</span>
+            <strong>Validacao</strong>
+          </article>
+
+          <article class="gate-step-card" data-qr-stage-card="result">
+            <span>03</span>
+            <strong>Passagem</strong>
+          </article>
         </div>
-      </div>
 
-      <div class="gate-simulator__timeline">
-        <article class="gate-timeline-card" data-qr-stage-card="created">
-          <span>01</span>
+        <article class="gate-ops-progress__summary">
+          <span class="gate-ops-progress__summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3h8"></path>
+              <path d="M9 3v4l-4.5 5.4a4 4 0 0 0 3 6.6h9a4 4 0 0 0 3-6.6L15 7V3"></path>
+              <path d="M9 14h6"></path>
+            </svg>
+          </span>
           <div>
-            <strong>QR gerado</strong>
-            <p>Token temporario emitido e pronto para leitura.</p>
+            <strong data-qr-result-heading>{{ qr_status.title }}</strong>
+            <p data-qr-result-copy>{{ qr_status.message }}</p>
           </div>
         </article>
+      </section>
 
-        <article class="gate-timeline-card" data-qr-stage-card="opened">
-          <span>02</span>
-          <div>
-            <strong>Solicitacao aberta</strong>
-            <p>O cliente abriu o QR e a catraca aguarda a compra.</p>
-          </div>
-        </article>
+      <section class="gate-ops-console">
+        <div class="gate-ops-console__copy">
+          <span class="eyebrow">Simulacao operacional</span>
+          <h3 data-qr-console-title>Fluxo de catraca no navegador</h3>
+          <p data-qr-console-copy>Simule a leitura do QR, a validacao do bilhete e a passagem pelo bloqueio com os dados reais do seu sistema.</p>
+        </div>
 
-        <article class="gate-timeline-card" data-qr-stage-card="result">
-          <span>03</span>
-          <div>
-            <strong data-qr-result-heading>Resultado da validacao</strong>
-            <p data-qr-result-copy>A autorizacao final aparece aqui assim que o cliente concluir a compra.</p>
-          </div>
-        </article>
-      </div>
+        <div class="gate-ops-console__actions">
+          <button type="button" class="primary-action" data-qr-scan-action>Simular leitura do QR</button>
+          <button type="button" class="secondary-action" data-qr-complete-action hidden>Simular passagem na catraca</button>
+          <a href="{{ qr_customer_url }}" class="nav-pill" target="_blank" rel="noopener" data-qr-passenger-link>Ver tela do passageiro</a>
+          <a href="/dashboard" class="nav-pill" data-qr-dashboard-link>Voltar ao painel</a>
+        </div>
+      </section>
 
-      <div class="gate-simulator__actions">
-        <a href="{{ qr_customer_url }}" class="secondary-action" target="_blank" rel="noopener">Abrir tela do passageiro</a>
+      <div class="gate-simulator__actions gate-simulator__actions--operator">
+        <a href="{{ qr_customer_url }}" class="secondary-action" target="_blank" rel="noopener">Abrir visual do QR</a>
         <a href="/dashboard" class="secondary-action">Voltar ao painel</a>
       </div>
     </section>
