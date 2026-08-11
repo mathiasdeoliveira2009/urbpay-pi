@@ -1873,27 +1873,41 @@ closeMonthlyModal.addEventListener("click", () => {
   monthlyModal.hidden = true;
 });
 
-document
-  .getElementById("openMonthlyModal")
-  .addEventListener("click", () => {
-    monthlyModal.hidden = false;
-  });
+function setupModal(openId, modalId, closeId) {
 
-document
-  .getElementById("closeMonthlyModal")
-  .addEventListener("click", () => {
-    monthlyModal.hidden = true;
-  });
+  const modal =
+      document.getElementById(modalId);
 
-monthlyModal.addEventListener("click", (event) => {
-  if (
-    event.target.classList.contains(
-      "monthly-modal__backdrop"
-    )
-  ) {
-    monthlyModal.hidden = true;
-  }
-});
+  document
+      .getElementById(openId)
+      .addEventListener("click", () => {
+          modal.hidden = false;
+      });
+
+  document
+      .getElementById(closeId)
+      .addEventListener("click", () => {
+          modal.hidden = true;
+      });
+
+  modal
+      .querySelector(".monthly-modal__backdrop")
+      .addEventListener("click", () => {
+          modal.hidden = true;
+      });
+}
+
+setupModal(
+  "openMonthlyModal",
+  "monthlyModal",
+  "closeMonthlyModal"
+);
+
+setupModal(
+  "openStatusModal",
+  "statusModal",
+  "closeStatusModal"
+);
 
 
 
