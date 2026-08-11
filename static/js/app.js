@@ -1816,9 +1816,11 @@ const applyWidgetVisibility = (state) => {
     card.hidden = !visible;
   });
 
-  widgetToggles.forEach((toggle) => {
-    const visible = state[toggle.value] !== false;
-    toggle.checked = visible;
+  widgetToggles.forEach((button) => {
+    const widget = button.dataset.widgetToggle;
+    const visible = state[widget] === true;
+
+    button.classList.toggle("active", visible);
   });
 };
 
@@ -1843,12 +1845,58 @@ if (historyChartsScript) {
   }
 
   applyWidgetVisibility(widgetState);
-
-  widgetToggles.forEach((toggle) => {
-    toggle.addEventListener("change", () => {
-      widgetState[toggle.value] = toggle.checked;
-      window.localStorage.setItem(widgetStorageKey, JSON.stringify(widgetState));
-      applyWidgetVisibility(widgetState);
-    });
-  });
 }
+
+widgetToggles.forEach((button) => {
+  button.addEventListener("click", () => {
+    const widget = button.dataset.widgetToggle;
+
+    const card = document.querySelector(
+      `[data-widget="${widget}"]`
+    );
+
+    if (!card) return;
+
+    card.hidden = !card.hidden;
+
+    button.classList.toggle("active", !card.hidden);
+  });
+});
+
+const monthlyModal =
+  document.getElementById("monthlyModal");
+
+const closeMonthlyModal =
+  document.getElementById("closeMonthlyModal");
+
+closeMonthlyModal.addEventListener("click", () => {
+  monthlyModal.hidden = true;
+});
+
+document
+  .getElementById("openMonthlyModal")
+  .addEventListener("click", () => {
+    monthlyModal.hidden = false;
+  });
+
+document
+  .getElementById("closeMonthlyModal")
+  .addEventListener("click", () => {
+    monthlyModal.hidden = true;
+  });
+
+monthlyModal.addEventListener("click", (event) => {
+  if (
+    event.target.classList.contains(
+      "monthly-modal__backdrop"
+    )
+  ) {
+    monthlyModal.hidden = true;
+  }
+});
+
+
+
+
+
+

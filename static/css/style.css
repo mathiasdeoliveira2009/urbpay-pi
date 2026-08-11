@@ -7569,3 +7569,81 @@ html[data-theme="dark"] .urb-empty-state {
     transform: none;
   }
 }
+
+.monthly-modal {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  z-index: 9999;
+}
+
+.monthly-modal[hidden] {
+  display: none;
+}
+
+.monthly-modal__backdrop {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  backdrop-filter: blur(8px);
+}
+
+.monthly-modal__wrapper {
+  position: relative;
+  z-index: 1;
+
+  width: min(1200px, 95vw);
+  max-height: 90vh;
+
+  overflow-y: auto;
+}
+
+.monthly-modal__close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #fff;
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+.monthly-modal__wrapper {
+  position: relative;
+}
+
+.monthly-modal__close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #fff;
+
+  font-size: 24px;
+  font-weight: bold;
+
+  cursor: pointer;
+  z-index: 10;
+}
