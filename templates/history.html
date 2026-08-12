@@ -18,16 +18,8 @@
 
 
   <main class="dashboard-main dashboard-main--history">
-
-
-
-
     <section class="history-hero history-hero--separate">
-
-
       <article class="dashboard-card history-hero__profile">
-
-
         <div class="dashboard-card__head">
           <span class="eyebrow">Cliente</span>
           <h2>{{ current_user.nome }}</h2>
@@ -35,15 +27,34 @@
         </div>
 
         <div class="history-profile-card">
-          <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil"
-            class="history-profile-card__avatar" />
-          <div>
+          <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil" class="history-profile-card">
+          <div class="history-profile-card__content">
             <strong>{{ current_user.nome }}</strong>
             <p>Cartao {{ formatted_card_number }}</p>
-            <p>Conta {{ card_preview.status }} | Validade {{ card_preview.data_validade.strftime('%m/%Y') }}</p>
+            <p>
+              Conta {{ card_preview.status }}
+              | Validade {{ card_preview.data_validade.strftime('%m/%Y') }}
+            </p>
+            <div class="history-profile-card__actions">
+              <button class="widget-button" id="openMonthlyModal">
+                Fluxo mensal
+              </button>
+              <button class="widget-button" id="openStatusModal">
+                Status das operações
+              </button>
+              <button class="widget-button" id="openLocationsModal">
+                Locais recorrentes
+              </button>
+              <button class="widget-button" id="openTimelineModal">
+                Linha recente
+              </button>
+              <button class="widget-button" id="openTableModal">
+                Extrato detalhado
+              </button>
+            </div>
           </div>
         </div>
-
+        <!--
         <div class="widget-picker">
           <span class="widget-picker__label">Escolha o que aparece na tela</span>
           <button class="widget-button active" id="openMonthlyModal">
@@ -52,16 +63,17 @@
           <button class="widget-button active" id="openStatusModal">
             Status das operações
           </button>
-          <button class="widget-button active" data-widget-toggle="locations">
+          <button class="widget-button active" id="openLocationsModal">
             Locais recorrentes
           </button>
-          <button class="widget-button active" data-widget-toggle="timeline">
+          <button class="widget-button active" id="openTimelineModal">
             Linha recente
           </button>
-          <button class="widget-button active" data-widget-toggle="table">
+          <button class="widget-button active" id="openTableModal">
             Extrato detalhado
           </button>
         </div>
+        -->
       </article>
 
       <article class="dashboard-card history-hero__summary">
@@ -150,7 +162,7 @@
     </section>
 
     <section class="history-dashboard history-dashboard--separate">
-    <!--
+      <!--
       <article class="dashboard-card chart-card" data-widget="monthly" hidden>
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
@@ -159,7 +171,7 @@
         </div>
         <div class="chart-area chart-area--bars" data-chart-monthly></div>
       </article> -->
-      
+
       <!--
       <article class="dashboard-card chart-card" data-widget="status">
         <div class="dashboard-card__head">
@@ -170,7 +182,7 @@
         <div class="chart-area chart-area--progress" data-chart-status></div>
       </article>
       -->
-
+      <!--
       <article class="dashboard-card chart-card" data-widget="locations">
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
@@ -179,7 +191,8 @@
         </div>
         <div class="chart-area chart-area--progress" data-chart-locations></div>
       </article>
-
+      -->
+      <!--
       <article class="dashboard-card chart-card" data-widget="timeline">
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
@@ -188,8 +201,9 @@
         </div>
         <div class="chart-area chart-area--timeline" data-chart-timeline></div>
       </article>
+      -->
     </section>
-
+    <!--
     <section class="dashboard-card history-table-card history-table-card--separate" data-widget="table">
       <div class="dashboard-card__head">
         <span class="eyebrow">Extrato detalhado</span>
@@ -216,14 +230,13 @@
         {% endfor %}
       </div>
     </section>
+    -->
   </main>
 
   <div id="monthlyModal" class="monthly-modal" hidden>
     <div class="monthly-modal__backdrop"></div>
     <div class="monthly-modal__wrapper">
-      <button id="closeMonthlyModal" class="monthly-modal__close">
-        &times;
-      </button>
+      <button id="closeMonthlyModal" class="monthly-modal__close">&times;</button>
       <article class="dashboard-card chart-card">
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
@@ -236,35 +249,88 @@
   </div>
 
   <div id="statusModal" class="monthly-modal" hidden>
-
     <div class="monthly-modal__backdrop"></div>
-
     <div class="monthly-modal__wrapper">
-
-        <button
-            id="closeStatusModal"
-            class="monthly-modal__close">
-            &times;
-        </button>
-
-        <article class="dashboard-card chart-card">
-
-            <div class="dashboard-card__head">
-                <span class="eyebrow">Dashboard</span>
-                <h2>Status das operações</h2>
-                <p>Distribuição de aprovações e falhas.</p>
-            </div>
-
-            <div
-                class="chart-area chart-area--progress"
-                data-chart-status>
-            </div>
-
-        </article>
-
+      <button id="closeStatusModal" class="monthly-modal__close">&times;</button>
+      <article class="dashboard-card chart-card">
+        <div class="dashboard-card__head">
+          <span class="eyebrow">Dashboard</span>
+          <h2>Status das operações</h2>
+          <p>Distribuição de aprovações e falhas.</p>
+        </div>
+        <div class="chart-area chart-area--progress" data-chart-status>
+        </div>
+      </article>
     </div>
+  </div>
 
-</div>
+  <div id="locationsModal" class="monthly-modal" hidden>
+    <div class="monthly-modal__backdrop"></div>
+    <div class="monthly-modal__wrapper">
+      <button id="closeLocationsModal" class="monthly-modal__close">
+        &times;
+      </button>
+      <article class="dashboard-card chart-card">
+        <div class="dashboard-card__head">
+          <span class="eyebrow">Dashboard</span>
+          <h2>Locais mais frequentes</h2>
+        </div>
+        <div class="chart-area chart-area--progress" data-chart-locations></div>
+      </article>
+    </div>
+  </div>
+
+  <div id="timelineModal" class="monthly-modal" hidden>
+    <div class="monthly-modal__backdrop"></div>
+    <div class="monthly-modal__wrapper">
+      <button id="closeTimelineModal" class="monthly-modal__close">
+        &times;
+      </button>
+      <article class="dashboard-card chart-card">
+        <div class="dashboard-card__head">
+          <span class="eyebrow">Dashboard</span>
+          <h2>Linha recente</h2>
+        </div>
+        <div class="chart-area chart-area--timeline" data-chart-timeline></div>
+      </article>
+    </div>
+  </div>
+
+  <div id="tableModal" class="monthly-modal" hidden>
+    <div class="monthly-modal__backdrop"></div>
+    <div class="monthly-modal__wrapper">
+      <button id="closeTableModal" class="monthly-modal__close">
+        &times;
+      </button>
+      <section class="dashboard-card history-table-card">
+        <div class="dashboard-card__head">
+          <span class="eyebrow">Extrato detalhado</span>
+          <h2>Historico completo do cartao</h2>
+          <p> Registro operacional organizado para conferencia do cliente.</p>
+        </div>
+        <div class="history-table">
+          <div class="history-table__head">
+            <span>Local</span>
+            <span>Tipo</span>
+            <span>Status</span>
+            <span>Valor</span>
+            <span>Data</span>
+          </div>
+          {% for row in movement_rows %}
+          <div class="history-table__row">
+            <strong>{{ row.location }}</strong>
+            <span>{{ row.type }}</span>
+            <span>{{ row.status }}</span>
+            <span>{{ row.amount_prefix }} R$ {{ row.amount }}</span>
+            <span>{{ row.created_at }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+
+
 
   <script type="application/json" data-history-charts>{{ analytics_charts_json|safe }}</script>
 </div>

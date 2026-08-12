@@ -1909,6 +1909,23 @@ setupModal(
   "closeStatusModal"
 );
 
+setupModal(
+  "openLocationsModal",
+  "locationsModal",
+  "closeLocationsModal"
+);
+
+setupModal(
+  "openTimelineModal",
+  "timelineModal",
+  "closeTimelineModal"
+);
+
+setupModal(
+  "openTableModal",
+  "tableModal",
+  "closeTableModal"
+);
 
 
 
