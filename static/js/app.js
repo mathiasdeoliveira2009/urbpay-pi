@@ -2092,9 +2092,11 @@ const applyWidgetVisibility = (state) => {
     card.hidden = !visible;
   });
 
-  widgetToggles.forEach((toggle) => {
-    const visible = state[toggle.value] !== false;
-    toggle.checked = visible;
+  widgetToggles.forEach((button) => {
+    const widget = button.dataset.widgetToggle;
+    const visible = state[widget] === true;
+
+    button.classList.toggle("active", visible);
   });
 };
 
@@ -2119,12 +2121,89 @@ if (historyChartsScript) {
   }
 
   applyWidgetVisibility(widgetState);
-
-  widgetToggles.forEach((toggle) => {
-    toggle.addEventListener("change", () => {
-      widgetState[toggle.value] = toggle.checked;
-      window.localStorage.setItem(widgetStorageKey, JSON.stringify(widgetState));
-      applyWidgetVisibility(widgetState);
-    });
-  });
 }
+
+widgetToggles.forEach((button) => {
+  button.addEventListener("click", () => {
+    const widget = button.dataset.widgetToggle;
+
+    const card = document.querySelector(
+      `[data-widget="${widget}"]`
+    );
+
+    if (!card) return;
+
+    card.hidden = !card.hidden;
+
+    button.classList.toggle("active", !card.hidden);
+  });
+});
+
+const monthlyModal =
+  document.getElementById("monthlyModal");
+
+const closeMonthlyModal =
+  document.getElementById("closeMonthlyModal");
+
+closeMonthlyModal.addEventListener("click", () => {
+  monthlyModal.hidden = true;
+});
+
+function setupModal(openId, modalId, closeId) {
+
+  const modal =
+      document.getElementById(modalId);
+
+  document
+      .getElementById(openId)
+      .addEventListener("click", () => {
+          modal.hidden = false;
+      });
+
+  document
+      .getElementById(closeId)
+      .addEventListener("click", () => {
+          modal.hidden = true;
+      });
+
+  modal
+      .querySelector(".monthly-modal__backdrop")
+      .addEventListener("click", () => {
+          modal.hidden = true;
+      });
+}
+
+setupModal(
+  "openMonthlyModal",
+  "monthlyModal",
+  "closeMonthlyModal"
+);
+
+setupModal(
+  "openStatusModal",
+  "statusModal",
+  "closeStatusModal"
+);
+
+setupModal(
+  "openLocationsModal",
+  "locationsModal",
+  "closeLocationsModal"
+);
+
+setupModal(
+  "openTimelineModal",
+  "timelineModal",
+  "closeTimelineModal"
+);
+
+setupModal(
+  "openTableModal",
+  "tableModal",
+  "closeTableModal"
+);
+
+
+
+
+
