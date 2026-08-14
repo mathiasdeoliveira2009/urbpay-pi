@@ -8531,55 +8531,125 @@ html[data-theme="dark"] .urb-empty-state {
   width: auto;
   min-width: 140px;
 }
-/* Container dos cartões no formulário */
-.cartao-select-field {
+/* =========================================================
+   ESTILIZAÇÃO DO CARTÃO VIRTUAL EM PÉ (AUMENTADO)
+   ========================================================= */
+
+/* Container centralizador com padding ajustado */
+.urb-card-vertical-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.cartao-select-field > span {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.cartoes-grid {
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-}
-
-.cartao-card {
-  cursor: pointer;
-  flex: 1;
-}
-
-/* Esconde o circulo do radio button */
-.cartao-card input[type="radio"] {
-  display: none;
-}
-
-/* Preview da imagem do cartão */
-.cartao-card__preview {
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: all 0.2s ease-in-out;
-  opacity: 0.6;
-}
-
-.cartao-card__preview img {
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
   width: 100%;
-  height: auto;
+}
+
+/* Moldura do cartão com dimensões maiores */
+.urb-card-display {
+  position: relative;
+  width: 230px;  /* Aumentado de 180px para 230px */
+  height: 365px; /* Aumentado de 285px para 365px */
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+  margin: 0 auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.urb-card-display:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+}
+
+/* Imagem de fundo preenchendo o novo tamanho */
+.urb-card-vertical-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
 
-/* Estado SELECIONADO (Efeito Verde UrbPay) */
-.cartao-card input[type="radio"]:checked + .cartao-card__preview {
-  border-color: #2e7d32;
-  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
-  opacity: 1;
-  transform: translateY(-2px);
+/* Camada de texto sobreposta com espaçamentos maiores */
+.urb-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px 18px; /* Mais espaço interno */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* Badge no topo (Estudante/Ativo) */
+.urb-card-overlay__top {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.urb-card-overlay__badge {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 11px; /* Fonte maior */
+  font-weight: 700;
+  color: #0f3d2e;
+  letter-spacing: 0.4px;
+}
+
+/* Dados inferiores ampliados */
+.urb-card-overlay__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+/* Número do cartão */
+.urb-card-overlay__number {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 15px; /* Fonte maior para leitura clara */
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #0d2c20;
+}
+
+/* Nome impresso */
+.urb-card-overlay__holder {
+  font-size: 13px; /* Fonte maior */
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #0d2c20;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.5px;
+}
+
+/* Meta dados (Validade e CVV) */
+.urb-card-overlay__meta {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.urb-card-overlay__label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: #1e4d3b;
+  opacity: 0.85;
+  letter-spacing: 0.5px;
+}
+
+.urb-card-overlay__value {
+  font-size: 12px; /* Fonte maior */
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  color: #0d2c20;
 }
 

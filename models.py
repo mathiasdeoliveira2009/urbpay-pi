@@ -43,6 +43,9 @@ class Cartao(Base):
         default="ATIVO",
         nullable=False,
     )
+    # LINHA ADICIONADA: Mapeia a nova coluna do MySQL
+    modelo: Mapped[str] = mapped_column(String(100), default="cartao-verde.png", nullable=False)
+    
     id_usuario: Mapped[int] = mapped_column(ForeignKey("usuarios.id_usuario"), nullable=False, unique=True)
 
     usuario: Mapped[Usuario] = relationship(back_populates="cartao")

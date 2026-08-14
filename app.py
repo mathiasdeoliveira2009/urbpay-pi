@@ -418,6 +418,7 @@ def build_profile_identity(user: Usuario, card: Cartao | None) -> dict:
         "email_masked": mask_sensitive(user.email, visible_digits=min(8, len(user.email))),
         "card_number_display": format_card_number(card.numero_cartao) if card else "--",
         "card_number_masked": format_card_number(mask_sensitive(card.numero_cartao, visible_digits=4)) if card else "--",
+        "card_model": card.modelo if card else "cartao-verde.png",  # <--- ADICIONE ESTA LINHA!
         "phone_display": user.telefone or "Nao informado",
         "phone_masked": mask_sensitive(user.telefone, visible_digits=3) if user.telefone else "Nao informado",
     }
@@ -1460,11 +1461,26 @@ def build_dashboard_context(
     issued_iso = issued_at.isoformat() if isinstance(issued_at, datetime) else None
     request_items = build_dashboard_requests(user, recent_movements)
 
+    # --- MONTAGEM DO PRIMARY_CARD PARA O HTML ---
+    primary_card = None
+    if card:
+        primary_card = {
+            "badge": "Ativo",
+            "display_name": card.nome_impresso or user.nome,
+            "card_number_masked": profile_identity.get("card_number_masked", "----"),
+            "card_number_full": format_card_number(card.numero_cartao),
+            "cvv": str(card.cvv),
+            "validity": card.data_validade.strftime("%m/%Y") if card.data_validade else "--/--",
+            # Puxa o campo modelo salvo no banco de dados ou usa o padrão
+            "model": getattr(card, "modelo", "cartao-verde.png") or "cartao-verde.png",
+        }
+
     return {
         "request": request,
         "current_user": user,
         "profile_image": user.foto_perfil or "imgs/Default.png",
         "profile_identity": profile_identity,
+        "primary_card": primary_card,  # <--- ADICIONADO AQUI!
         "card_preview": card,
         "my_cards": dashboard_cards,
         "service_menu": build_dashboard_services(active_service_key),
@@ -1542,7 +1558,8 @@ async def signup(
     telefone: str = Form(""),
     endereco: str = Form(""),
     senha: str = Form(...),
-    foto_perfil: UploadFile | None = File(default="imgs/Default.png"),
+    modelo_cartao: str = Form("cartao-verde.png"),  # Valor padrão caso não venha selecionado
+    foto_perfil: UploadFile | None = File(default=None),
     db: Session = Depends(get_db),
 ):
     cpf_digits = normalize_digits(cpf)
@@ -1585,11 +1602,13 @@ async def signup(
         )
         return templates.TemplateResponse("index.html", context, status_code=409)
 
-    try:
-        image_path = save_profile_image(foto_perfil)
-    except ValueError as exc:
-        context = build_landing_context(request, form_error=str(exc), open_signup_modal=True)
-        return templates.TemplateResponse("index.html", context, status_code=400)
+    image_path = "imgs/Default.png"
+    if foto_perfil and foto_perfil.filename:
+        try:
+            image_path = save_profile_image(foto_perfil)
+        except ValueError as exc:
+            context = build_landing_context(request, form_error=str(exc), open_signup_modal=True)
+            return templates.TemplateResponse("index.html", context, status_code=400)
 
     usuario = Usuario(
         nome=nome.strip(),
@@ -1613,6 +1632,7 @@ async def signup(
             nome_impresso=nome.strip().upper()[:100],
             data_validade=date.today() + timedelta(days=365 * 4),
             id_usuario=usuario.id_usuario,
+            modelo=modelo_cartao,  # <--- Salva o nome da imagem/modelo escolhido!
         )
         db.add(cartao)
         db.flush()
