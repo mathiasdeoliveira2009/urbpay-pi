@@ -66,11 +66,56 @@ const dashboardViewButtons = document.querySelectorAll("[data-dashboard-view]");
 const dashboardPanels = document.querySelectorAll("[data-dashboard-panel]");
 const dashboardPlaceholder = document.querySelector("[data-dashboard-placeholder]");
 const dashboardWorkspace = document.querySelector(".urb-workspace");
+const settingsTabButtons = document.querySelectorAll("[data-settings-tab]");
+const settingsSections = document.querySelectorAll("[data-settings-section]");
+const settingsOpenTabButtons = document.querySelectorAll("[data-settings-open-tab]");
+const settingsChoiceButtons = document.querySelectorAll("[data-setting-choice]");
+const settingsToggleInputs = document.querySelectorAll("[data-setting-toggle]");
+const settingsSelectInputs = document.querySelectorAll("[data-setting-select]");
+const settingsFeedbackButtons = document.querySelectorAll("[data-settings-feedback]");
+const languageOptionButtons = document.querySelectorAll("[data-language-option]");
 
 const settingsStorage = {
   theme: "urbpay-theme",
   language: "urbpay-language",
   feedback: "urbpay-feedback-items",
+  uiPreferences: "urbpay-ui-preferences",
+  settingsTab: "urbpay-settings-tab",
+};
+
+const systemThemeQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+const defaultUiSettings = {
+  contactEmail: true,
+  lowBalanceSms: false,
+  prioritySupport: true,
+  defaultCard: "active",
+  lowBalanceLimit: "10",
+  autoOpenQr: true,
+  qrValidity: "60",
+  quickRecharge: "20",
+  autoReload: false,
+  pushAlerts: true,
+  emailAlerts: true,
+  smsAlerts: false,
+  rechargeAlerts: true,
+  transportAlerts: true,
+  quietHours: "off",
+  twoFactorAuth: false,
+  deviceBiometrics: true,
+  sessionAlerts: true,
+  maskCardDetails: true,
+  sessionTimeout: "20",
+  anonymousAnalytics: false,
+  supportDiagnostics: true,
+  publicScreenMode: true,
+  personalizedTips: false,
+  textSize: "default",
+  density: "comfortable",
+  highContrast: false,
+  reducedMotion: false,
+  focusHighlight: true,
+  readableMode: false,
 };
 
 const i18n = {
@@ -144,6 +189,9 @@ const i18n = {
 
 const getStoredLanguage = () => window.localStorage.getItem(settingsStorage.language) || "pt-BR";
 const getStoredTheme = () => window.localStorage.getItem(settingsStorage.theme) || "light";
+const resolveTheme = (theme) => theme === "system"
+  ? (systemThemeQuery?.matches ? "dark" : "light")
+  : theme;
 const currencyFormatter = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
@@ -173,7 +221,138 @@ const applyLanguage = (language) => {
 
 const applyTheme = (theme) => {
   window.localStorage.setItem(settingsStorage.theme, theme);
-  root.dataset.theme = theme;
+  root.dataset.theme = resolveTheme(theme);
+  root.dataset.themePreference = theme;
+};
+
+const getStoredUiSettings = () => {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(settingsStorage.uiPreferences) || "{}");
+    return {
+      ...defaultUiSettings,
+      ...saved,
+    };
+  } catch (error) {
+    console.error(error);
+    return { ...defaultUiSettings };
+  }
+};
+
+const saveUiSettings = (settings) => {
+  window.localStorage.setItem(settingsStorage.uiPreferences, JSON.stringify(settings));
+};
+
+const getStoredSettingsTab = () => window.localStorage.getItem(settingsStorage.settingsTab) || "account";
+
+let uiSettingsState = getStoredUiSettings();
+
+const setSettingsSummaryValue = (name, value) => {
+  document.querySelectorAll(`[data-settings-summary="${name}"]`).forEach((node) => {
+    node.textContent = value;
+  });
+};
+
+const applyUiSettingsToDocument = (settings) => {
+  root.dataset.uiScale = settings.textSize;
+  root.dataset.uiDensity = settings.density;
+  root.dataset.uiContrast = settings.highContrast ? "high" : "default";
+  root.dataset.uiMotion = settings.reducedMotion ? "reduced" : "full";
+  root.dataset.uiFocus = settings.focusHighlight ? "strong" : "default";
+  root.dataset.uiReadable = settings.readableMode ? "true" : "false";
+};
+
+const updateSettingsSummary = (settings = uiSettingsState) => {
+  const themeLabels = {
+    light: "Claro",
+    dark: "Escuro",
+    system: "Sistema",
+  };
+  const languageLabels = {
+    "pt-BR": "Portugues",
+    "en-US": "English",
+  };
+  const textSizeLabels = {
+    default: "Padrao",
+    large: "Ampliado",
+    xlarge: "Maximo",
+  };
+  const densityLabels = {
+    comfortable: "Confortavel",
+    compact: "Compacta",
+  };
+
+  setSettingsSummaryValue("theme", themeLabels[getStoredTheme()] || "Claro");
+  setSettingsSummaryValue("language", languageLabels[getStoredLanguage()] || "Portugues");
+  setSettingsSummaryValue("textSize", textSizeLabels[settings.textSize] || "Padrao");
+  setSettingsSummaryValue("density", densityLabels[settings.density] || "Confortavel");
+  setSettingsSummaryValue("motion", settings.reducedMotion ? "Reduzido" : "Completo");
+  setSettingsSummaryValue("contrast", settings.highContrast ? "Elevado" : "Padrao");
+  setSettingsSummaryValue("focus", settings.focusHighlight ? "Ativo" : "Suave");
+};
+
+const syncSettingsControls = () => {
+  settingsChoiceButtons.forEach((button) => {
+    const key = button.dataset.settingChoice;
+    const value = button.dataset.settingValue;
+    const currentValue = key === "theme" ? getStoredTheme() : uiSettingsState[key];
+    const isActive = currentValue === value;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  languageOptionButtons.forEach((button) => {
+    const isActive = button.dataset.languageOption === getStoredLanguage();
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  settingsToggleInputs.forEach((input) => {
+    const key = input.dataset.settingToggle;
+    input.checked = Boolean(uiSettingsState[key]);
+  });
+
+  settingsSelectInputs.forEach((input) => {
+    const key = input.dataset.settingSelect;
+    const value = uiSettingsState[key];
+    if (typeof value !== "undefined") {
+      input.value = String(value);
+    }
+  });
+
+  updateSettingsSummary();
+};
+
+const applyUiSettings = (settings) => {
+  uiSettingsState = {
+    ...defaultUiSettings,
+    ...settings,
+  };
+  saveUiSettings(uiSettingsState);
+  applyUiSettingsToDocument(uiSettingsState);
+  syncSettingsControls();
+};
+
+const setSettingsTab = (tabName) => {
+  if (!settingsSections.length) {
+    return;
+  }
+
+  const availableTabs = Array.from(settingsSections).map((section) => section.dataset.settingsSection);
+  const nextTab = availableTabs.includes(tabName) ? tabName : "account";
+
+  window.localStorage.setItem(settingsStorage.settingsTab, nextTab);
+
+  settingsSections.forEach((section) => {
+    const isActive = section.dataset.settingsSection === nextTab;
+    section.hidden = !isActive;
+    section.classList.toggle("is-active", isActive);
+  });
+
+  settingsTabButtons.forEach((button) => {
+    const isActive = button.dataset.settingsTab === nextTab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
 };
 
 const closeToolbarPanels = () => {
@@ -593,6 +772,8 @@ const sendCommonSupportEmail = async (item) => {
 
 applyTheme(getStoredTheme());
 applyLanguage(getStoredLanguage());
+applyUiSettings(getStoredUiSettings());
+setSettingsTab(getStoredSettingsTab());
 
 const syncBodyModalState = () => {
   const hasOpenModal = signupModal?.classList.contains("is-open") || qrModal?.classList.contains("is-open");
@@ -706,8 +887,9 @@ document.querySelectorAll("[data-toolbar-panel]").forEach((panel) => {
 
 themeToggleButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const nextTheme = getStoredTheme() === "dark" ? "light" : "dark";
+    const nextTheme = resolveTheme(getStoredTheme()) === "dark" ? "light" : "dark";
     applyTheme(nextTheme);
+    syncSettingsControls();
     closeToolbarPanels();
   });
 });
@@ -745,8 +927,13 @@ feedbackForms.forEach((form) => {
 
 profileActionButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    if (button.dataset.profileAction === "account") {
-      window.location.href = "/dashboard";
+    const action = button.dataset.profileAction;
+
+    if (action === "account" || action === "password" || action === "security") {
+      setDashboardView("profile");
+      setSettingsTab(action === "account" ? "account" : "security");
+      syncSettingsControls();
+      closeToolbarPanels();
       return;
     }
 
@@ -1168,6 +1355,95 @@ dashboardShortcutButtons.forEach((button) => {
 
     showToolbarToast("Este atalho entra na proxima etapa.");
   });
+});
+
+settingsTabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setSettingsTab(button.dataset.settingsTab || "account");
+  });
+});
+
+settingsOpenTabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setDashboardView("profile");
+    setSettingsTab(button.dataset.settingsOpenTab || "account");
+    syncSettingsControls();
+  });
+});
+
+settingsChoiceButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const key = button.dataset.settingChoice;
+    const value = button.dataset.settingValue;
+
+    if (!key || !value) {
+      return;
+    }
+
+    if (key === "theme") {
+      applyTheme(value);
+      syncSettingsControls();
+      return;
+    }
+
+    applyUiSettings({
+      ...uiSettingsState,
+      [key]: value,
+    });
+  });
+});
+
+languageOptionButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const language = button.dataset.languageOption;
+    if (!language) {
+      return;
+    }
+
+    applyLanguage(language);
+    syncSettingsControls();
+  });
+});
+
+settingsToggleInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    const key = input.dataset.settingToggle;
+    if (!key) {
+      return;
+    }
+
+    applyUiSettings({
+      ...uiSettingsState,
+      [key]: input.checked,
+    });
+  });
+});
+
+settingsSelectInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    const key = input.dataset.settingSelect;
+    if (!key) {
+      return;
+    }
+
+    applyUiSettings({
+      ...uiSettingsState,
+      [key]: input.value,
+    });
+  });
+});
+
+settingsFeedbackButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    showToolbarToast(button.dataset.settingsFeedback || "Este ajuste entra na proxima etapa.");
+  });
+});
+
+systemThemeQuery?.addEventListener("change", () => {
+  if (getStoredTheme() === "system") {
+    applyTheme("system");
+    syncSettingsControls();
+  }
 });
 
 if ("IntersectionObserver" in window) {
