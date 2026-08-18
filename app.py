@@ -62,18 +62,18 @@ QR_PATTERN = [
 CARD_TYPES = [
     {
         "title": "Bilhete UrbPay Estudante",
-        "description": "Ideal para estudantes com acesso a beneficios, identificacao e uso diario no transporte.",
-        "image": "imgs/front-cartao-urb.png",
+        "description": "Meia-tarifa garantida para estudantes, com solicitação simplificada no app e recarga instantânea via Pix.",
+        "image": "imgs/cartao-urbano.png",
     },
     {
         "title": "Bilhete UrbPay Digital",
-        "description": "Versao integrada ao perfil do cliente com QR code para validacao e consulta rapida.",
-        "image": "imgs/verso-cartao-urb.png",
+        "description": "Emissão de QR Code no app sem filas, com integração direta à carteira digital do celular.",
+        "image": "imgs/cartao-verde.png",
     },
     {
         "title": "Bilhete UrbPay Escolar",
-        "description": "Pensado para instituicoes de ensino com dados do aluno, curso e controle de emissao.",
-        "image": "imgs/front-cartao-urb.png",
+        "description": "Painel completo para controle de cotas, emissão em lote e verificação de vínculo acadêmico.",
+        "image": "imgs/cartao-conecta.png",
     },
 ]
 
@@ -1437,10 +1437,14 @@ def build_dashboard_context(
     qr_token: str | None = None,
 ) -> dict:
     cards = get_user_cards(db, user.id_usuario)
-    card = cards[0] if cards else user.cartao
+    
+    # 1. Pega o cartão mais recente (último da lista) se houver múltiplos
+    card = cards[-1] if cards else user.cartao
+
     dashboard_cards = build_dashboard_cards(user, cards)
     if not dashboard_cards and card:
         dashboard_cards = build_dashboard_cards(user, [card])
+        
     active_service_key = dashboard_cards[0]["service_key"] if dashboard_cards else None
     recent_movements = get_recent_movements(db, card.id_cartao) if card else []
     debit_total = sum(Decimal(str(item.valor)) for item in recent_movements if item.tipo_operacao == "DEBITO")
@@ -1464,15 +1468,18 @@ def build_dashboard_context(
     # --- MONTAGEM DO PRIMARY_CARD PARA O HTML ---
     primary_card = None
     if card:
+        # Garante que 'imgs/' seja removido caso venha gravado junto no banco
+        raw_model = getattr(card, "modelo", "cartao-verde.png") or "cartao-verde.png"
+        clean_model = raw_model.replace("imgs/", "").replace("/static/", "")
+
         primary_card = {
-            "badge": "Ativo",
+            "badge": getattr(card, "tipo", "Comum") or "Comum",
             "display_name": card.nome_impresso or user.nome,
             "card_number_masked": profile_identity.get("card_number_masked", "----"),
             "card_number_full": format_card_number(card.numero_cartao),
             "cvv": str(card.cvv),
             "validity": card.data_validade.strftime("%m/%Y") if card.data_validade else "--/--",
-            # Puxa o campo modelo salvo no banco de dados ou usa o padrão
-            "model": getattr(card, "modelo", "cartao-verde.png") or "cartao-verde.png",
+            "model": clean_model,
         }
 
     return {
@@ -1480,7 +1487,7 @@ def build_dashboard_context(
         "current_user": user,
         "profile_image": user.foto_perfil or "imgs/Default.png",
         "profile_identity": profile_identity,
-        "primary_card": primary_card,  # <--- ADICIONADO AQUI!
+        "primary_card": primary_card,
         "card_preview": card,
         "my_cards": dashboard_cards,
         "service_menu": build_dashboard_services(active_service_key),
@@ -1558,10 +1565,16 @@ async def signup(
     telefone: str = Form(""),
     endereco: str = Form(""),
     senha: str = Form(...),
-    modelo_cartao: str = Form("cartao-verde.png"),  # Valor padrão caso não venha selecionado
+    modelo_cartao: str = Form("cartao-verde.png"),
     foto_perfil: UploadFile | None = File(default=None),
     db: Session = Depends(get_db),
 ):
+    # 1. Log de diagnóstico para acompanhar no terminal o que o formulário enviou
+    print(f"--> MODELO SELECIONADO NO SIGNUP: '{modelo_cartao}'")
+
+    # 2. Tratamento defensivo para garantir que venha apenas o nome do arquivo (ex: 'cartao-urbano.png')
+    clean_modelo = (modelo_cartao or "cartao-verde.png").replace("imgs/", "").replace("/static/", "").strip()
+
     cpf_digits = normalize_digits(cpf)
     telefone_digits = normalize_digits(telefone)
     normalized_email = email.strip().lower()
@@ -1632,7 +1645,7 @@ async def signup(
             nome_impresso=nome.strip().upper()[:100],
             data_validade=date.today() + timedelta(days=365 * 4),
             id_usuario=usuario.id_usuario,
-            modelo=modelo_cartao,  # <--- Salva o nome da imagem/modelo escolhido!
+            modelo=clean_modelo,  # <--- Atribui o modelo limpo
         )
         db.add(cartao)
         db.flush()
@@ -1649,7 +1662,6 @@ async def signup(
 
     request.session["user_id"] = usuario.id_usuario
     return RedirectResponse(url="/dashboard?status=signup-success", status_code=303)
-
 
 @app.post("/login")
 def login(

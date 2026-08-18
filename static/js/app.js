@@ -2204,6 +2204,47 @@ setupModal(
 );
 
 
+// Função para abrir o modal
+function openUrbModal() {
+  const modal = document.getElementById('settings-modal');
+  if (modal) {
+    modal.removeAttribute('hidden');
+    modal.style.setProperty('display', 'flex', 'important');
+    document.body.style.overflow = 'hidden'; // Bloqueia a rolagem do fundo
+  }
+}
+
+// Função para fechar o modal
+function closeUrbModal() {
+  const modal = document.getElementById('settings-modal');
+  if (modal) {
+    modal.setAttribute('hidden', 'true');
+    modal.style.setProperty('display', 'none', 'important');
+    document.body.style.overflow = ''; // Libera a rolagem do fundo
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('settings-modal');
+
+  // Fechar ao clicar no fundo escurecido (fora da caixa branca)
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeUrbModal();
+      }
+    });
+  }
+
+  // Fechar ao pressionar a tecla ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && !modal.hasAttribute('hidden')) {
+      closeUrbModal();
+    }
+  });
+});
+
+
 
 
 

@@ -1502,6 +1502,23 @@ html[data-theme="dark"] .gate-ops-hero.gate-turnstile {
   box-shadow: var(--shadow);
 }
 
+.feature-card {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important; /* Alinha todo o texto no meio vertical da caixa */
+  min-height: 180px;                  /* Ajuste a altura mínima conforme desejar */
+  padding: 24px !important;            /* Distribui o espaçamento por igual */
+}
+
+.product-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  padding: 12px;         /* Diminui o espaçamento interno para caber melhor em 3 colunas */
+  gap: 12px;             /* Espaço entre a imagem e o texto */
+  height: 100%;          /* Faz o card ocupar toda a altura do grid */
+}
+
 .hero-banner {
   position: relative;
   display: grid;
@@ -1746,6 +1763,10 @@ html[data-theme="dark"] .gate-ops-hero.gate-turnstile {
   margin-bottom: 8px;
   font-family: "Sora", sans-serif;
   font-size: 1.2rem;
+}
+.feature-card.qr-feature .qr-box {
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .qr-feature {
@@ -2874,7 +2895,8 @@ html[data-theme="dark"] .my-card-empty {
 }
 
 .cards-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch; /* Garante que todos os cards tenham a mesma altura */
 }
 
 .product-card {
@@ -2886,14 +2908,31 @@ html[data-theme="dark"] .my-card-empty {
   border-color: var(--line-strong);
 }
 
+.product-card {
+  padding: 16px 12px !important; /* Menos espaçamento nas laterais internas */
+  gap: 12px !important;          /* Espaço justo entre a imagem e o texto */
+}
+
+
 .product-image {
   width: 100%;
   height: 190px;
   object-fit: cover;
 }
 
+.product-card .product-image {
+  width: 150px !important;      /* Aumenta a largura (teste com 160px ou 170px se quiser ainda maior) */
+  max-height: 220px !important; /* Permite que a imagem cresça na vertical */
+  height: auto !important;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 .product-copy {
   padding: 18px;
+}
+
+.product-card .product-copy {
+  padding: 0 !important;
 }
 
 .product-copy p {
@@ -3664,6 +3703,9 @@ html[data-theme="dark"] .my-card-empty {
   width: 100%;
 }
 
+
+
+
 .my-cards-layout {
   display: grid;
   grid-template-columns: 400px minmax(0, 1fr);
@@ -3710,14 +3752,22 @@ html[data-theme="dark"] .my-card-empty {
 }
 
 .my-card-tile {
-  position: relative;
+  position: relative !important;
+  display: inline-block;
+  width: 220px;          /* Ajuste o tamanho geral do cartão aqui */
+  border-radius: 20px;
   overflow: hidden;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 36px;
-  border: 0;
-  background: transparent;
-  box-shadow: 0 26px 58px rgba(24, 45, 37, 0.16);
+}
+
+.my-card-tile__info,
+.my-card-details {
+  position: absolute !important;
+  bottom: 20px;          /* Mantém as informações na parte inferior do cartão */
+  left: 16px;
+  right: 16px;
+  z-index: 2;            /* Coloca por cima da imagem */
+  color: #1b4332;        /* Cor escura para dar leitura sobre o verde */
+  text-align: left;
 }
 
 .my-card-tile::after {
@@ -3731,10 +3781,9 @@ html[data-theme="dark"] .my-card-empty {
 
 .my-card-tile__image {
   display: block;
-  width: 100%;
+  width: 100% !important;
   height: auto;
-  border-radius: 36px;
-  object-fit: cover;
+  border-radius: 20px;
 }
 
 .my-card-tile__overlay {
@@ -3750,13 +3799,11 @@ html[data-theme="dark"] .my-card-empty {
 
 .my-card-tile__topbar,
 .my-card-tile__meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: flex !important;
+  gap: 16px;
+  font-size: 10px;
+  font-weight: 600;
 }
-
 .my-card-tile__body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -3812,8 +3859,11 @@ html[data-theme="dark"] .my-card-empty {
 }
 
 .my-card-tile__name {
-  font-size: 1.08rem;
-  line-height: 1.05;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
 }
 
 .my-card-tile__cvv,
@@ -5884,9 +5934,9 @@ html[data-theme="dark"] .common-support-message--agent {
   }
 
   .steps-grid,
-  .cards-grid {
-    gap: 12px;
-  }
+.cards-grid {
+  gap: 16px; /* Aumente ou diminua este valor (ex: 20px, 24px) */
+}
 
   .step-card {
     padding: 16px;
@@ -7400,6 +7450,12 @@ html[data-theme="dark"] .urb-profile-field {
   box-shadow: none;
 }
 
+#settings-modal .urb-settings-panel {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 .urb-settings-shell {
   display: grid;
   gap: 0;
@@ -8726,3 +8782,111 @@ html[data-theme="dark"] .urb-empty-state {
   opacity: 1;
   transform: translateY(-3px);
 }
+
+/* Fundo escurecido que cobre a tela inteira */
+.urb-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(5px) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  box-sizing: border-box !important;
+}
+
+/* Oculta quando possui o atributo hidden */
+.urb-modal-overlay[hidden] {
+  display: none !important;
+}
+/* Caixa branca do Modal */
+.urb-modal-container {
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  max-width: 950px !important;
+  width: 100% !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;          /* Permite rolar apenas o conteúdo interno */
+  position: relative !important;
+  padding: 32px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Botão 'X' para fechar no canto superior direito */
+.urb-modal-close {
+  position: absolute !important;
+  top: 16px !important;
+  right: 20px !important;
+  background: #f1f3f5 !important;
+  border: none !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  font-size: 22px !important;
+  font-weight: bold !important;
+  color: #495057 !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  line-height: 1 !important;
+}
+
+.urb-modal-close:hover {
+  background: #e9ecef !important;
+  color: #212529 !important;
+  transform: scale(1.05);
+}
+/* Quando o modal não estiver hidden, força o display flex */
+#settings-modal:not([hidden]) {
+  display: flex !important;
+}
+
+/* Força o painel interno a ficar visível dentro da janela */
+#settings-modal .urb-panel,
+#settings-modal .urb-workspace__panel {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Container da imagem do cartão com posição relativa */
+.urb-virtual-card__media {
+  position: relative !important;
+  display: inline-block !important;
+  width: 100% !important;
+}
+
+/* Imagem do cartão adaptável */
+.urb-virtual-card__image {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  border-radius: 12px !important;
+}
+
+/* Badge posicionada no canto superior direito DENTRO da imagem */
+.urb-virtual-card__badge {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #1b4d3e !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 4px 10px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(2px) !important;
+  z-index: 2 !important;
+  white-space: nowrap !important;
+}
+
+
