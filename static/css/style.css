@@ -7006,10 +7006,11 @@ html[data-theme="dark"] .urb-virtual-card {
 
 .urb-virtual-card__top,
 .urb-virtual-card__meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  border-top: 1px solid #edf2f7 !important;
+  padding-top: 10px !important;
 }
 
 .urb-virtual-card__brand {
@@ -7042,27 +7043,34 @@ html[data-theme="dark"] .urb-virtual-card {
   margin: 0;
 }
 
+.urb-virtual-card strong {
+  display: block !important;
+  font-size: 15px !important;
+  color: #1b4d3e !important;
+  margin-top: 8px !important;
+}
+
 .urb-virtual-card__number {
-  margin: 0;
-  font-size: 1.05rem;
-  letter-spacing: 0.14em;
+  font-size: 14px !important;
+  letter-spacing: 1px !important;
+  color: #4a5568 !important;
+  margin: 6px 0 12px 0 !important;
 }
 
 .urb-virtual-card__meta span,
 .urb-passage-card span,
 .urb-qr-viewer__meta span,
 .urb-profile-field span {
-  display: block;
-  color: var(--text-soft);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  display: block !important;
+  font-size: 11px !important;
+  color: #718096 !important;
+  text-transform: uppercase !important;
 }
 
 .urb-virtual-card__meta strong,
 .urb-profile-field strong {
-  font-size: 1rem;
+  margin-top: 2px !important;
+  font-size: 13px !important;
 }
 
 .urb-inline-link {
@@ -8860,8 +8868,9 @@ html[data-theme="dark"] .urb-empty-state {
 /* Container da imagem do cartão com posição relativa */
 .urb-virtual-card__media {
   position: relative !important;
-  display: inline-block !important;
+  display: block !important;
   width: 100% !important;
+  margin-bottom: 16px !important;
 }
 
 /* Imagem do cartão adaptável */
@@ -8877,16 +8886,13 @@ html[data-theme="dark"] .urb-empty-state {
   position: absolute !important;
   top: 12px !important;
   right: 12px !important;
-  background-color: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
   color: #1b4d3e !important;
   font-size: 11px !important;
   font-weight: 700 !important;
   padding: 4px 10px !important;
   border-radius: 20px !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-  backdrop-filter: blur(2px) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
   z-index: 2 !important;
-  white-space: nowrap !important;
 }
-
 
