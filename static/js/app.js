@@ -1876,25 +1876,25 @@ closeMonthlyModal.addEventListener("click", () => {
 function setupModal(openId, modalId, closeId) {
 
   const modal =
-      document.getElementById(modalId);
+    document.getElementById(modalId);
 
   document
-      .getElementById(openId)
-      .addEventListener("click", () => {
-          modal.hidden = false;
-      });
+    .getElementById(openId)
+    .addEventListener("click", () => {
+      modal.hidden = false;
+    });
 
   document
-      .getElementById(closeId)
-      .addEventListener("click", () => {
-          modal.hidden = true;
-      });
+    .getElementById(closeId)
+    .addEventListener("click", () => {
+      modal.hidden = true;
+    });
 
   modal
-      .querySelector(".monthly-modal__backdrop")
-      .addEventListener("click", () => {
-          modal.hidden = true;
-      });
+    .querySelector(".monthly-modal__backdrop")
+    .addEventListener("click", () => {
+      modal.hidden = true;
+    });
 }
 
 setupModal(
@@ -1926,6 +1926,23 @@ setupModal(
   "tableModal",
   "closeTableModal"
 );
+
+
+
+function mostrarAba(id, botao) {
+
+    document.querySelectorAll('.aba').forEach(function(aba) {
+        aba.classList.remove('ativa');
+    });
+
+    document.querySelectorAll('.menu-item').forEach(function(item) {
+        item.classList.remove('active');
+    });
+
+    document.getElementById(id).classList.add('ativa');
+    botao.classList.add('active');
+}
+
 
 
 
