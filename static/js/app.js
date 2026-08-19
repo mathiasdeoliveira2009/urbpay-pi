@@ -2245,6 +2245,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+function mostrarAba(id, botao) {
+ 
+    document.querySelectorAll('.aba').forEach(function(aba) {
+        aba.classList.remove('ativa');
+    });
+ 
+    document.querySelectorAll('.menu-item').forEach(function(item) {
+        item.classList.remove('active');
+    });
+ 
+    document.getElementById(id).classList.add('ativa');
+    botao.classList.add('active');
+}
+
 
 
 
