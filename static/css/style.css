@@ -1502,6 +1502,23 @@ html[data-theme="dark"] .gate-ops-hero.gate-turnstile {
   box-shadow: var(--shadow);
 }
 
+.feature-card {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important; /* Alinha todo o texto no meio vertical da caixa */
+  min-height: 180px;                  /* Ajuste a altura mínima conforme desejar */
+  padding: 24px !important;            /* Distribui o espaçamento por igual */
+}
+
+.product-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  padding: 12px;         /* Diminui o espaçamento interno para caber melhor em 3 colunas */
+  gap: 12px;             /* Espaço entre a imagem e o texto */
+  height: 100%;          /* Faz o card ocupar toda a altura do grid */
+}
+
 .hero-banner {
   position: relative;
   display: grid;
@@ -1746,6 +1763,10 @@ html[data-theme="dark"] .gate-ops-hero.gate-turnstile {
   margin-bottom: 8px;
   font-family: "Sora", sans-serif;
   font-size: 1.2rem;
+}
+.feature-card.qr-feature .qr-box {
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .qr-feature {
@@ -2874,7 +2895,8 @@ html[data-theme="dark"] .my-card-empty {
 }
 
 .cards-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch; /* Garante que todos os cards tenham a mesma altura */
 }
 
 .product-card {
@@ -2886,14 +2908,31 @@ html[data-theme="dark"] .my-card-empty {
   border-color: var(--line-strong);
 }
 
+.product-card {
+  padding: 16px 12px !important; /* Menos espaçamento nas laterais internas */
+  gap: 12px !important;          /* Espaço justo entre a imagem e o texto */
+}
+
+
 .product-image {
   width: 100%;
   height: 190px;
   object-fit: cover;
 }
 
+.product-card .product-image {
+  width: 150px !important;      /* Aumenta a largura (teste com 160px ou 170px se quiser ainda maior) */
+  max-height: 220px !important; /* Permite que a imagem cresça na vertical */
+  height: auto !important;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 .product-copy {
   padding: 18px;
+}
+
+.product-card .product-copy {
+  padding: 0 !important;
 }
 
 .product-copy p {
@@ -3664,6 +3703,9 @@ html[data-theme="dark"] .my-card-empty {
   width: 100%;
 }
 
+
+
+
 .my-cards-layout {
   display: grid;
   grid-template-columns: 400px minmax(0, 1fr);
@@ -3710,14 +3752,22 @@ html[data-theme="dark"] .my-card-empty {
 }
 
 .my-card-tile {
-  position: relative;
+  position: relative !important;
+  display: inline-block;
+  width: 220px;          /* Ajuste o tamanho geral do cartão aqui */
+  border-radius: 20px;
   overflow: hidden;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 36px;
-  border: 0;
-  background: transparent;
-  box-shadow: 0 26px 58px rgba(24, 45, 37, 0.16);
+}
+
+.my-card-tile__info,
+.my-card-details {
+  position: absolute !important;
+  bottom: 20px;          /* Mantém as informações na parte inferior do cartão */
+  left: 16px;
+  right: 16px;
+  z-index: 2;            /* Coloca por cima da imagem */
+  color: #1b4332;        /* Cor escura para dar leitura sobre o verde */
+  text-align: left;
 }
 
 .my-card-tile::after {
@@ -3731,10 +3781,9 @@ html[data-theme="dark"] .my-card-empty {
 
 .my-card-tile__image {
   display: block;
-  width: 100%;
+  width: 100% !important;
   height: auto;
-  border-radius: 36px;
-  object-fit: cover;
+  border-radius: 20px;
 }
 
 .my-card-tile__overlay {
@@ -3750,13 +3799,11 @@ html[data-theme="dark"] .my-card-empty {
 
 .my-card-tile__topbar,
 .my-card-tile__meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: flex !important;
+  gap: 16px;
+  font-size: 10px;
+  font-weight: 600;
 }
-
 .my-card-tile__body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -3812,8 +3859,11 @@ html[data-theme="dark"] .my-card-empty {
 }
 
 .my-card-tile__name {
-  font-size: 1.08rem;
-  line-height: 1.05;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
 }
 
 .my-card-tile__cvv,
@@ -5884,9 +5934,9 @@ html[data-theme="dark"] .common-support-message--agent {
   }
 
   .steps-grid,
-  .cards-grid {
-    gap: 12px;
-  }
+.cards-grid {
+  gap: 16px; /* Aumente ou diminua este valor (ex: 20px, 24px) */
+}
 
   .step-card {
     padding: 16px;
@@ -7395,6 +7445,816 @@ html[data-theme="dark"] .urb-profile-field {
   gap: 14px;
 }
 
+.urb-settings-panel {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#settings-modal .urb-settings-panel {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.urb-settings-shell {
+  display: grid;
+  gap: 0;
+}
+
+.urb-settings-surface {
+  display: grid;
+  gap: 22px;
+  padding: 26px 22px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(43, 72, 60, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 50px rgba(26, 47, 39, 0.06);
+}
+
+.urb-settings-surface__head {
+  margin-bottom: 0;
+}
+
+.urb-settings-card__head h3,
+.urb-settings-row__copy h4,
+.urb-settings-profile__copy strong,
+.urb-settings-metric strong,
+.urb-settings-field strong,
+.urb-settings-preview__item strong,
+.urb-settings-mini-stat strong,
+.urb-settings-checklist__item strong,
+.urb-settings-side-note strong {
+  margin: 0;
+}
+
+.urb-settings-card__head p,
+.urb-settings-row__copy p,
+.urb-settings-side-note p,
+.urb-settings-checklist__item p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+
+.urb-settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  padding: 0;
+  border-bottom: 1px solid rgba(43, 72, 60, 0.12);
+}
+
+.urb-settings-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #55665d;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 180ms ease, opacity 180ms ease;
+}
+
+.urb-settings-tab::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: #2f8541;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.urb-settings-tab__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.urb-settings-tab__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.urb-settings-tab:hover,
+.urb-settings-tab.is-active {
+  color: #26703d;
+}
+
+.urb-settings-tab[aria-selected="true"] {
+  font-weight: 600;
+}
+
+.urb-settings-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.urb-settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.65fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.urb-settings-content,
+.urb-settings-sidebar,
+.urb-settings-group {
+  display: grid;
+  gap: 18px;
+}
+
+.urb-settings-group[hidden] {
+  display: none;
+}
+
+.urb-settings-card,
+.urb-settings-sidecard {
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(43, 72, 60, 0.08);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: none;
+}
+
+.urb-settings-card--soft {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.urb-settings-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.urb-settings-card__head--avatar {
+  align-items: flex-start;
+}
+
+.urb-settings-card__head h3 {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: -0.03em;
+}
+
+.urb-settings-card--reference {
+  padding: 0;
+}
+
+.urb-settings-block {
+  padding: 18px;
+}
+
+.urb-settings-block--separated {
+  border-top: 1px solid rgba(43, 72, 60, 0.08);
+}
+
+.urb-settings-avatar-badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #edf4ef, #f7faf8);
+  color: #234838;
+  font-size: 1.2rem;
+  box-shadow: inset 0 0 0 1px rgba(43, 72, 60, 0.06);
+}
+
+.urb-settings-avatar-badge__action {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(43, 72, 60, 0.08);
+  border-radius: 50%;
+  background: #f4f8f4;
+  color: #577264;
+}
+
+.urb-settings-avatar-badge__action svg {
+  width: 14px;
+  height: 14px;
+}
+
+.urb-settings-account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 38px;
+}
+
+.urb-settings-inline-field {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(43, 72, 60, 0.12);
+}
+
+.urb-settings-inline-field span,
+.urb-settings-form-field span {
+  display: block;
+  color: #58695f;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.urb-settings-inline-field strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #25342d;
+}
+
+.urb-settings-inline-field--action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.urb-settings-inline-field--full {
+  grid-column: 1 / -1;
+}
+
+.urb-settings-inline-button {
+  min-height: 34px;
+  padding: 0 16px;
+  border: 1px solid rgba(61, 98, 75, 0.12);
+  border-radius: 6px;
+  background: #f5faf6;
+  color: #4c715f;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.urb-settings-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.urb-settings-form-field {
+  display: grid;
+  gap: 8px;
+}
+
+.urb-settings-form-field small {
+  color: var(--text-soft);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.urb-settings-profile {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.urb-settings-profile__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 26px;
+  object-fit: cover;
+  border: 3px solid rgba(46, 128, 63, 0.12);
+  box-shadow: 0 16px 34px rgba(46, 128, 63, 0.12);
+}
+
+.urb-settings-profile__copy {
+  display: grid;
+  gap: 6px;
+}
+
+.urb-settings-profile__copy strong {
+  font-family: "Sora", sans-serif;
+  font-size: 1.24rem;
+  letter-spacing: -0.04em;
+}
+
+.urb-settings-profile__copy p,
+.urb-settings-profile__copy span {
+  margin: 0;
+}
+
+.urb-settings-profile__copy span {
+  color: #2d7a40;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.urb-settings-metrics,
+.urb-settings-mini-grid,
+.urb-settings-preview__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.urb-settings-metric,
+.urb-settings-mini-stat,
+.urb-settings-preview__item,
+.urb-settings-field {
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(43, 72, 60, 0.08);
+  background: rgba(244, 249, 244, 0.94);
+}
+
+.urb-settings-metric span,
+.urb-settings-mini-stat span,
+.urb-settings-preview__item span,
+.urb-settings-field span {
+  display: block;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.urb-settings-metric strong,
+.urb-settings-mini-stat strong,
+.urb-settings-preview__item strong,
+.urb-settings-field strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
+.urb-settings-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.urb-settings-list {
+  display: grid;
+}
+
+.urb-settings-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid rgba(43, 72, 60, 0.08);
+}
+
+.urb-settings-row--inline {
+  padding-block: 16px;
+}
+
+.urb-settings-row--stacked {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.urb-settings-row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.urb-settings-row__copy {
+  display: grid;
+  gap: 6px;
+}
+
+.urb-settings-row__copy h4 {
+  font-size: 1rem;
+}
+
+.urb-settings-choice-group,
+.urb-settings-inline-actions,
+.urb-settings-action-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.urb-settings-action-list {
+  display: grid;
+  gap: 0;
+}
+
+.urb-settings-action-list > * + * {
+  border-top: 1px solid rgba(43, 72, 60, 0.08);
+}
+
+.urb-settings-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.urb-settings-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgba(43, 72, 60, 0.12);
+  border-radius: 4px;
+  background: #fff;
+  color: #5b6c62;
+  font-weight: 600;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.urb-settings-choice:hover,
+.urb-settings-choice.is-active {
+  color: #256d3b;
+  border-color: #4eab67;
+  background: #fff;
+}
+
+.urb-settings-select {
+  min-width: 170px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(43, 72, 60, 0.12);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text);
+}
+
+.urb-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 34px;
+}
+
+.urb-switch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.urb-switch__track {
+  position: relative;
+  width: 58px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(131, 150, 139, 0.32);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.urb-switch__track::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(18, 34, 25, 0.18);
+  transition: transform 180ms ease;
+}
+
+.urb-switch input:checked + .urb-switch__track {
+  background: linear-gradient(135deg, #2f8541, #236b36);
+}
+
+.urb-switch input:checked + .urb-switch__track::after {
+  transform: translateX(24px);
+}
+
+.urb-settings-link-form {
+  width: 100%;
+  margin: 0;
+}
+
+.urb-settings-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  transition: color 180ms ease;
+}
+
+.urb-settings-link:hover {
+  background: transparent;
+  transform: none;
+}
+
+.urb-settings-link strong {
+  color: #7b8d84;
+  font-size: 1.2rem;
+}
+
+.urb-settings-link--danger {
+  color: #b24f37;
+}
+
+.urb-settings-link--danger strong {
+  color: inherit;
+}
+
+.urb-settings-app-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.urb-settings-app-meta__item {
+  display: grid;
+  gap: 8px;
+}
+
+.urb-settings-app-meta__item span {
+  color: #58695f;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.urb-settings-app-meta__item strong {
+  font-size: 1rem;
+}
+
+.urb-settings-app-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #eef5ef, #f6faf6);
+  color: #37624d;
+  font-weight: 600;
+}
+
+.urb-settings-side-note {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 8px;
+  border: 1px dashed rgba(46, 128, 63, 0.16);
+  background: #f8fbf8;
+}
+
+.urb-settings-surface .urb-virtual-card,
+.urb-settings-surface .urb-empty-state {
+  border-radius: 10px;
+}
+
+.urb-settings-surface .urb-virtual-card__badge {
+  border-radius: 6px;
+}
+
+.urb-settings-surface .urb-virtual-card__meta div {
+  border-radius: 6px;
+}
+
+.urb-settings-preview {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.urb-settings-checklist {
+  display: grid;
+  gap: 14px;
+}
+
+.urb-settings-checklist__item {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(43, 72, 60, 0.08);
+  background: rgba(246, 250, 246, 0.94);
+}
+
+.urb-settings-checklist__item p {
+  margin-top: 8px;
+}
+
+html[data-theme="dark"] .urb-settings-card,
+html[data-theme="dark"] .urb-settings-surface,
+html[data-theme="dark"] .urb-settings-sidecard {
+  background: rgba(18, 28, 23, 0.94);
+  border-color: rgba(169, 188, 178, 0.1);
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .urb-settings-choice,
+html[data-theme="dark"] .urb-settings-select,
+html[data-theme="dark"] .urb-settings-link {
+  background: rgba(26, 38, 31, 0.92);
+  border-color: rgba(169, 188, 178, 0.12);
+  color: var(--text);
+}
+
+html[data-theme="dark"] .urb-settings-tab:hover,
+html[data-theme="dark"] .urb-settings-choice:hover,
+html[data-theme="dark"] .urb-settings-choice.is-active,
+html[data-theme="dark"] .urb-settings-link:hover {
+  color: #9fd4bd;
+}
+
+html[data-theme="dark"] .urb-settings-avatar-badge,
+html[data-theme="dark"] .urb-settings-avatar-badge__action,
+html[data-theme="dark"] .urb-settings-inline-button,
+html[data-theme="dark"] .urb-settings-side-note,
+html[data-theme="dark"] .urb-settings-app-button {
+  background: rgba(26, 38, 31, 0.92);
+  border-color: rgba(169, 188, 178, 0.12);
+  color: var(--text);
+}
+
+html[data-theme="dark"] .urb-settings-tabs {
+  border-bottom-color: rgba(169, 188, 178, 0.16);
+}
+
+html[data-theme="dark"] .urb-settings-tab {
+  background: transparent;
+}
+
+html[data-theme="dark"] .urb-settings-metric,
+html[data-theme="dark"] .urb-settings-mini-stat,
+html[data-theme="dark"] .urb-settings-preview__item,
+html[data-theme="dark"] .urb-settings-field,
+html[data-theme="dark"] .urb-settings-checklist__item,
+html[data-theme="dark"] .urb-settings-side-note {
+  background: rgba(26, 38, 31, 0.9);
+  border-color: rgba(169, 188, 178, 0.1);
+}
+
+html[data-ui-scale="large"] {
+  font-size: 17px;
+}
+
+html[data-ui-scale="xlarge"] {
+  font-size: 18px;
+}
+
+html[data-ui-density="compact"] .urb-settings-card,
+html[data-ui-density="compact"] .urb-settings-sidecard {
+  padding: 20px;
+}
+
+html[data-ui-density="compact"] .urb-settings-row {
+  padding: 14px 0;
+}
+
+html[data-ui-density="compact"] .urb-settings-link {
+  min-height: 50px;
+}
+
+html[data-ui-contrast="high"] {
+  --line: rgba(32, 54, 42, 0.28);
+  --line-strong: rgba(32, 54, 42, 0.42);
+  --text-soft: #425348;
+}
+
+html[data-theme="dark"][data-ui-contrast="high"] {
+  --line: rgba(211, 230, 219, 0.28);
+  --line-strong: rgba(211, 230, 219, 0.46);
+  --text-soft: #c3d7cd;
+}
+
+html[data-ui-contrast="high"] .urb-settings-card,
+html[data-ui-contrast="high"] .urb-settings-sidecard,
+html[data-ui-contrast="high"] .urb-settings-choice,
+html[data-ui-contrast="high"] .urb-settings-select,
+html[data-ui-contrast="high"] .urb-settings-link,
+html[data-ui-contrast="high"] .urb-settings-metric,
+html[data-ui-contrast="high"] .urb-settings-field,
+html[data-ui-contrast="high"] .urb-settings-mini-stat,
+html[data-ui-contrast="high"] .urb-settings-preview__item {
+  border-color: var(--line-strong);
+}
+
+html[data-ui-motion="reduced"] *,
+html[data-ui-motion="reduced"] *::before,
+html[data-ui-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html[data-ui-focus="strong"] button:focus-visible,
+html[data-ui-focus="strong"] a:focus-visible,
+html[data-ui-focus="strong"] input:focus-visible,
+html[data-ui-focus="strong"] select:focus-visible,
+html[data-ui-focus="strong"] textarea:focus-visible {
+  outline: 3px solid #2d7a40;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(45, 122, 64, 0.14);
+}
+
+html[data-ui-readable="true"] body,
+html[data-ui-readable="true"] p,
+html[data-ui-readable="true"] span,
+html[data-ui-readable="true"] label,
+html[data-ui-readable="true"] button,
+html[data-ui-readable="true"] input,
+html[data-ui-readable="true"] select,
+html[data-ui-readable="true"] textarea {
+  line-height: 1.72;
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
+}
+
+@media (max-width: 1360px) {
+  .urb-settings-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .urb-settings-account-grid,
+  .urb-settings-form-grid,
+  .urb-settings-row,
+  .urb-settings-profile {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .urb-settings-field-grid,
+  .urb-settings-app-meta,
+  .urb-settings-metrics,
+  .urb-settings-mini-grid,
+  .urb-settings-preview__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .urb-settings-row {
+    justify-items: stretch;
+  }
+
+  .urb-settings-inline-field--action {
+    grid-template-columns: 1fr;
+  }
+
+  .urb-settings-choice-group,
+  .urb-settings-chip-grid,
+  .urb-settings-inline-actions,
+  .urb-settings-action-list {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .urb-settings-surface,
+  .urb-settings-card,
+  .urb-settings-sidecard {
+    padding: 18px;
+    border-radius: 10px;
+  }
+
+  .urb-settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 12px;
+  }
+
+  .urb-settings-tab,
+  .urb-settings-choice,
+  .urb-settings-inline-actions .secondary-action,
+  .urb-settings-link {
+    width: 100%;
+  }
+
+  .urb-settings-choice-group,
+  .urb-settings-chip-grid,
+  .urb-settings-inline-actions,
+  .urb-settings-action-list {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .urb-settings-select {
+    width: 100%;
+  }
+}
+
 .urb-empty-state {
   display: grid;
   gap: 8px;
@@ -7731,6 +8591,308 @@ html[data-theme="dark"] .urb-empty-state {
   width: auto;
   min-width: 140px;
 }
+/* =========================================================
+   ESTILIZAÇÃO DO CARTÃO VIRTUAL EM PÉ (AUMENTADO)
+   ========================================================= */
+
+/* Container centralizador com padding ajustado */
+.urb-card-vertical-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  width: 100%;
+}
+
+/* Moldura do cartão com dimensões maiores */
+.urb-card-display {
+  position: relative;
+  width: 230px;  /* Aumentado de 180px para 230px */
+  height: 365px; /* Aumentado de 285px para 365px */
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+  margin: 0 auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.urb-card-display:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+}
+
+/* Imagem de fundo preenchendo o novo tamanho */
+.urb-card-vertical-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Camada de texto sobreposta com espaçamentos maiores */
+.urb-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px 18px; /* Mais espaço interno */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* Badge no topo (Estudante/Ativo) */
+.urb-card-overlay__top {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.urb-card-overlay__badge {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 11px; /* Fonte maior */
+  font-weight: 700;
+  color: #0f3d2e;
+  letter-spacing: 0.4px;
+}
+
+/* Dados inferiores ampliados */
+.urb-card-overlay__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+/* Número do cartão */
+.urb-card-overlay__number {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 15px; /* Fonte maior para leitura clara */
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #0d2c20;
+}
+
+/* Nome impresso */
+.urb-card-overlay__holder {
+  font-size: 13px; /* Fonte maior */
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #0d2c20;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.5px;
+}
+
+/* Meta dados (Validade e CVV) */
+.urb-card-overlay__meta {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.urb-card-overlay__label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: #1e4d3b;
+  opacity: 0.85;
+  letter-spacing: 0.5px;
+}
+
+.urb-card-overlay__value {
+  font-size: 12px; /* Fonte maior */
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  color: #0d2c20;
+}
+/* =========================================================
+   RESTAURAÇÃO DA SELEÇÃO DE CARTÕES (FORMULÁRIO DE CADASTRO)
+   ========================================================= */
+
+/* Container geral da seleção */
+.cartao-select-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.cartao-select-field > span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Grid com os 3 cartões lado a lado */
+/* =========================================================
+   PREVIEW DOS CARTÕES (AMPLIADO E SEM BORDAS LATERAIS)
+   ========================================================= */
+
+/* Container da grid de seleção */
+.cartoes-grid {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Aumentado o max-width de 110px para 135px */
+.cartao-card {
+  cursor: pointer;
+  flex: 1;
+  max-width: 135px;
+  margin: 0;
+}
+
+/* Oculta o radio button padrão */
+.cartao-card input[type="radio"] {
+  display: none !important;
+}
+
+/* Container do preview em formato vertical de cartão */
+.cartao-card__preview {
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+  opacity: 0.7;
+  width: 100%;
+  aspect-ratio: 1 / 1.58; /* Proporção padrão de cartão vertical */
+  display: block;
+}
+
+/* A imagem preenche todo o espaço sem bordas brancas */
+.cartao-card__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+/* Estado Selecionado: Borda destacada em verde UrbPay */
+.cartao-card input[type="radio"]:checked + .cartao-card__preview {
+  border-color: #2e7d32;
+  box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4);
+  opacity: 1;
+  transform: translateY(-3px);
+}
+
+/* Fundo escurecido que cobre a tela inteira */
+.urb-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(5px) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  box-sizing: border-box !important;
+}
+
+/* Oculta quando possui o atributo hidden */
+.urb-modal-overlay[hidden] {
+  display: none !important;
+}
+/* Caixa branca do Modal */
+.urb-modal-container {
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  max-width: 950px !important;
+  width: 100% !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;          /* Permite rolar apenas o conteúdo interno */
+  position: relative !important;
+  padding: 32px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Botão 'X' para fechar no canto superior direito */
+.urb-modal-close {
+  position: absolute !important;
+  top: 16px !important;
+  right: 20px !important;
+  background: #f1f3f5 !important;
+  border: none !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  font-size: 22px !important;
+  font-weight: bold !important;
+  color: #495057 !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  line-height: 1 !important;
+}
+
+.urb-modal-close:hover {
+  background: #e9ecef !important;
+  color: #212529 !important;
+  transform: scale(1.05);
+}
+/* Quando o modal não estiver hidden, força o display flex */
+#settings-modal:not([hidden]) {
+  display: flex !important;
+}
+
+/* Força o painel interno a ficar visível dentro da janela */
+#settings-modal .urb-panel,
+#settings-modal .urb-workspace__panel {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Container da imagem do cartão com posição relativa */
+.urb-virtual-card__media {
+  position: relative !important;
+  display: inline-block !important;
+  width: 100% !important;
+}
+
+/* Imagem do cartão adaptável */
+.urb-virtual-card__image {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  border-radius: 12px !important;
+}
+
+/* Badge posicionada no canto superior direito DENTRO da imagem */
+.urb-virtual-card__badge {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #1b4d3e !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 4px 10px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(2px) !important;
+  z-index: 2 !important;
+  white-space: nowrap !important;
+}
+
 
 
 
@@ -7800,3 +8962,51 @@ html[data-theme="dark"] .urb-empty-state {
 .history-hero__summary {
   width: 100%;
 }
+
+
+.history-layout{
+  display:flex;
+  gap:24px;
+  align-items:flex-start;
+}
+
+.history-left{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+
+.dashboard-sidebar{
+  width:240px;
+  margin-left: auto;
+  margin-top: 10px;
+}
+
+
+.menu-item{
+  font-weight:500;
+}
+
+.menu-item:hover{
+  background:#e8f0ea;
+  transform:translateX(4px);
+}
+
+.menu-item.active{
+  background:#5d7b67;
+  color:#fff;
+}
+
+
+.metric-card{
+    transition:.25s;
+}
+
+.metric-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+}
+
+
+
