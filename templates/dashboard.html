@@ -150,127 +150,96 @@
         </div>
       </header>
 
-      <section class="urb-overview">
-        <article class="urb-balance-card" data-sensitive>
-          <div class="urb-balance-card__header">
-            <div>
-              <span class="urb-card-label">Saldo disponivel</span>
-              <h2 data-sensitive-value data-masked="R$ ••••" data-full="{{ current_balance }}">{{ current_balance }}
-              </h2>
+      <section class="urb-overview urb-overview--clean">
+  <!-- Card 1: Saldo Disponível (Coluna Esquerda) -->
+  <article class="urb-balance-card" data-sensitive>
+    <div class="urb-balance-card__header">
+      <div>
+        <span class="urb-card-label">Saldo disponível</span>
+        <h2 data-sensitive-value data-masked="R$ ••••" data-full="{{ current_balance }}">{{ current_balance }}</h2>
+      </div>
+
+      <div class="urb-balance-card__eye">
+        <button type="button" class="urb-icon-button" data-sensitive-toggle aria-label="Alternar exibição do saldo">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="urb-balance-card__actions">
+      <button type="button" class="urb-action-button urb-action-button--light" data-dashboard-view="services" data-service-trigger="credit-home">Adicionar saldo</button>
+      <button type="button" class="urb-action-button urb-action-button--ghost" data-qr-modal-open>Ver passagem</button>
+    </div>
+
+    <div class="urb-balance-card__meta">
+      <span>Última atualização: 
+        {% if qr_issued_at %}
+          {{ qr_issued_at[:16].replace('T', ', ') }}
+        {% else %}
+          agora
+        {% endif %}
+      </span>
+    </div>
+  </article>
+
+  <!-- Card 2: Meu Cartão Virtual (Coluna Direita) -->
+  <article class="urb-summary-card urb-summary-card--card">
+    <div class="urb-summary-card__head">
+      <div>
+        <span class="urb-card-label">Meu cartão virtual</span>
+        <h3>Cartão ativo</h3>
+      </div>
+    </div>
+
+    <!-- Container do cartão vertical -->
+    <div class="urb-card-vertical-wrapper">
+      <div class="urb-card-display">
+        {% if primary_card %}
+          <img
+            src="{{ url_for('static', path='imgs/' ~ ((primary_card.card_model or 'cartao-verde.png') | replace('imgs/', '') | replace('/static/', ''))) }}"
+            alt="Cartão UrbPay" class="urb-card-vertical-img"
+            onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+
+          <div class="urb-card-overlay">
+            <div class="urb-card-overlay__top">
+              <span class="urb-card-overlay__badge">{{ primary_card.badge or 'Comum' }}</span>
             </div>
 
-            <div class="urb-balance-card__eye">
-              <button type="button" class="urb-icon-button" data-sensitive-toggle
-                aria-label="Alternar exibicao do saldo">
-                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </button>
-            </div>
-          </div>
+            <div class="urb-card-overlay__bottom">
+              <div class="urb-card-overlay__number">
+                {{ primary_card.card_number_masked or '•••• •••• •••• 0000' }}
+              </div>
 
-          <div class="urb-balance-card__actions">
-            <button type="button" class="urb-action-button urb-action-button--light" data-dashboard-view="services"
-              data-service-trigger="credit-home">Adicionar saldo</button>
-            <button type="button" class="urb-action-button urb-action-button--ghost" data-qr-modal-open>Ver
-              passagem</button>
-          </div>
+              <div class="urb-card-overlay__holder">
+                {{ primary_card.display_name }}
+              </div>
 
-          <div class="urb-balance-card__meta">
-            <span>Ultima atualizacao:
-              {% if qr_issued_at %}
-              {{ qr_issued_at[:16].replace('T', ', ') }}
-              {% else %}
-              agora
-              {% endif %}
-            </span>
-          </div>
-        </article>
-
-        <article class="urb-summary-card urb-summary-card--card">
-          <div class="urb-summary-card__head">
-            <div>
-              <span class="urb-card-label">Meu cartão virtual</span>
-              <h3>Cartão ativo</h3>
-            </div>
-          </div>
-
-          <!-- Container do cartão em pé (Vertical) -->
-          <div class="urb-card-vertical-wrapper">
-            <div class="urb-card-display">
-              {% if primary_card %}
-              <!-- Imagem dinâmica do cartão selecionado no cadastro -->
-              <img
-                src="{{ url_for('static', path='imgs/' ~ ((primary_card.card_model or 'cartao-verde.png') | replace('imgs/', '') | replace('/static/', ''))) }}"
-                alt="Cartão UrbPay" class="urb-card-vertical-img"
-                onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
-
-              <!-- Dados sobrepostos ao cartão -->
-              <div class="urb-card-overlay">
-                <div class="urb-card-overlay__top">
-                  <span class="urb-card-overlay__badge">{{ primary_card.badge or 'Comum' }}</span>
+              <div class="urb-card-overlay__meta">
+                <div>
+                  <span class="urb-card-overlay__label">VALIDADE</span>
+                  <span class="urb-card-overlay__value">{{ primary_card.validity or '--/--' }}</span>
                 </div>
-
-                <div class="urb-card-overlay__bottom">
-                  <div class="urb-card-overlay__number">
-                    {{ primary_card.card_number_masked or '•••• •••• •••• 0000' }}
-                  </div>
-
-                  <div class="urb-card-overlay__holder">
-                    {{ primary_card.display_name }}
-                  </div>
-
-                  <div class="urb-card-overlay__meta">
-                    <div>
-                      <span class="urb-card-overlay__label">VALIDADE</span>
-                      <span class="urb-card-overlay__value">{{ primary_card.validity or '--/--' }}</span>
-                    </div>
-                    <div>
-                      <span class="urb-card-overlay__label">CVV</span>
-                      <span class="urb-card-overlay__value">{{ primary_card.cvv or '•••' }}</span>
-                    </div>
-                  </div>
+                <div>
+                  <span class="urb-card-overlay__label">CVV</span>
+                  <span class="urb-card-overlay__value">{{ primary_card.cvv or '•••' }}</span>
                 </div>
               </div>
-              {% else %}
-              <!-- Fallback de imagem caso o usuário não tenha nenhum cartão retornado -->
-              <img src="/static/imgs/cartao-verde.png" alt="Cartão UrbPay Padrão" class="urb-card-vertical-img" />
-              {% endif %}
             </div>
           </div>
+        {% else %}
+          <img src="/static/imgs/cartao-verde.png" alt="Cartão UrbPay Padrão" class="urb-card-vertical-img" />
+        {% endif %}
+      </div>
+    </div>
 
-          <button type="button" class="urb-inline-link urb-inline-link--button" data-dashboard-view="cards">
-            Ver dados do cartão
-          </button>
-        </article>
-
-        <article class="urb-summary-card urb-summary-card--passage">
-          <div class="urb-summary-card__head">
-            <div>
-              <span class="urb-card-label">Passagem ativa</span>
-              <h3>Leitura em andamento</h3>
-            </div>
-            <span class="urb-status-pill" data-passage-status>Ativa</span>
-          </div>
-
-          <div class="urb-passage-card">
-            <div>
-              <span>Expira em</span>
-              <strong data-countdown data-expires-at="{{ qr_expires_at }}">Carregando...</strong>
-              <small>mm : ss</small>
-            </div>
-            <button type="button" class="urb-passage-card__preview urb-passage-card__preview--button" data-qr-modal-open
-              aria-label="Abrir QR Code da passagem">
-              <img src="{{ qr_image_url }}" alt="QR Code UrbPay" />
-            </button>
-          </div>
-
-          <button type="button" class="urb-action-button urb-action-button--solid" data-qr-modal-open>Mostrar QR
-            Code</button>
-        </article>
-      </section>
+    <button type="button" class="urb-inline-link urb-inline-link--button" onclick="openUrbModal()">
+      Ver dados do cartão
+    </button>
+  </article>
+</section>
 
       <section class="urb-panel urb-quick-panel">
 

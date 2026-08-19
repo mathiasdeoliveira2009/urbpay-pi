@@ -6915,6 +6915,11 @@ html[data-theme="dark"] .urb-profile-card {
   margin-top: 26px;
 }
 
+.urb-balance-card__actions {
+  margin-top: 16px !important;
+  margin-bottom: 8px !important;
+}
+
 .urb-balance-card__actions form {
   margin: 0;
 }
@@ -8894,5 +8899,94 @@ html[data-theme="dark"] .urb-empty-state {
   border-radius: 20px !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
   z-index: 2 !important;
+}
+
+/* Transforma o grid principal em 2 colunas proporcionais */
+.urb-overview.urb-overview--clean {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+}
+
+/* Deixa o card de saldo compacto e alinhado */
+.urb-overview--clean .urb-balance-card {
+  padding: 28px !important;
+  border-radius: 20px !important;
+  max-height: 280px !important; /* Limita a altura do bloco verde */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+/* Ajuste fino para a imagem do cartão caber perfeitamente */
+.urb-overview--clean .urb-summary-card--card {
+  position: relative !important;
+  padding: 24px !important;
+  border-radius: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow: hidden !important; /* Impede qualquer elemento de vazar do bloco */
+}
+
+.urb-overview--clean .urb-card-vertical-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 220px !important;
+  margin: 10px auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.urb-overview--clean .urb-card-vertical-img,
+.urb-overview--clean .urb-card-display {
+  position: relative !important;
+  width: 100% !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+.urb-overview--clean .urb-card-overlay {
+  position: relative !important;
+  width: 100% !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin-top: 12px !important;
+  text-align: center !important;
+}
+
+.urb-overview--clean .urb-card-overlay__number {
+  font-size: 13px !important;
+  letter-spacing: 1px !important;
+  color: #2d3748 !important;
+  margin-bottom: 4px !important;
+}
+
+.urb-overview--clean .urb-card-overlay__holder {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #1a202c !important;
+}
+
+.urb-overview--clean .urb-card-overlay__meta {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  font-size: 11px !important;
+  color: #718096 !important;
+  margin-top: 6px !important;
+}
+
+/* Responsividade para telas menores (celulares) */
+@media (max-width: 768px) {
+  .urb-overview.urb-overview--clean {
+    grid-template-columns: 1fr !important;
+  }
 }
 
