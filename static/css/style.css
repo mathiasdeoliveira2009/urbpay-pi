@@ -2173,6 +2173,10 @@ html[data-theme="dark"] .gate-shell {
 
 .dashboard-main {
   padding: 0 32px 36px;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 1500px;
+  margin-left: 400px;
 }
 
 .dashboard-hero,
@@ -3137,6 +3141,7 @@ html[data-theme="dark"] .my-card-empty {
 .dashboard-main--history {
   display: grid;
   gap: 0;
+
 }
 
 .full-bleed {
@@ -3160,6 +3165,7 @@ html[data-theme="dark"] .my-card-empty {
   box-shadow: none;
   border: 0;
   margin-bottom: 0;
+
 }
 
 .qr-landing__media,
@@ -5126,7 +5132,7 @@ html[data-theme="dark"] .common-support-message--agent {
 
 .dashboard-overview {
   display: grid;
-  gap: 18px;
+  gap: 8px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -8896,11 +8902,7 @@ html[data-theme="dark"] .urb-empty-state {
 
 
 
-.dashboard-layout {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-}
+
 
 .dashboard-sidebar {
   width: 240px;
@@ -8910,6 +8912,8 @@ html[data-theme="dark"] .urb-empty-state {
   box-shadow: 0 4px 12px rgba(0,0,0,.08);
   position: sticky;
   top: 20px;
+  margin-top: 10px;
+  margin-left: 330px;
 }
 
 .dashboard-sidebar h3 {
@@ -8948,13 +8952,15 @@ html[data-theme="dark"] .urb-empty-state {
 .aba.ativa {
   display: block;
 }
-
+/*
 .dashboard-layout {
   display: flex;
   gap: 24px;
-  align-items: flex-start;
+  flex-direction: row;
+  justify-content:center;
+  align-items: center;
 }
-
+*/
 .dashboard-content {
   flex: 1;
 }
@@ -8976,13 +8982,13 @@ html[data-theme="dark"] .urb-empty-state {
   flex-direction:column;
   gap:24px;
 }
-
+/*
 .dashboard-sidebar{
   width:240px;
   margin-left: auto;
   margin-top: 10px;
 }
-
+*/
 
 .menu-item{
   font-weight:500;
@@ -9010,3 +9016,112 @@ html[data-theme="dark"] .urb-empty-state {
 
 
 
+.terms-modal{
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.7);
+  z-index: 999999;
+}
+
+.terms-modal.show{
+  display:flex;
+}
+
+.terms-modal-content{
+  width:700px;
+  max-width:90%;
+  background:#fff;
+  border-radius:20px;
+  padding:30px;
+}
+
+.terms-text{
+  max-height:300px;
+  overflow-y:auto;
+  margin:20px 0;
+}
+
+.terms-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+
+/* =========================
+   HAMBURGER
+========================= */
+
+.urb-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+/* =========================
+   OVERLAY
+========================= */
+
+.urb-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: .3s ease;
+  z-index: 998;
+}
+
+.urb-sidebar-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .urb-hamburger {
+    display: flex;
+  }
+
+  .urb-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    z-index: 999;
+    transition: left .3s ease;
+    overflow-y: auto;
+  }
+
+  .urb-sidebar.is-open {
+    left: 0;
+  }
+
+  .urb-main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .urb-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}

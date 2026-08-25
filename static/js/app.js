@@ -2145,32 +2145,37 @@ const monthlyModal =
 const closeMonthlyModal =
   document.getElementById("closeMonthlyModal");
 
-closeMonthlyModal.addEventListener("click", () => {
-  monthlyModal.hidden = true;
-});
+if (monthlyModal && closeMonthlyModal) {
+  closeMonthlyModal.addEventListener("click", () => {
+    monthlyModal.hidden = true;
+  });
+}
 
 function setupModal(openId, modalId, closeId) {
 
-  const modal =
-    document.getElementById(modalId);
+  const modal = document.getElementById(modalId);
+  const openBtn = document.getElementById(openId);
+  const closeBtn = document.getElementById(closeId);
 
-  document
-    .getElementById(openId)
-    .addEventListener("click", () => {
-      modal.hidden = false;
-    });
+  if (!modal || !openBtn || !closeBtn) {
+    return;
+  }
 
-  document
-    .getElementById(closeId)
-    .addEventListener("click", () => {
+  openBtn.addEventListener("click", () => {
+    modal.hidden = false;
+  });
+
+  closeBtn.addEventListener("click", () => {
+    modal.hidden = true;
+  });
+
+  const backdrop = modal.querySelector(".monthly-modal__backdrop");
+
+  if (backdrop) {
+    backdrop.addEventListener("click", () => {
       modal.hidden = true;
     });
-
-  modal
-    .querySelector(".monthly-modal__backdrop")
-    .addEventListener("click", () => {
-      modal.hidden = true;
-    });
+  }
 }
 
 setupModal(
@@ -2248,17 +2253,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function mostrarAba(id, botao) {
 
-    document.querySelectorAll('.aba').forEach(function(aba) {
-        aba.classList.remove('ativa');
-    });
+  document.querySelectorAll('.aba').forEach(function (aba) {
+    aba.classList.remove('ativa');
+  });
 
-    document.querySelectorAll('.menu-item').forEach(function(item) {
-        item.classList.remove('active');
-    });
+  document.querySelectorAll('.menu-item').forEach(function (item) {
+    item.classList.remove('active');
+  });
 
-    document.getElementById(id).classList.add('ativa');
-    botao.classList.add('active');
+  document.getElementById(id).classList.add('ativa');
+  botao.classList.add('active');
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const form = document.querySelector(".signup-form");
+  const termsModal = document.getElementById("termsModal");
+
+  const openTerms = document.getElementById("openTerms");
+  const cancelTerms = document.getElementById("cancelTerms");
+  const confirmTerms = document.getElementById("confirmTerms");
+  const acceptTerms = document.getElementById("acceptTerms");
+
+  if (openTerms) {
+    openTerms.addEventListener("click", () => {
+      termsModal.classList.add("show");
+    });
+  }
+
+  if (cancelTerms) {
+    cancelTerms.addEventListener("click", () => {
+      termsModal.classList.remove("show");
+    });
+  }
+
+  if (confirmTerms) {
+    confirmTerms.addEventListener("click", () => {
+
+      if (!acceptTerms.checked) {
+        alert("Você precisa aceitar os Termos de Uso.");
+        return;
+      }
+
+      termsModal.classList.remove("show");
+
+      if (form) {
+        form.submit();
+      }
+    });
+  }
+
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const hamburger = document.getElementById("urbHamburger");
+  const sidebar = document.querySelector(".urb-sidebar");
+  const overlay = document.getElementById("urbSidebarOverlay");
+
+  if (!hamburger || !sidebar || !overlay) return;
+
+  hamburger.addEventListener("click", () => {
+    sidebar.classList.toggle("is-open");
+    overlay.classList.toggle("is-open");
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("is-open");
+    overlay.classList.remove("is-open");
+  });
+
+});
 
 
 
