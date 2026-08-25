@@ -6994,15 +6994,15 @@ html[data-theme="dark"] .urb-panel__footer {
 }
 
 .urb-virtual-card {
-  display: grid;
-  gap: 18px;
-  padding: 20px;
-  margin-top: 18px;
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at top right, rgba(229, 243, 230, 0.72), transparent 28%),
-    linear-gradient(145deg, #ffffff 0%, #eef5ee 100%);
-  border: 1px solid rgba(47, 84, 60, 0.08);
+  position: relative;
+  width: 100%;
+  max-width: 290px;
+  height: 440px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  margin: 0.5rem 0;
+  background: transparent;
 }
 
 html[data-theme="dark"] .urb-virtual-card {
@@ -7060,6 +7060,15 @@ html[data-theme="dark"] .urb-virtual-card {
   letter-spacing: 1px !important;
   color: #4a5568 !important;
   margin: 6px 0 12px 0 !important;
+}
+.urb-virtual-card {
+  position: relative;
+  width: 260px;          /* Largura maior para preencher melhor o card */
+  height: 400px;         /* Altura proporcional ao design */
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
+  background: transparent;
 }
 
 .urb-virtual-card__meta span,
@@ -8983,6 +8992,507 @@ html[data-theme="dark"] .urb-empty-state {
   margin-top: 6px !important;
 }
 
+/* Grid com duas colunas de proporções iguais */
+.urb-main-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr; /* Coluna da direita ganha mais espaço horizontal */
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
+}
+
+/* Coluna Direita que empilha Saldo e Mapa */
+.urb-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+/* Base Comum dos Cards */
+.urb-card {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  border: 1px solid #edf2f0;
+}
+
+/* Card do Cartão (Hero Esquerda) */
+.urb-card--vertical-hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  height: 100%;
+}
+
+.urb-card--vertical-hero .urb-card__header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.urb-card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 0;
+  flex: 1;
+}
+
+.urb-card__header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.urb-vertical-img {
+  max-height: 240px;
+  width: auto;
+  object-fit: contain;
+  margin: 1rem 0;
+  border-radius: 0.75rem;
+}
+
+.urb-card-footer-info {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.urb-card-status {
+  color: #16a34a;
+}
+
+/* Bloco de Saldo */
+.urb-balance-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.urb-balance-top h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 0.25rem 0 0 0;
+  color: #111827;
+}
+
+.urb-balance-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.urb-btn {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.urb-btn--fill {
+  background: #16a34a;
+  color: #fff;
+}
+
+.urb-btn--outline {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.urb-btn-eye {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  color: #6b7280;
+}
+
+.urb-btn-eye svg {
+  width: 100%;
+  height: 100%;
+}
+
+.urb-link-action {
+  background: none;
+  border: none;
+  color: #16a34a;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+/* Bloco do Mapa */
+.urb-card--map-container {
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+  padding: 1rem;
+}
+
+.urb-map-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.urb-map-badge {
+  font-size: 0.75rem;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+#urb-bus-map {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.urb-label {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Card Container */
+.urb-card--bus-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.urb-bus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.urb-bus-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.urb-badge-pulse {
+  font-size: 0.75rem;
+  color: #16a34a;
+  background: #f0fdf4;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  font-weight: 600;
+}
+
+/* Campo de Pesquisa */
+.urb-search-box {
+  position: relative;
+  width: 210px;
+}
+
+.urb-search-box input {
+  width: 100%;
+  padding: 0.45rem 2rem 0.45rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  font-size: 0.8125rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.urb-search-box input:focus {
+  border-color: #16a34a;
+}
+
+.urb-search-box .search-icon {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  stroke: #9ca3af;
+}
+
+/* Lista */
+.urb-bus-items {
+  flex: 1;
+  max-height: 230px; /* Ajustado proporcionalmente */
+  overflow-y: auto;
+}
+
+.urb-bus-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.urb-bus-item:hover {
+  background: #ffffff;
+  border-color: #16a34a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.urb-bus-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.urb-bus-tag {
+  background: #16a34a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  min-width: 42px;
+  text-align: center;
+}
+
+.urb-bus-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.urb-bus-details strong {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.urb-bus-details small {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.urb-bus-time {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.urb-bus-time--fast {
+  color: #16a34a;
+}
+.urb-virtual-card {
+  position: relative;
+  width: 230px;
+  height: 350px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.urb-virtual-card .urb-vertical-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Camada de texto sobre o cartão */
+.urb-card-overlay-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.5rem 1.25rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.25) 100%);
+}
+
+.urb-card-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.urb-card-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #1b4332;
+  letter-spacing: 0.5px;
+}
+
+.urb-card-val-text {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f281e;
+  letter-spacing: 0.5px;
+}
+
+/* Alinhamento dos 3 itens inferiores (NÚMERO, CVV, DATA) */
+.urb-card-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr;
+  gap: 0.4rem;
+  align-items: flex-end;
+}
+
+.urb-card__header .urb-btn-eye {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.urb-card__header .urb-btn-eye svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Container Externo do Cartão */
+.card-display-box {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.card-display-box__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.card-display-box__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.card-display-box__eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.card-display-box__eye-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Área Central do Cartão (Flex para centralizar e expandir) */
+.card-display-box__body {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex: 1 !important;
+  padding: 0 !important;
+}
+
+/* Estrutura do Cartão em Si (Aumentando largura e altura) */
+.virtual-card-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 240px !important; /* Ajustado de 260px para 240px */
+  height: 380px !important;    /* Proporção ideal para não achatar */
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12) !important;
+}
+
+.virtual-card-wrapper__img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: fill !important; /* Força a imagem a esticar na altura toda */
+  display: block !important;
+}
+
+/* Dados posicionados sobre a imagem */
+.virtual-card-wrapper__info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.25rem 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.virtual-card-wrapper__group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.virtual-card-wrapper__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #1b4332;
+  letter-spacing: 0.5px;
+}
+
+.virtual-card-wrapper__value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f281e;
+  letter-spacing: 0.5px;
+}
+
+.virtual-card-wrapper__grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr;
+  gap: 0.4rem;
+  align-items: flex-end;
+}
+
+/* Rodapé do Container */
+.card-display-box__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #444;
+  margin-top: 0.5rem;
+}
+
+.card-display-box__status {
+  color: #10b981;
+  font-weight: 600;
+}
+
+
+
+
 /* Responsividade para telas menores (celulares) */
 @media (max-width: 768px) {
   .urb-overview.urb-overview--clean {
@@ -8990,6 +9500,38 @@ html[data-theme="dark"] .urb-empty-state {
   }
 }
 
+
+
+/* BREAKPOINT MOBILE (Telas menores que 768px) */
+@media (max-width: 768px) {
+  /* Força o botão hambúrguer a aparecer */
+  .mobile-toggle {
+    display: flex !important;
+  }
+
+  /* Força o menu a ficar ESCONDIDO por padrão */
+  .topbar .site-menu,
+  nav.site-menu {
+    display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.25rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border-radius: 0 0 16px 16px;
+    z-index: 999;
+  }
+
+  /* Só exibe quando o JS adicionar a classe "is-active" */
+  .topbar .site-menu.is-active,
+  nav.site-menu.is-active {
+    display: flex !important;
+  }
+}
 
 
 
