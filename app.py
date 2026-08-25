@@ -1409,23 +1409,34 @@ def build_history_analytics(movements: list[Movimentacao]) -> dict:
     }
 
 
-def build_landing_context(
-    request: Request,
-    *,
-    status: str | None = None,
-    form_error: str | None = None,
-    open_signup_modal: bool = False,
-) -> dict:
-    status_kind, status_message = STATUS_MESSAGES.get(status, (None, None))
-    return {
-        "request": request,
-        "card_types": CARD_TYPES,
-        "how_it_works": HOW_IT_WORKS,
-        "qr_pattern": QR_PATTERN,
-        "status_kind": status_kind,
-        "status_message": form_error or status_message,
-        "open_signup_modal": open_signup_modal,
-    }
+def build_dashboard_cards(user: Usuario, cards: list[Cartao]) -> list[dict]:
+    result = []
+    for c in cards:
+        raw_model = getattr(c, "modelo", "cartao-verde.png") or "cartao-verde.png"
+        clean_model = str(raw_model).replace("imgs/", "").replace("/static/", "")
+
+        numero = getattr(c, "numero_cartao", "") or ""
+        masked_number = f"•••• •••• •••• {numero[-4:]}" if len(numero) >= 4 else "•••• 0000"
+        
+        formatted_num = format_card_number(numero) if 'format_card_number' in globals() and numero else masked_number
+        saldo_formatted = currency(c.saldo) if 'currency' in globals() and hasattr(c, 'saldo') and c.saldo is not None else str(getattr(c, 'saldo', '0.00'))
+
+        result.append({
+            "id": c.id_cartao,
+            "badge": getattr(c, "tipo", "Comum") or "Comum",
+            "display_name": getattr(c, "nome_impresso", None) or getattr(user, "nome", "Usuário"),
+            "card_number_masked": masked_number,
+            "card_number_full": formatted_num,
+            "cvv": str(getattr(c, "cvv", "") or "000"),
+            "validity": c.data_validade.strftime("%m/%Y") if getattr(c, "data_validade", None) else "--/--",
+            "balance": saldo_formatted,
+            "balance_value": str(getattr(c, "saldo", "0.00")),
+            "service_key": f"card_{c.id_cartao}",
+            "model": clean_model,
+            "modelo": clean_model,
+            "card_model": clean_model,
+        })
+    return result
 
 
 def build_dashboard_context(
@@ -1437,8 +1448,6 @@ def build_dashboard_context(
     qr_token: str | None = None,
 ) -> dict:
     cards = get_user_cards(db, user.id_usuario)
-    
-    # 1. Pega o cartão mais recente (último da lista) se houver múltiplos
     card = cards[-1] if cards else user.cartao
 
     dashboard_cards = build_dashboard_cards(user, cards)
@@ -1465,10 +1474,8 @@ def build_dashboard_context(
     issued_iso = issued_at.isoformat() if isinstance(issued_at, datetime) else None
     request_items = build_dashboard_requests(user, recent_movements)
 
-    # --- MONTAGEM DO PRIMARY_CARD PARA O HTML ---
     primary_card = None
     if card:
-        # Garante que 'imgs/' seja removido caso venha gravado junto no banco
         raw_model = getattr(card, "modelo", "cartao-verde.png") or "cartao-verde.png"
         clean_model = raw_model.replace("imgs/", "").replace("/static/", "")
 
@@ -1480,6 +1487,8 @@ def build_dashboard_context(
             "cvv": str(card.cvv),
             "validity": card.data_validade.strftime("%m/%Y") if card.data_validade else "--/--",
             "model": clean_model,
+            "modelo": clean_model,
+            "card_model": clean_model,
         }
 
     return {
@@ -1546,6 +1555,24 @@ def build_history_context(request: Request, db: Session, user: Usuario) -> dict:
         "membership_id": profile_identity["membership_id"],
     }
 
+
+def build_landing_context(
+    request: Request,
+    *,
+    status: str | None = None,
+    form_error: str | None = None,
+    open_signup_modal: bool = False,
+) -> dict:
+    status_kind, status_message = STATUS_MESSAGES.get(status, (None, None))
+    return {
+        "request": request,
+        "card_types": CARD_TYPES,
+        "how_it_works": HOW_IT_WORKS,
+        "qr_pattern": QR_PATTERN,
+        "status_kind": status_kind,
+        "status_message": form_error or status_message,
+        "open_signup_modal": open_signup_modal,
+    }
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, status: str | None = None, db: Session = Depends(get_db)) -> HTMLResponse:
@@ -1689,6 +1716,15 @@ def dashboard(request: Request, status: str | None = None, db: Session = Depends
         return RedirectResponse(url="/", status_code=303)
 
     context = build_dashboard_context(request, db, user, status=status)
+
+    
+    context["bus_lines"] = [
+        {"codigo": "063", "destino": "Pq. Dom Pedro II", "itinerario": "Via Perimetral / Parada Bessa", "tempo": "3 min", "minutos": 3},
+        {"codigo": "160", "destino": "Terminal Santo André", "itinerario": "Via Av. Portugal", "tempo": "10 min", "minutos": 10},
+        {"codigo": "B19", "destino": "Jardim Las Vegas", "itinerario": "Via Bairro Assunção", "tempo": "15 min", "minutos": 15},
+        {"codigo": "T14", "destino": "Estação Prefeito Saladino", "itinerario": "Via Av. Industrial", "tempo": "22 min", "minutos": 22}
+    ]
+
     return templates.TemplateResponse("dashboard.html", context)
 
 

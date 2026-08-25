@@ -2251,6 +2251,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
 function mostrarAba(id, botao) {
 
   document.querySelectorAll('.aba').forEach(function (aba) {
@@ -2329,6 +2330,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+
+
+// Filtra as linhas conforme o usuário digita na busca
+function filterBuses() {
+  const input = document.getElementById('bus-search-input');
+  const filter = input.value.toLowerCase();
+  const ul = document.getElementById('bus-list');
+  const li = ul.getElementsByTagName('li');
+
+  for (let i = 0; i < li.length; i++) {
+    const text = li[i].textContent || li[i].innerText;
+    if (text.toLowerCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+
+document.addEventListener("click", function (e) {
+  // Procura se o elemento clicado é o botão ou está dentro dele
+  const toggleBtn = e.target.closest("#toggle-card-data");
+  
+  if (toggleBtn) {
+    e.preventDefault();
+    console.log("Olhinho clicado com sucesso!");
+
+    const numElem = document.getElementById("card-number");
+    const cvvElem = document.getElementById("card-cvv");
+    const valElem = document.getElementById("card-validity");
+
+    if (!numElem || !cvvElem || !valElem) {
+      console.error("Elementos com ID card-number, card-cvv ou card-validity não foram encontrados.");
+      return;
+    }
+
+    const isHidden = numElem.textContent.includes("••••");
+
+    numElem.textContent = isHidden ? numElem.dataset.full : numElem.dataset.masked;
+    cvvElem.textContent = isHidden ? cvvElem.dataset.full : cvvElem.dataset.masked;
+    valElem.textContent = isHidden ? valElem.dataset.full : valElem.dataset.masked;
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.getElementById('menuToggle');
+  const menu = document.getElementById('siteMenu');
+
+  if (toggleBtn && menu) {
+    toggleBtn.addEventListener('click', () => {
+      menu.classList.toggle('is-active');
+    });
+
+    // Fecha o menu automaticamente quando o usuário clica em um link
+    document.querySelectorAll('.site-menu__link').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.classList.remove('is-active');
+      });
+    });
+  }
+});
 
 
 
