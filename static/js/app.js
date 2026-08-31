@@ -2145,32 +2145,37 @@ const monthlyModal =
 const closeMonthlyModal =
   document.getElementById("closeMonthlyModal");
 
-closeMonthlyModal.addEventListener("click", () => {
-  monthlyModal.hidden = true;
-});
+if (monthlyModal && closeMonthlyModal) {
+  closeMonthlyModal.addEventListener("click", () => {
+    monthlyModal.hidden = true;
+  });
+}
 
 function setupModal(openId, modalId, closeId) {
 
-  const modal =
-      document.getElementById(modalId);
+  const modal = document.getElementById(modalId);
+  const openBtn = document.getElementById(openId);
+  const closeBtn = document.getElementById(closeId);
 
-  document
-      .getElementById(openId)
-      .addEventListener("click", () => {
-          modal.hidden = false;
-      });
+  if (!modal || !openBtn || !closeBtn) {
+    return;
+  }
 
-  document
-      .getElementById(closeId)
-      .addEventListener("click", () => {
-          modal.hidden = true;
-      });
+  openBtn.addEventListener("click", () => {
+    modal.hidden = false;
+  });
 
-  modal
-      .querySelector(".monthly-modal__backdrop")
-      .addEventListener("click", () => {
-          modal.hidden = true;
-      });
+  closeBtn.addEventListener("click", () => {
+    modal.hidden = true;
+  });
+
+  const backdrop = modal.querySelector(".monthly-modal__backdrop");
+
+  if (backdrop) {
+    backdrop.addEventListener("click", () => {
+      modal.hidden = true;
+    });
+  }
 }
 
 setupModal(
@@ -2263,7 +2268,136 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+<<<<<<< HEAD
   // Menu Lateral / Mobile Toggle
+=======
+
+
+
+function mostrarAba(id, botao) {
+
+  document.querySelectorAll('.aba').forEach(function (aba) {
+    aba.classList.remove('ativa');
+  });
+
+  document.querySelectorAll('.menu-item').forEach(function (item) {
+    item.classList.remove('active');
+  });
+
+  document.getElementById(id).classList.add('ativa');
+  botao.classList.add('active');
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const form = document.querySelector(".signup-form");
+  const termsModal = document.getElementById("termsModal");
+
+  const openTerms = document.getElementById("openTerms");
+  const cancelTerms = document.getElementById("cancelTerms");
+  const confirmTerms = document.getElementById("confirmTerms");
+  const acceptTerms = document.getElementById("acceptTerms");
+
+  if (openTerms) {
+    openTerms.addEventListener("click", () => {
+      termsModal.classList.add("show");
+    });
+  }
+
+  if (cancelTerms) {
+    cancelTerms.addEventListener("click", () => {
+      termsModal.classList.remove("show");
+    });
+  }
+
+  if (confirmTerms) {
+    confirmTerms.addEventListener("click", () => {
+
+      if (!acceptTerms.checked) {
+        alert("Você precisa aceitar os Termos de Uso.");
+        return;
+      }
+
+      termsModal.classList.remove("show");
+
+      if (form) {
+        form.submit();
+      }
+    });
+  }
+
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const hamburger = document.getElementById("urbHamburger");
+  const sidebar = document.querySelector(".urb-sidebar");
+  const overlay = document.getElementById("urbSidebarOverlay");
+
+  if (!hamburger || !sidebar || !overlay) return;
+
+  hamburger.addEventListener("click", () => {
+    sidebar.classList.toggle("is-open");
+    overlay.classList.toggle("is-open");
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("is-open");
+    overlay.classList.remove("is-open");
+  });
+
+});
+
+
+
+
+
+// Filtra as linhas conforme o usuário digita na busca
+function filterBuses() {
+  const input = document.getElementById('bus-search-input');
+  const filter = input.value.toLowerCase();
+  const ul = document.getElementById('bus-list');
+  const li = ul.getElementsByTagName('li');
+
+  for (let i = 0; i < li.length; i++) {
+    const text = li[i].textContent || li[i].innerText;
+    if (text.toLowerCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+
+document.addEventListener("click", function (e) {
+  // Procura se o elemento clicado é o botão ou está dentro dele
+  const toggleBtn = e.target.closest("#toggle-card-data");
+  
+  if (toggleBtn) {
+    e.preventDefault();
+    console.log("Olhinho clicado com sucesso!");
+
+    const numElem = document.getElementById("card-number");
+    const cvvElem = document.getElementById("card-cvv");
+    const valElem = document.getElementById("card-validity");
+
+    if (!numElem || !cvvElem || !valElem) {
+      console.error("Elementos com ID card-number, card-cvv ou card-validity não foram encontrados.");
+      return;
+    }
+
+    const isHidden = numElem.textContent.includes("••••");
+
+    numElem.textContent = isHidden ? numElem.dataset.full : numElem.dataset.masked;
+    cvvElem.textContent = isHidden ? cvvElem.dataset.full : cvvElem.dataset.masked;
+    valElem.textContent = isHidden ? valElem.dataset.full : valElem.dataset.masked;
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+>>>>>>> d3c0f4f8f5302efb02450ccf4b5e228f3f279cb1
   const toggleBtn = document.getElementById('menuToggle');
   const menu = document.getElementById('siteMenu');
 
@@ -2284,6 +2418,7 @@ document.addEventListener("click", function (e) {
   const eyeBtn = e.target.closest("#toggle-card-data");
   if (!eyeBtn) return;
 
+<<<<<<< HEAD
   e.preventDefault();
 
   const num = document.getElementById("card-number");
@@ -2298,3 +2433,6 @@ document.addEventListener("click", function (e) {
   cvv.textContent = isMasked ? cvv.dataset.full : cvv.dataset.masked;
   val.textContent = isMasked ? val.dataset.full : val.dataset.masked;
 });
+=======
+
+>>>>>>> d3c0f4f8f5302efb02450ccf4b5e228f3f279cb1

@@ -50,38 +50,76 @@
         </label>
 
         <div class="cartao-select-field">
-  <span>Escolha o modelo do cartão</span>
-  <div class="cartoes-grid">
+          <span>Escolha o modelo do cartão</span>
+          <div class="cartoes-grid">
 
-    <!-- Modelo 1 (Verde) -->
-    <label class="cartao-card">
-      <input type="radio" name="modelo_cartao" value="cartao-verde.png" checked />
-      <div class="cartao-card__preview">
-        <img src="/static/imgs/cartao-verde.png" alt="Modelo Verde" />
-      </div>
-    </label>
+            <!-- Modelo 1 (Verde) -->
+            <label class="cartao-card">
+              <input type="radio" name="modelo_cartao" value="cartao-verde.png" checked />
+              <div class="cartao-card__preview">
+                <img src="/static/imgs/cartao-verde.png" alt="Modelo Verde" />
+              </div>
+            </label>
 
-    <!-- Modelo 2 (Urbano) -->
-    <label class="cartao-card">
-      <input type="radio" name="modelo_cartao" value="cartao-urbano.png" />
-      <div class="cartao-card__preview">
-        <img src="/static/imgs/cartao-urbano.png" alt="Modelo Urbano" />
-      </div>
-    </label>
+            <!-- Modelo 2 (Urbano) -->
+            <label class="cartao-card">
+              <input type="radio" name="modelo_cartao" value="cartao-urbano.png" />
+              <div class="cartao-card__preview">
+                <img src="/static/imgs/cartao-urbano.png" alt="Modelo Urbano" />
+              </div>
+            </label>
 
-    <!-- Modelo 3 (Conecta) -->
-    <label class="cartao-card">
-      <input type="radio" name="modelo_cartao" value="cartao-conecta.png" />
-      <div class="cartao-card__preview">
-        <img src="/static/imgs/cartao-conecta.png" alt="Modelo Conecta" />
-      </div>
-    </label>
+            <!-- Modelo 3 (Conecta) -->
+            <label class="cartao-card">
+              <input type="radio" name="modelo_cartao" value="cartao-conecta.png" />
+              <div class="cartao-card__preview">
+                <img src="/static/imgs/cartao-conecta.png" alt="Modelo Conecta" />
+              </div>
+            </label>
 
-  </div>
-</div>
+          </div>
+        </div>
 
-        <button type="submit" class="login-submit">Cadastrar</button>
+        <button type="button" id="openTerms" class="login-submit"> Cadastrar </button>
       </form>
+      <div class="terms-modal" id="termsModal">
+        <div class="terms-modal-content">
+          <h2>Termos de Uso</h2>
+
+          <div class="terms-text">
+            <p>
+              Ao utilizar a plataforma UrbPay, você concorda com a coleta
+              e tratamento dos dados necessários para identificação,
+              autenticação e utilização dos serviços oferecidos.
+            </p>
+
+            <p>
+              O usuário é responsável pela veracidade das informações
+              fornecidas durante o cadastro.
+            </p>
+
+            <p>
+              A UrbPay poderá utilizar os dados exclusivamente para
+              funcionamento da plataforma e cumprimento das exigências legais.
+            </p>
+          </div>
+
+          <label class="terms-check">
+            <input type="checkbox" id="acceptTerms">
+            Li e concordo com os Termos de Uso
+          </label>
+
+          <div class="terms-actions">
+            <button type="button" id="cancelTerms">
+              Cancelar
+            </button>
+
+            <button type="button" id="confirmTerms">
+              Aceitar e Cadastrar
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -116,7 +154,7 @@
     <section class="hero-banner reveal" data-reveal>
       <div class="hero-copy">
         <span class="eyebrow">Portal URBPAY</span>
-        <h1>Cadastro, login e cartao digital conectados ao seu banco.</h1>
+        <h1>Cadastro, login e cartão digital conectados ao seu banco.</h1>
         <p class="hero-text">
           Agora o portal pode registrar usuarios de verdade, salvar acesso por CPF e gerar um cartao visual
           com a foto de perfil enviada no cadastro.
@@ -155,13 +193,13 @@
         <article class="glass-stat floating-card card-a">
           <span class="eyebrow small">Dados persistidos</span>
           <strong>Conta conectada</strong>
-          <p>Cadastro, login e cartao agora podem ficar associados ao usuario salvo no banco.</p>
+          <p>Cadastro, login e cartão agora podem ficar associados ao usuário salvo no banco.</p>
         </article>
 
         <article class="login-card magnetic" id="acesso" data-magnetic>
           <div class="login-card__head">
             <span class="eyebrow small">Entrar na plataforma</span>
-            <h2>Area de acesso</h2>
+            <h2>Área de acesso</h2>
             <p>Use seu CPF e senha para entrar no portal e recuperar seu perfil.</p>
           </div>
 
