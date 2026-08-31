@@ -2397,7 +2397,6 @@ document.addEventListener("click", function (e) {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
->>>>>>> d3c0f4f8f5302efb02450ccf4b5e228f3f279cb1
   const toggleBtn = document.getElementById('menuToggle');
   const menu = document.getElementById('siteMenu');
 
@@ -2418,7 +2417,7 @@ document.addEventListener("click", function (e) {
   const eyeBtn = e.target.closest("#toggle-card-data");
   if (!eyeBtn) return;
 
-<<<<<<< HEAD
+
   e.preventDefault();
 
   const num = document.getElementById("card-number");
@@ -2433,6 +2432,3 @@ document.addEventListener("click", function (e) {
   cvv.textContent = isMasked ? cvv.dataset.full : cvv.dataset.masked;
   val.textContent = isMasked ? val.dataset.full : val.dataset.masked;
 });
-=======
-
->>>>>>> d3c0f4f8f5302efb02450ccf4b5e228f3f279cb1
