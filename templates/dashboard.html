@@ -153,146 +153,156 @@
       <!-- 1. Estilo do Leaflet (Coloque no topo do bloco) -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-      <section class="urb-main-grid">
-        
-        <!-- COLUNA ESQUERDA: CARTÃO VERTICAL COM DADOS MASCARADOS -->
-        <article class="card-display-box">
-  <div class="card-display-box__header">
-    <span class="card-display-box__title">Meu cartão virtual</span>
-    <button type="button" class="card-display-box__eye-btn" id="toggle-card-data" aria-label="Alternar exibição dos dados" style="cursor: pointer; z-index: 10;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events: none;">
-        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6Z"></path>
-        <circle cx="12" cy="12" r="3"></circle>
-      </svg>
-    </button>
-  </div>
+     <section class="urb-main-grid" style="display: flex !important; justify-content: flex-start !important; align-items: stretch !important; gap: 0.75rem !important; width: 100% !important;">
 
-  <div class="card-display-box__body">
-    <div class="virtual-card-wrapper">
-      <!-- Imagem Dinâmica do Cartão -->
-     <img
-  src="/static/imgs/{{ (primary_card.model if primary_card and primary_card.model else 'cartao-verde.png') | replace('imgs/', '') | replace('/static/', '') }}"
-  alt="Cartão UrbPay" 
-  class="virtual-card-wrapper__img"
-  onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+  <!-- COLUNA ESQUERDA: Envolto em div flexível para forçar altura total de 100% -->
+  <div style="flex: 0 0 500px !important; max-width: 500px !important; width: 500px !important; display: flex !important; flex-direction: column !important;">
+    
+    <article class="card-display-box" style="width: 100% !important; height: 100% !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; padding: 1.5rem !important;">
+      
+      <!-- Cabeçalho -->
+      <div class="card-display-box__header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span class="card-display-box__title" style="font-weight: 600; font-size: 1rem;">Meu cartão virtual</span>
+        <button type="button" id="toggle-card-data" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
 
-      <div class="virtual-card-wrapper__info">
-        <!-- Nome impresso no cartão -->
-        <div class="virtual-card-wrapper__group">
-          <span class="virtual-card-wrapper__label">NOME</span>
-          <strong class="virtual-card-wrapper__value">
-            {{ primary_card.display_name if primary_card else current_user.nome }}
-          </strong>
-        </div>
+      <!-- Corpo do Cartão (Centralizado no meio da caixa) -->
+      <div class="card-display-box__body" style="flex: 1 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+        <div class="virtual-card-wrapper" style="position: relative; width: 230px; height: 350px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2);">
 
-        <!-- Dados mascarados do cartão -->
-        <div class="virtual-card-wrapper__grid">
-          <div class="virtual-card-wrapper__group">
-            <span class="virtual-card-wrapper__label">NÚMERO</span>
-            <strong class="virtual-card-wrapper__value" id="card-number"
-                    data-masked="{{ primary_card.card_number_masked if primary_card else '•••• 4892' }}"
-                    data-full="{{ primary_card.card_number_full if primary_card else '4589 1234 5678 4892' }}">
-              {{ primary_card.card_number_masked if primary_card else '•••• 4892' }}
-            </strong>
-          </div>
+          <img src="/static/imgs/{{ (primary_card.model if primary_card and primary_card.model else 'cartao-verde.png') | replace('imgs/', '') | replace('/static/', '') }}"
+            alt="Cartão UrbPay" style="width: 100%; height: 100%; object-fit: cover; display: block;"
+            onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
 
-          <div class="virtual-card-wrapper__group">
-            <span class="virtual-card-wrapper__label">CVV</span>
-            <strong class="virtual-card-wrapper__value" id="card-cvv"
-                    data-masked="•••"
-                    data-full="{{ primary_card.cvv if primary_card else '934' }}">
-              •••
-            </strong>
-          </div>
+          <div class="virtual-card-wrapper__info" style="position: absolute; inset: 0; padding: 1.25rem 1rem; display: flex; flex-direction: column; justify-content: flex-end; box-sizing: border-box; z-index: 10; pointer-events: none;">
 
-          <div class="virtual-card-wrapper__group">
-            <span class="virtual-card-wrapper__label">DATA</span>
-            <strong class="virtual-card-wrapper__value" id="card-validity"
-                    data-masked="••/••"
-                    data-full="{{ primary_card.validity if primary_card else '08/30' }}">
-              ••/••
-            </strong>
+            <!-- NOME -->
+            <div style="margin-bottom: 0.6rem; text-align: left;">
+              <span style="display: block; color: rgba(255, 255, 255, 0.8); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px;">NOME</span>
+              <strong style="color: #ffffff; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; text-shadow: 0 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
+                {{ primary_card.display_name if primary_card else current_user.nome }}
+              </strong>
+            </div>
+
+            <!-- NÚMERO -->
+            <div style="margin-bottom: 0.6rem; text-align: left;">
+              <span style="display: block; color: rgba(255, 255, 255, 0.8); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px;">NÚMERO</span>
+              <strong id="card-number"
+                data-masked="{{ primary_card.card_number_masked if primary_card else '•••• 4892' }}"
+                data-full="{{ primary_card.card_number_full if primary_card else '4589 1234 5678 4892' }}"
+                style="color: #ffffff; font-size: 0.75rem; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); white-space: nowrap; display: block; letter-spacing: 0.5px;">
+                {{ primary_card.card_number_masked if primary_card else '•••• 4892' }}
+              </strong>
+            </div>
+
+            <!-- DATA E CVV -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%;">
+              <div style="text-align: left;">
+                <span style="display: block; color: rgba(255, 255, 255, 0.8); font-size: 0.6rem; font-weight: 700;">DATA</span>
+                <strong id="card-validity" data-masked="••/••"
+                  data-full="{{ primary_card.validity if primary_card else '08/30' }}"
+                  style="color: #ffffff; font-size: 0.75rem; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); white-space: nowrap; display: block;">
+                  ••/••
+                </strong>
+              </div>
+
+              <div style="text-align: left;">
+                <span style="display: block; color: rgba(255, 255, 255, 0.8); font-size: 0.6rem; font-weight: 700;">CVV</span>
+                <strong id="card-cvv" data-masked="•••"
+                  data-full="{{ primary_card.cvv if primary_card else '934' }}"
+                  style="color: #ffffff; font-size: 0.75rem; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); white-space: nowrap; display: block; max-width: 50px; overflow: hidden; text-overflow: ellipsis;">
+                  •••
+                </strong>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
+
+      <!-- Rodapé do Cartão -->
+      <div class="card-display-box__footer" style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.85rem; color: #666;">
+        <span>{{ primary_card.badge if primary_card else 'Comum' }}</span>
+        <span style="color: #2e7d32; font-weight: 600;">● Ativo</span>
+      </div>
+    </article>
+  </div>
+
+  <!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS (Estruturada para esticar e igualar a altura) -->
+<!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS (Altura total cravada em 490px) -->
+<div class="urb-right-column" style="flex: 1 !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; gap: 0.75rem !important; max-height: 490px !important;">
+  
+  <!-- BLOCO 1: SALDO -->
+  <article class="urb-card urb-card--compact-balance" data-sensitive style="flex: 0 0 auto !important;">
+    <div class="urb-balance-top">
+      <div>
+        <span class="urb-label">Saldo disponível</span>
+        <h2 data-sensitive-value data-masked="R$ ••••" data-full="{{ current_balance }}">{{ current_balance }}</h2>
+      </div>
+      <button type="button" class="urb-btn-eye" data-sensitive-toggle aria-label="Alternar exibição do saldo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6Z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
     </div>
-  </div>
 
-  <div class="card-display-box__footer">
-    <span>{{ primary_card.badge if primary_card else 'Comum' }}</span>
-    <span class="card-display-box__status">● Ativo</span>
-  </div>
-</article>
-        <!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS -->
-        <div class="urb-right-column">
-          <!-- BLOCO 1: SALDO -->
-          <article class="urb-card urb-card--compact-balance" data-sensitive>
-            <div class="urb-balance-top">
-              <div>
-                <span class="urb-label">Saldo disponível</span>
-                <h2 data-sensitive-value data-masked="R$ ••••" data-full="{{ current_balance }}">{{ current_balance }}
-                </h2>
-              </div>
-              <button type="button" class="urb-btn-eye" data-sensitive-toggle aria-label="Alternar exibição do saldo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6Z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </button>
-            </div>
+    <div class="urb-balance-actions">
+      <button type="button" class="urb-btn urb-btn--fill" data-dashboard-view="services"
+        data-service-trigger="credit-home">Adicionar saldo</button>
+      <button type="button" class="urb-btn urb-btn--outline" data-qr-modal-open>Ver passagem</button>
+    </div>
+  </article>
 
-            <div class="urb-balance-actions">
-              <button type="button" class="urb-btn urb-btn--fill" data-dashboard-view="services"
-                data-service-trigger="credit-home">Adicionar saldo</button>
-              <button type="button" class="urb-btn urb-btn--outline" data-qr-modal-open>Ver passagem</button>
-            </div>
-          </article>
+  <!-- BLOCO 2: LINHAS PRÓXIMAS (Altura fixa e lista com scroll para não vazar) -->
+  <article class="urb-card urb-card--bus-list" style="height: 300px !important; display: flex !important; flex-direction: column !important; overflow: hidden !important;">
+    <div class="urb-bus-header" style="flex: 0 0 auto !important;">
+      <div class="urb-bus-title">
+        <span class="urb-label">Linhas próximas</span>
+        <span id="location-badge" class="urb-badge-pulse">● Santo André</span>
+      </div>
 
-          <!-- BLOCO 2: LINHAS PRÓXIMAS -->
-          <article class="urb-card urb-card--bus-list">
-            <div class="urb-bus-header">
-              <div class="urb-bus-title">
-                <span class="urb-label">Linhas próximas</span>
-                <span id="location-badge" class="urb-badge-pulse">● Santo André</span>
-              </div>
+      <div class="urb-search-box">
+        <input type="text" id="bus-search-input" placeholder="Buscar linha ou destino..." onkeyup="filterBuses()">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+    </div>
 
-              <div class="urb-search-box">
-                <input type="text" id="bus-search-input" placeholder="Buscar linha ou destino..."
-                  onkeyup="filterBuses()">
-                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </div>
-            </div>
-
-            <ul class="urb-bus-items" id="bus-list">
-              {% if bus_lines %}
-              {% for bus in bus_lines %}
-              <li class="urb-bus-item"
-                onclick="openLineDetails('{{ bus.codigo }}', '{{ bus.destino }}', '{{ bus.tempo }}')">
-                <div class="urb-bus-info">
-                  <span class="urb-bus-tag">{{ bus.codigo }}</span>
-                  <div class="urb-bus-details">
-                    <strong>{{ bus.destino }}</strong>
-                    <small>{{ bus.itinerario }}</small>
-                  </div>
-                </div>
-                <span class="urb-bus-time {% if bus.minutos and bus.minutos <= 5 %}urb-bus-time--fast{% endif %}">
-                  {{ bus.tempo }}
-                </span>
-              </li>
-              {% endfor %}
-              {% else %}
-              <li class="urb-bus-empty">
-                <small>Nenhuma linha encontrada no momento.</small>
-              </li>
-              {% endif %}
-            </ul>
-          </article>
+    <ul class="urb-bus-items" id="bus-list" style="flex: 1 !important; max-height: 200px !important; overflow-y: auto !important;">
+      {% if bus_lines %}
+      {% for bus in bus_lines %}
+      <li class="urb-bus-item"
+        onclick="openLineDetails('{{ bus.codigo }}', '{{ bus.destino }}', '{{ bus.tempo }}')">
+        <div class="urb-bus-info">
+          <span class="urb-bus-tag">{{ bus.codigo }}</span>
+          <div class="urb-bus-details">
+            <strong>{{ bus.destino }}</strong>
+            <small>{{ bus.itinerario }}</small>
+          </div>
         </div>
-      </section>
+        <span class="urb-bus-time {% if bus.minutos and bus.minutos <= 5 %}urb-bus-time--fast{% endif %}">
+          {{ bus.tempo }}
+        </span>
+      </li>
+      {% endfor %}
+      {% else %}
+      <li class="urb-bus-empty">
+        <small>Nenhuma linha encontrada no momento.</small>
+      </li>
+      {% endif %}
+    </ul>
+  </article>
 
+</div>
+</section>
       <!-- 2. Script da Biblioteca + Inicialização do Mapa (Logo abaixo da section) -->
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <script>
@@ -1980,6 +1990,28 @@
 </main>
 </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('toggle-card-data');
+    if (!btn) return;
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+
+      const num = document.getElementById('card-number');
+      const cvv = document.getElementById('card-cvv');
+      const val = document.getElementById('card-validity');
+
+      if (!num || !cvv || !val) return;
+
+      const isMasked = num.textContent.trim().includes('•');
+
+      num.textContent = isMasked ? num.dataset.full : num.dataset.masked;
+      cvv.textContent = isMasked ? cvv.dataset.full : cvv.dataset.masked;
+      val.textContent = isMasked ? val.dataset.full : val.dataset.masked;
+    });
+  });
+</script>
 <!-- BIBLIOTECA DO MAPA (LEAFLET) E SEU SCRIPT -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{{ url_for('static', path='js/seu-script.js') }}"></script>
