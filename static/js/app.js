@@ -2426,3 +2426,4 @@ document.addEventListener("click", function (e) {
   cvv.textContent = isMasked ? cvv.dataset.full : cvv.dataset.masked;
   val.textContent = isMasked ? val.dataset.full : val.dataset.masked;
 });
+                        
