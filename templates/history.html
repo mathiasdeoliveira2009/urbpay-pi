@@ -31,7 +31,7 @@
         </div>
 
         <div class="history-profile-card">
-          <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil" class="history-profile-card">
+          <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil" class="history-profile-card__avatar">
           <div class="history-profile-card__content">
             <strong>{{ current_user.nome }}</strong>
             <p>Cartao {{ formatted_card_number }}</p>

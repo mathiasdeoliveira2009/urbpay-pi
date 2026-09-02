@@ -512,12 +512,12 @@
           <p class="urb-panel__footer">Mostrando {{ recent_movements[:4] | length }} de {{ movement_count }} transacoes.</p>
         </section>
         -->
-            =======
+            
             <div class="urb-card-vertical-wrapper">
               <div class="urb-card-display">
                 <img src="{{ url_for('static', path='imgs/' ~ (item.modelo or 'cartao-verde.png')) }}"
                   alt="Cartao UrbPay {{ item.display_name }}" class="urb-card-vertical-img" />
-                >>>>>>> 5324adfee0313425e63b38a77787a6820870019b
+                
 
                 <div class="urb-card-overlay">
                   <div class="urb-card-overlay__top">
@@ -1375,7 +1375,7 @@
                       </article>
                     </section>
 
-<<<<<<< HEAD
+
                     <section class="urb-settings-group" data-settings-section="notifications"
                       id="settings-panel-notifications" role="tabpanel" aria-labelledby="settings-tab-notifications"
                       hidden>
@@ -1857,7 +1857,7 @@
                       <div class="urb-virtual-card">
                         <div class="urb-virtual-card__top">
                           <!-- Colocamos a badge junto com a imagem dentro de um wrapper de imagem -->
-=======
+
                       <section class="urb-settings-group" data-settings-section="card" id="settings-panel-card"
                         role="tabpanel" aria-labelledby="settings-tab-card" hidden>
                         <article class="urb-settings-card">
@@ -2400,7 +2400,6 @@
                       {% if primary_card %}
                       <div class="urb-virtual-card">
                         <div class="urb-virtual-card__top">
->>>>>>> c4e7046b59c6e6f1005d24662f903ac18c9819ef
                           <div class="urb-virtual-card__media">
                             <img
                               src="{{ url_for('static', path='imgs/' ~ (primary_card.card_model or primary_card.modelo or 'cartao-verde.png')) }}"
@@ -2408,7 +2407,6 @@
                             <span class="urb-virtual-card__badge">{{ primary_card.badge }}</span>
                           </div>
                         </div>
-<<<<<<< HEAD
                         <strong>{{ card_preview.nome_impresso if card_preview and card_preview.nome_impresso else
                           current_user.nome.upper() }}</strong>
                       </div>
@@ -2455,7 +2453,7 @@
         </div>
       </div>
       </section>
-=======
+
 
                         <strong>{{ card_preview.nome_impresso if card_preview and card_preview.nome_impresso else
                           current_user.nome.upper() }}</strong>
@@ -2509,7 +2507,6 @@
                 </div>
               </div>
             </section>
->>>>>>> c4e7046b59c6e6f1005d24662f903ac18c9819ef
       </section>
   </div>
 </div>

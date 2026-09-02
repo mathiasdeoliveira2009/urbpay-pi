@@ -2394,3 +2394,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+document.addEventListener("DOMContentLoaded", () => {
+
+  const loginModal =
+    document.querySelector("[data-login-modal]");
+
+  document
+    .querySelectorAll("[data-login-open]")
+    .forEach(btn => {
+
+      btn.addEventListener("click", () => {
+        loginModal.classList.add("is-open");
+      });
+
+    });
+
+  document
+    .querySelectorAll("[data-login-close]")
+    .forEach(btn => {
+
+      btn.addEventListener("click", () => {
+        loginModal.classList.remove("is-open");
+      });
+
+    });
+
+});
+
+
+
