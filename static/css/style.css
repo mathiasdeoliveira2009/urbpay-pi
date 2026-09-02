@@ -9776,6 +9776,350 @@ html[data-theme="dark"] .urb-empty-state {
   }
 }
 
+/* Força a cor branca em todos os rótulos e valores dentro do cartão */
+.virtual-card-wrapper__info .virtual-card-wrapper__label {
+    color: rgba(255, 255, 255, 0.75) !important; /* Rótulos (NOME, NÚMERO, CVV, DATA) em branco suave */
+}
+
+.virtual-card-wrapper__info .virtual-card-wrapper__value {
+    color: #ffffff !important; /* Dados em branco puro */
+}
+
+/* Garante que o modal fique sobreposto e oculto por padrão */
+.urb-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important;
+  
+  /* Escondido por padrão */
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+/* Estado Visível quando a classe .is-open for adicionada pelo JS */
+.urb-modal.is-open {
+  opacity: 1 !important;
+  pointer-events: all !important;
+  visibility: visible !important;
+}
+
+.urb-modal__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.urb-modal__content {
+  position: relative;
+  background: #ffffff;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+}
+
+/* Modal Container Base */
+.urb-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: all 0.25s ease;
+}
+
+.urb-modal.is-open {
+  opacity: 1 !important;
+  pointer-events: all !important;
+  visibility: visible !important;
+}
+
+.urb-modal__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.urb-modal__content {
+  position: relative;
+  background: #ffffff;
+  width: 90%;
+  max-width: 460px;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.12);
+  z-index: 10000;
+  font-family: inherit;
+}
+
+.urb-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.urb-modal__title-group h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.urb-modal__title-group p {
+  margin: 4px 0 0 0;
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.urb-modal__close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.urb-modal__close:hover {
+  background: #e2e8f0;
+}
+
+.urb-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.urb-form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* Picker Seletor de Cartões em Grid */
+.urb-card-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.urb-card-picker__item input[type="radio"] {
+  display: none;
+}
+
+.urb-card-picker__card {
+  border: 2px solid #edf2f7;
+  border-radius: 12px;
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fafafa;
+}
+
+.urb-card-picker__card img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.urb-card-picker__card span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+/* Destaque do cartão selecionado */
+.urb-card-picker__item input[type="radio"]:checked + .urb-card-picker__card {
+  border-color: #10b981;
+  background: #ecfdf5;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.urb-card-picker__item input[type="radio"]:checked + .urb-card-picker__card span {
+  color: #047857;
+}
+
+/* Select Estilizado */
+.urb-input-styled {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  font-size: 0.9rem;
+  color: #2d3748;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.urb-input-styled:focus {
+  border-color: #10b981;
+  background: #ffffff;
+}
+
+/* Botões da Ação Modal */
+.urb-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.urb-btn-flat {
+  background: transparent;
+  border: none;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.urb-btn-flat:hover {
+  background: #f1f5f9;
+}
+
+.urb-btn-brand {
+  background: #10b981;
+  border: none;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.urb-btn-brand:hover {
+  background: #059669;
+}
+
+.urb-btn-brand:active {
+  transform: scale(0.98);
+}
+
+/* Container que encapsula os cartões e as setas */
+.urb-cards-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Força a trilha a se comportar como linha com rolagem suave */
+.urb-cards-carousel-track {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 10px 4px;
+  width: 100%;
+  
+  /* Esconde as barras de rolagem */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.urb-cards-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Cada cartão ocupa largura fixa e não encolhe */
+.urb-card-slide {
+  flex: 0 0 280px !important;
+  scroll-snap-align: center;
+}
+
+/* Estilização das Setas do Carrossel */
+.urb-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  color: #1a202c;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.urb-carousel-btn:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+.urb-carousel-btn.prev { left: -16px; }
+.urb-carousel-btn.next { right: -16px; }
+
+.urb-cards-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  /* Esconde a barra de rolagem visual mantendo a funcionalidade */
+  scrollbar-width: none; /* Firefox */
+}
+
+.urb-cards-carousel-track::-webkit-scrollbar {
+  display: none; /* Chrome, Safari e Edge */
+}
+
+.urb-card-slide {
+  flex: 0 0 auto; /* Impede que os cartões encolham */
+  scroll-snap-align: center;
+}
+
 /* ============================================================
    1. ESTILOS DO CARTÃO DA TELA INICIAL (.virtual-card-wrapper)
    ============================================================ */
