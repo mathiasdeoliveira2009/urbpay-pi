@@ -2268,12 +2268,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-<<<<<<< HEAD
-  // Menu Lateral / Mobile Toggle
-=======
-
-
-
 function mostrarAba(id, botao) {
 
   document.querySelectorAll('.aba').forEach(function (aba) {
