@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
@@ -16,6 +17,7 @@ MYSQL_PORT = os.getenv("MYSQL_PORT", "3306")
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 MYSQL_DB = os.getenv("MYSQL_DB")
+SQLITE_PATH = os.getenv("SQLITE_PATH", "urbpay-dev.sqlite3")
 SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
 
 
@@ -93,6 +95,18 @@ def _build_mysql_database_url() -> str:
     return f"mysql+pymysql://{mysql_user}:{safe_password}@{mysql_host}:{mysql_port}/{mysql_db}"
 
 
+def _build_sqlite_database_url() -> str:
+    sqlite_path = _clean_env_value("SQLITE_PATH", SQLITE_PATH)
+    if sqlite_path == ":memory:":
+        return "sqlite+pysqlite:///:memory:"
+
+    database_path = Path(sqlite_path)
+    if not database_path.is_absolute():
+        database_path = Path(__file__).resolve().parent / database_path
+
+    return f"sqlite+pysqlite:///{database_path.as_posix()}"
+
+
 DATABASE_BACKEND = _get_database_backend()
 SESSION_SECRET_KEY = _clean_env_value("SESSION_SECRET_KEY", _require_env("SESSION_SECRET_KEY", SESSION_SECRET_KEY))
 
@@ -102,10 +116,17 @@ if DATABASE_BACKEND in {"postgres", "postgresql", "database_url"}:
 elif DATABASE_BACKEND == "mysql":
     ACTIVE_DATABASE_URL = _build_mysql_database_url()
     DATABASE_SOURCE = "MYSQL_*"
+elif DATABASE_BACKEND == "sqlite":
+    ACTIVE_DATABASE_URL = _build_sqlite_database_url()
+    DATABASE_SOURCE = "SQLITE_PATH"
 else:
-    raise RuntimeError("Invalid DATABASE_BACKEND. Use 'mysql' or 'postgresql'.")
+    raise RuntimeError("Invalid DATABASE_BACKEND. Use 'sqlite', 'mysql' or 'postgresql'.")
 
-engine = create_engine(ACTIVE_DATABASE_URL, pool_pre_ping=True)
+engine_options = {"pool_pre_ping": True}
+if DATABASE_BACKEND == "sqlite":
+    engine_options["connect_args"] = {"check_same_thread": False}
+
+engine = create_engine(ACTIVE_DATABASE_URL, **engine_options)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

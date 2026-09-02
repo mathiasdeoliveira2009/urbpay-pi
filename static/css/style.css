@@ -10046,6 +10046,127 @@ html[data-theme="dark"] .urb-empty-state {
   justify-content: space-between !important;
 }
 
+/* Settings modal: larger desktop viewport with UrbPay scrollbar. */
+#settings-modal.urb-modal-overlay {
+  padding: 16px !important;
+}
+
+#settings-modal .urb-modal-container {
+  box-sizing: border-box !important;
+  width: min(1240px, calc(100vw - 32px)) !important;
+  max-width: none !important;
+  height: calc(100vh - 32px) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 32px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 22px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #2f8541 rgba(46, 128, 63, 0.12) !important;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar-track {
+  background: rgba(46, 128, 63, 0.1);
+  border-radius: 999px;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar-thumb {
+  background: #2f8541;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar-thumb:hover {
+  background: #26703d;
+}
+
+#settings-modal .urb-settings-surface {
+  box-sizing: border-box !important;
+  gap: 14px !important;
+  min-height: calc(100vh - 76px) !important;
+  padding: 22px !important;
+}
+
+#settings-modal .urb-settings-surface__head h2 {
+  font-size: 1.55rem !important;
+  line-height: 1.1 !important;
+}
+
+#settings-modal .urb-settings-tabs {
+  gap: 2px 16px !important;
+}
+
+#settings-modal .urb-settings-tab {
+  min-height: 44px !important;
+  font-size: 0.94rem !important;
+}
+
+#settings-modal .urb-settings-layout {
+  grid-template-columns: minmax(0, 1.75fr) minmax(260px, 0.7fr) !important;
+  gap: 16px !important;
+}
+
+#settings-modal .urb-settings-content,
+#settings-modal .urb-settings-sidebar,
+#settings-modal .urb-settings-group {
+  gap: 14px !important;
+}
+
+#settings-modal .urb-settings-card,
+#settings-modal .urb-settings-sidecard {
+  padding: 16px 18px !important;
+}
+
+#settings-modal .urb-settings-card__head {
+  margin-bottom: 12px !important;
+}
+
+#settings-modal .urb-settings-card__head p,
+#settings-modal .urb-settings-row__copy p,
+#settings-modal .urb-settings-side-note p,
+#settings-modal .urb-settings-checklist__item p {
+  line-height: 1.45 !important;
+}
+
+#settings-modal .urb-settings-row {
+  gap: 14px !important;
+  padding: 12px 0 !important;
+}
+
+#settings-modal .urb-settings-row__copy {
+  gap: 4px !important;
+}
+
+#settings-modal .urb-settings-surface .urb-virtual-card {
+  width: 100% !important;
+  max-width: 230px !important;
+  height: 350px !important;
+  margin: 0 auto !important;
+}
+
+#settings-modal .urb-settings-surface .urb-virtual-card__media {
+  margin-bottom: 10px !important;
+}
+
+@media (max-width: 900px) {
+  #settings-modal .urb-modal-container {
+    overflow-y: auto !important;
+  }
+
+  #settings-modal .urb-settings-surface {
+    min-height: auto !important;
+  }
+
+  #settings-modal .urb-settings-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 
 
 
