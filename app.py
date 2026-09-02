@@ -1156,7 +1156,14 @@ def load_gtfs_index() -> dict[str, object]:
     }
 
 
-def gtfs_nearby_points(lat: float, lng: float, *, search: str = "", limit: int = 160) -> list[dict[str, object]]:
+def gtfs_nearby_points(
+    lat: float,
+    lng: float,
+    *,
+    search: str = "",
+    route_type: str = "",
+    limit: int = 160,
+) -> list[dict[str, object]]:
     index = load_gtfs_index()
     stops = index["stops"].values()
     normalized_search = search.strip().lower()
@@ -1172,10 +1179,13 @@ def gtfs_nearby_points(lat: float, lng: float, *, search: str = "", limit: int =
         )
         haystack = f"{name} {stop.get('address', '')} {route_text}".lower()
         distance_km = haversine_km(lat, lng, float(stop["lat"]), float(stop["lng"]))
+        stop_type = str(stop.get("type", "bus"))
 
+        if route_type and stop_type != route_type:
+            continue
         if normalized_search and normalized_search not in haystack:
             continue
-        if not normalized_search and distance_km > 8:
+        if not normalized_search and distance_km > 35:
             continue
 
         points.append(
@@ -2111,6 +2121,7 @@ def dashboard_locate_gtfs_points(
     lat: float = -23.5505,
     lng: float = -46.6333,
     q: str = "",
+    type: str = "",
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
     user = get_user_from_session(request, db)
@@ -2120,7 +2131,11 @@ def dashboard_locate_gtfs_points(
     if not GTFS_DIR.exists():
         raise HTTPException(status_code=503, detail="Base GTFS nao encontrada em data/gtfs.")
 
-    points = gtfs_nearby_points(lat, lng, search=q)
+    route_type = type.strip().lower()
+    if route_type not in {"", "bus", "train"}:
+        raise HTTPException(status_code=400, detail="Tipo de ponto invalido.")
+
+    points = gtfs_nearby_points(lat, lng, search=q, route_type=route_type)
     return {
         "items": points,
         "source": "GTFS CittaMobi",
@@ -2399,6 +2414,13 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
         "profile_image": user.foto_perfil or "imgs/Default.png",
         "amount": currency(payload["amount"]),
         "card_number": format_card_number(card.numero_cartao),
+        "card_number_masked": format_card_number(mask_sensitive(card.numero_cartao, visible_digits=4)),
+        "card_digits": str(card.numero_cartao)[-4:],
+        "card_cvv": str(card.cvv),
+        "card_validity": card.data_validade.strftime("%m/%Y") if card.data_validade else "--/--",
+        "card_model": (getattr(card, "modelo", None) or "cartao-verde.png").replace("imgs/", "").replace("/static/", ""),
+        "card_badge": infer_card_badge(user, card)["label"],
+        "card_display_name": card.nome_impresso or user.nome,
         "current_balance": currency(card.saldo),
     }
     return templates.TemplateResponse("passage_gate.html", context)

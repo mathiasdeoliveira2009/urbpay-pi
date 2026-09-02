@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #f5efe5;
   --surface: rgba(255, 251, 246, 0.9);
   --surface-strong: rgba(252, 247, 240, 0.94);
@@ -1506,16 +1506,16 @@ html[data-theme="dark"] .gate-ops-hero.gate-turnstile {
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important; /* Alinha todo o texto no meio vertical da caixa */
-  min-height: 180px;                  /* Ajuste a altura mínima conforme desejar */
-  padding: 24px !important;            /* Distribui o espaçamento por igual */
+  min-height: 180px;                  /* Ajuste a altura mÃ­nima conforme desejar */
+  padding: 24px !important;            /* Distribui o espaÃ§amento por igual */
 }
 
 .product-card {
   display: flex !important;
   flex-direction: row !important;
   align-items: center;
-  padding: 12px;         /* Diminui o espaçamento interno para caber melhor em 3 colunas */
-  gap: 12px;             /* Espaço entre a imagem e o texto */
+  padding: 12px;         /* Diminui o espaÃ§amento interno para caber melhor em 3 colunas */
+  gap: 12px;             /* EspaÃ§o entre a imagem e o texto */
   height: 100%;          /* Faz o card ocupar toda a altura do grid */
 }
 
@@ -2619,6 +2619,385 @@ html[data-theme="dark"] .my-card-empty {
   justify-content: center;
 }
 
+.gate-shell--reader {
+  align-items: start;
+  padding: clamp(18px, 5vw, 56px) 18px;
+}
+
+.gate-reader-card {
+  width: min(100%, 980px);
+  display: grid;
+  gap: 22px;
+  padding: clamp(22px, 4vw, 34px);
+  border: 1px solid rgba(43, 72, 60, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 28px 70px rgba(46, 72, 60, 0.16);
+}
+
+.gate-reader-card__header,
+.gate-reader-hero,
+.gate-reader-layout,
+.gate-reader-summary__row,
+.gate-reader-legend span {
+  display: flex;
+  align-items: center;
+}
+
+.gate-reader-card__header {
+  justify-content: space-between;
+  gap: 12px;
+  color: #52665b;
+  font-weight: 700;
+}
+
+.gate-reader-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(47, 133, 65, 0.12);
+  color: #26703d;
+}
+
+.gate-reader-status i,
+.gate-reader-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.gate-reader-status i {
+  background: #22c55e;
+  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.16);
+}
+
+.gate-reader-code {
+  font-size: 0.9rem;
+}
+
+.gate-reader-hero {
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px;
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(232, 244, 236, 0.9), rgba(255, 255, 255, 0.92)),
+    radial-gradient(circle at 85% 12%, rgba(47, 133, 65, 0.16), transparent 38%);
+}
+
+.gate-reader-copy {
+  max-width: 540px;
+}
+
+.gate-reader-copy h1 {
+  margin: 8px 0 10px;
+  font-size: clamp(2.2rem, 8vw, 4.25rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+  color: #183226;
+}
+
+.gate-reader-copy p {
+  margin: 0;
+  max-width: 620px;
+  color: #617468;
+  font-size: clamp(1rem, 2.8vw, 1.2rem);
+  line-height: 1.5;
+}
+
+.gate-turnstile-visual {
+  flex: 0 0 230px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 220px;
+  border-radius: 26px;
+  background: #10261c;
+  color: #e7f8ed;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 18px 38px rgba(16, 38, 28, 0.22);
+}
+
+.gate-turnstile-visual__scan {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  border-radius: 24px;
+  background: #1ea853;
+  color: #ffffff;
+  box-shadow: 0 0 0 10px rgba(30, 168, 83, 0.16);
+}
+
+.gate-turnstile-visual__scan svg {
+  width: 46px;
+  height: 46px;
+}
+
+.gate-turnstile-visual__arms {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  margin-top: 4px;
+}
+
+.gate-turnstile-visual__arms span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58px;
+  height: 7px;
+  border-radius: 999px;
+  background: #d9eadf;
+  transform-origin: left center;
+}
+
+.gate-turnstile-visual__arms span:nth-child(1) {
+  transform: rotate(0deg);
+}
+
+.gate-turnstile-visual__arms span:nth-child(2) {
+  transform: rotate(120deg);
+}
+
+.gate-turnstile-visual__arms span:nth-child(3) {
+  transform: rotate(240deg);
+}
+
+.gate-turnstile-visual strong,
+.gate-turnstile-visual small {
+  margin: 0;
+}
+
+.gate-turnstile-visual small {
+  color: #a9c9b5;
+}
+
+.gate-reader-layout {
+  align-items: stretch;
+  gap: 20px;
+}
+
+.gate-active-card,
+.gate-reader-summary {
+  border: 1px solid rgba(43, 72, 60, 0.1);
+  border-radius: 24px;
+  background: rgba(250, 253, 251, 0.92);
+}
+
+.gate-active-card {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.gate-active-card__media {
+  position: relative;
+  width: min(100%, 280px);
+  aspect-ratio: 0.64;
+  overflow: hidden;
+  border-radius: 22px;
+  box-shadow: 0 18px 36px rgba(30, 66, 45, 0.24);
+}
+
+.gate-active-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gate-active-card__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+}
+
+.gate-active-card__brand {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.gate-active-card__badge {
+  align-self: flex-end;
+  margin-top: -22px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #17452a;
+  text-shadow: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.gate-active-card__data {
+  display: grid;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.gate-active-card__data span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.gate-active-card__data strong {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.gate-active-card__data > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.gate-active-card__data p {
+  margin: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.gate-reader-summary {
+  flex: 0 0 340px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 20px;
+}
+
+.gate-reader-summary__row {
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(43, 72, 60, 0.1);
+}
+
+.gate-reader-summary span {
+  color: #607568;
+  font-weight: 700;
+}
+
+.gate-reader-summary strong {
+  color: #183226;
+  font-family: "Sora", sans-serif;
+}
+
+.gate-reader-summary__amount {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #10261c;
+  color: #ffffff;
+}
+
+.gate-reader-summary__amount span {
+  color: #a9c9b5;
+}
+
+.gate-reader-summary__amount strong {
+  color: #ffffff;
+  font-size: 2rem;
+}
+
+.gate-reader-legend {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.gate-reader-legend span {
+  gap: 10px;
+  color: #52665b;
+  font-size: 0.94rem;
+}
+
+.gate-reader-legend .is-waiting {
+  background: #2563eb;
+}
+
+.gate-reader-legend .is-processing {
+  background: #d18608;
+}
+
+.gate-reader-legend .is-approved {
+  background: #1ea853;
+}
+
+.gate-reader-form {
+  margin-top: 0;
+}
+
+html[data-theme="dark"] .gate-reader-card {
+  background: rgba(13, 24, 18, 0.96);
+  border-color: rgba(159, 212, 189, 0.14);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
+}
+
+html[data-theme="dark"] .gate-reader-copy h1,
+html[data-theme="dark"] .gate-reader-summary strong {
+  color: #eef8f1;
+}
+
+html[data-theme="dark"] .gate-reader-copy p,
+html[data-theme="dark"] .gate-reader-card__header,
+html[data-theme="dark"] .gate-reader-summary span,
+html[data-theme="dark"] .gate-reader-legend span {
+  color: #a8beb1;
+}
+
+html[data-theme="dark"] .gate-reader-hero {
+  background:
+    linear-gradient(135deg, rgba(19, 35, 27, 0.96), rgba(14, 25, 19, 0.96)),
+    radial-gradient(circle at 85% 12%, rgba(47, 133, 65, 0.2), transparent 38%);
+}
+
+html[data-theme="dark"] .gate-active-card,
+html[data-theme="dark"] .gate-reader-summary {
+  background: rgba(18, 31, 24, 0.94);
+  border-color: rgba(159, 212, 189, 0.14);
+}
+
+@media (max-width: 760px) {
+  .gate-reader-card {
+    border-radius: 24px;
+    gap: 18px;
+  }
+
+  .gate-reader-card__header,
+  .gate-reader-hero,
+  .gate-reader-layout {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gate-turnstile-visual {
+    flex: none;
+    min-height: 190px;
+  }
+
+  .gate-reader-summary {
+    flex: none;
+  }
+
+  .gate-active-card__media {
+    width: min(100%, 240px);
+  }
+}
+
 .gate-card--result {
   display: grid;
   gap: 20px;
@@ -2913,8 +3292,8 @@ html[data-theme="dark"] .my-card-empty {
 }
 
 .product-card {
-  padding: 16px 12px !important; /* Menos espaçamento nas laterais internas */
-  gap: 12px !important;          /* Espaço justo entre a imagem e o texto */
+  padding: 16px 12px !important; /* Menos espaÃ§amento nas laterais internas */
+  gap: 12px !important;          /* EspaÃ§o justo entre a imagem e o texto */
 }
 
 
@@ -2926,7 +3305,7 @@ html[data-theme="dark"] .my-card-empty {
 
 .product-card .product-image {
   width: 150px !important;      /* Aumenta a largura (teste com 160px ou 170px se quiser ainda maior) */
-  max-height: 220px !important; /* Permite que a imagem cresça na vertical */
+  max-height: 220px !important; /* Permite que a imagem cresÃ§a na vertical */
   height: auto !important;
   object-fit: contain;
   flex-shrink: 0;
@@ -3760,7 +4139,7 @@ html[data-theme="dark"] .my-card-empty {
 .my-card-tile {
   position: relative !important;
   display: inline-block;
-  width: 220px;          /* Ajuste o tamanho geral do cartão aqui */
+  width: 220px;          /* Ajuste o tamanho geral do cartÃ£o aqui */
   border-radius: 20px;
   overflow: hidden;
 }
@@ -3768,7 +4147,7 @@ html[data-theme="dark"] .my-card-empty {
 .my-card-tile__info,
 .my-card-details {
   position: absolute !important;
-  bottom: 20px;          /* Mantém as informações na parte inferior do cartão */
+  bottom: 20px;          /* MantÃ©m as informaÃ§Ãµes na parte inferior do cartÃ£o */
   left: 16px;
   right: 16px;
   z-index: 2;            /* Coloca por cima da imagem */
@@ -5418,7 +5797,7 @@ html[data-theme="dark"] .common-support-message--agent {
 /* Exemplo para o container principal da dashboard */
 .dashboard-grid {
     display: grid;
-    /* Coluna esquerda (cartão) com largura definida e coluna direita expansível */
+    /* Coluna esquerda (cartÃ£o) com largura definida e coluna direita expansÃ­vel */
     grid-template-columns: 320px 1fr; 
     gap: 1.25rem !important; /* Aproxima os blocos na horizontal */
     align-items: start; /* Impede que os blocos estiquem verticalmente */
@@ -8629,7 +9008,7 @@ html[data-theme="dark"] .urb-empty-state {
   min-width: 140px;
 }
 /* =========================================================
-   ESTILIZAÇÃO DO CARTÃO VIRTUAL EM PÉ (AUMENTADO)
+   ESTILIZAÃ‡ÃƒO DO CARTÃƒO VIRTUAL EM PÃ‰ (AUMENTADO)
    ========================================================= */
 
 /* Container centralizador com padding ajustado */
@@ -8641,7 +9020,7 @@ html[data-theme="dark"] .urb-empty-state {
   width: 100%;
 }
 
-/* Moldura do cartão com dimensões maiores */
+/* Moldura do cartÃ£o com dimensÃµes maiores */
 .urb-card-display {
   position: relative;
   width: 230px;  /* Aumentado de 180px para 230px */
@@ -8666,14 +9045,14 @@ html[data-theme="dark"] .urb-empty-state {
   display: block;
 }
 
-/* Camada de texto sobreposta com espaçamentos maiores */
+/* Camada de texto sobreposta com espaÃ§amentos maiores */
 .urb-card-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 20px 18px; /* Mais espaço interno */
+  padding: 20px 18px; /* Mais espaÃ§o interno */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -8706,7 +9085,7 @@ html[data-theme="dark"] .urb-empty-state {
   margin-bottom: 6px;
 }
 
-/* Número do cartão */
+/* NÃºmero do cartÃ£o */
 .urb-card-overlay__number {
   font-family: 'Courier New', Courier, monospace;
   font-size: 15px; /* Fonte maior para leitura clara */
@@ -8750,10 +9129,10 @@ html[data-theme="dark"] .urb-empty-state {
   color: #0d2c20;
 }
 /* =========================================================
-   RESTAURAÇÃO DA SELEÇÃO DE CARTÕES (FORMULÁRIO DE CADASTRO)
+   RESTAURAÃ‡ÃƒO DA SELEÃ‡ÃƒO DE CARTÃ•ES (FORMULÃRIO DE CADASTRO)
    ========================================================= */
 
-/* Container geral da seleção */
+/* Container geral da seleÃ§Ã£o */
 .cartao-select-field {
   display: flex;
   flex-direction: column;
@@ -8769,12 +9148,12 @@ html[data-theme="dark"] .urb-empty-state {
   color: #333;
 }
 
-/* Grid com os 3 cartões lado a lado */
+/* Grid com os 3 cartÃµes lado a lado */
 /* =========================================================
-   PREVIEW DOS CARTÕES (AMPLIADO E SEM BORDAS LATERAIS)
+   PREVIEW DOS CARTÃ•ES (AMPLIADO E SEM BORDAS LATERAIS)
    ========================================================= */
 
-/* Container da grid de seleção */
+/* Container da grid de seleÃ§Ã£o */
 .cartoes-grid {
   display: flex;
   gap: 14px;
@@ -8790,12 +9169,12 @@ html[data-theme="dark"] .urb-empty-state {
   margin: 0;
 }
 
-/* Oculta o radio button padrão */
+/* Oculta o radio button padrÃ£o */
 .cartao-card input[type="radio"] {
   display: none !important;
 }
 
-/* Container do preview em formato vertical de cartão */
+/* Container do preview em formato vertical de cartÃ£o */
 .cartao-card__preview {
   border: 2px solid transparent;
   border-radius: 12px;
@@ -8803,11 +9182,11 @@ html[data-theme="dark"] .urb-empty-state {
   transition: all 0.2s ease-in-out;
   opacity: 0.7;
   width: 100%;
-  aspect-ratio: 1 / 1.58; /* Proporção padrão de cartão vertical */
+  aspect-ratio: 1 / 1.58; /* ProporÃ§Ã£o padrÃ£o de cartÃ£o vertical */
   display: block;
 }
 
-/* A imagem preenche todo o espaço sem bordas brancas */
+/* A imagem preenche todo o espaÃ§o sem bordas brancas */
 .cartao-card__preview img {
   width: 100%;
   height: 100%;
@@ -8852,13 +9231,13 @@ html[data-theme="dark"] .urb-empty-state {
   max-width: 950px !important;
   width: 100% !important;
   max-height: 85vh !important;
-  overflow-y: auto !important;          /* Permite rolar apenas o conteúdo interno */
+  overflow-y: auto !important;          /* Permite rolar apenas o conteÃºdo interno */
   position: relative !important;
   padding: 32px !important;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Botão 'X' para fechar no canto superior direito */
+/* BotÃ£o 'X' para fechar no canto superior direito */
 .urb-modal-close {
   position: absolute !important;
   top: 16px !important;
@@ -8885,1511 +9264,18 @@ html[data-theme="dark"] .urb-empty-state {
   color: #212529 !important;
   transform: scale(1.05);
 }
-/* Quando o modal não estiver hidden, força o display flex */
+/* Quando o modal nÃ£o estiver hidden, forÃ§a o display flex */
 #settings-modal:not([hidden]) {
   display: flex !important;
 }
 
-/* Força o painel interno a ficar visível dentro da janela */
-#settings-modal .urb-panel,
-#settings-modal .urb-workspace__panel {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Container da imagem do cartão com posição relativa */
-.urb-virtual-card__media {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  margin-bottom: 16px !important;
-}
-
-/* Imagem do cartão adaptável */
-.urb-virtual-card__image {
-  width: 100% !important;
-  height: auto !important;
-  display: block !important;
-  border-radius: 12px !important;
-}
-
-/* Badge posicionada no canto superior direito DENTRO da imagem */
-.urb-virtual-card__badge {
-  position: absolute !important;
-  top: 12px !important;
-  right: 12px !important;
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  color: #1b4d3e !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  padding: 4px 10px !important;
-  border-radius: 20px !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
-  z-index: 2 !important;
-}
-
-/* Transforma o grid principal em 2 colunas proporcionais */
-.urb-overview.urb-overview--clean {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 24px !important;
-  align-items: stretch !important;
-}
-
-/* Deixa o card de saldo compacto e alinhado */
-.urb-overview--clean .urb-balance-card {
-  padding: 28px !important;
-  border-radius: 20px !important;
-  max-height: 280px !important; /* Limita a altura do bloco verde */
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-}
-
-/* Ajuste fino para a imagem do cartão caber perfeitamente */
-.urb-overview--clean .urb-summary-card--card {
-  position: relative !important;
-  padding: 24px !important;
-  border-radius: 20px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  overflow: hidden !important; /* Impede qualquer elemento de vazar do bloco */
-}
-
-.urb-overview--clean .urb-card-vertical-wrapper {
-  position: relative !important;
-  width: 100% !important;
-  max-width: 220px !important;
-  margin: 10px auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-}
-
-.urb-overview--clean .urb-card-vertical-img,
-.urb-overview--clean .urb-card-display {
-  position: relative !important;
-  width: 100% !important;
-  border-radius: 16px !important;
-  overflow: hidden !important;
-}
-
-.urb-overview--clean .urb-card-overlay {
-  position: relative !important;
-  width: 100% !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  margin-top: 12px !important;
-  text-align: center !important;
-}
-
-.urb-overview--clean .urb-card-overlay__number {
-  font-size: 13px !important;
-  letter-spacing: 1px !important;
-  color: #2d3748 !important;
-  margin-bottom: 4px !important;
-}
-
-.urb-overview--clean .urb-card-overlay__holder {
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  color: #1a202c !important;
-}
-
-.urb-overview--clean .urb-card-overlay__meta {
-  display: flex !important;
-  justify-content: center !important;
-  gap: 16px !important;
-  font-size: 11px !important;
-  color: #718096 !important;
-  margin-top: 6px !important;
-}
-
-/* Grid com duas colunas de proporções iguais */
-.urb-main-grid {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr; /* Coluna da direita ganha mais espaço horizontal */
-  gap: 1.5rem;
-  align-items: stretch;
-  margin-bottom: 1.5rem;
-}
-
-/* Coluna Direita que empilha Saldo e Mapa */
+/* Coluna direita da home, agora somente com saldo. */
 .urb-right-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
-}
-
-/* Base Comum dos Cards */
-.urb-card {
-  background: #ffffff;
-  border-radius: 1.25rem;
-  padding: 1.25rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-  border: 1px solid #edf2f0;
-}
-
-/* Card do Cartão (Hero Esquerda) */
-.urb-card--vertical-hero {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  height: 100%;
-}
-
-.urb-card--vertical-hero .urb-card__header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.urb-card-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem 0;
-  flex: 1;
-}
-
-.urb-card__header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.urb-vertical-img {
-  max-height: 240px;
-  width: auto;
-  object-fit: contain;
-  margin: 1rem 0;
-  border-radius: 0.75rem;
-}
-
-.urb-card-footer-info {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-}
-
-.urb-card-status {
-  color: #16a34a;
-}
-
-/* Bloco de Saldo */
-.urb-balance-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.urb-balance-top h2 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin: 0.25rem 0 0 0;
-  color: #111827;
-}
-
-.urb-balance-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.urb-btn {
-  flex: 1;
-  padding: 0.6rem;
-  border-radius: 0.625rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-}
-
-.urb-btn--fill {
-  background: #16a34a;
-  color: #fff;
-}
-
-.urb-btn--outline {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-.urb-btn-eye {
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  color: #6b7280;
-}
-
-.urb-btn-eye svg {
-  width: 100%;
-  height: 100%;
-}
-
-.urb-link-action {
-  background: none;
-  border: none;
-  color: #16a34a;
-  font-weight: 600;
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-
-/* Bloco do Mapa */
-.urb-card--map-container {
-  display: flex;
-  flex-direction: column;
-  height: 200px;
-  padding: 1rem;
-}
-
-.urb-map-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-}
-
-.urb-map-badge {
-  font-size: 0.75rem;
-  color: #16a34a;
-  font-weight: 600;
-}
-
-#urb-bus-map {
-  width: 100%;
-  height: 100%;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.urb-label {
-  font-size: 0.8125rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* Card Container */
-.urb-card--bus-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.urb-bus-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-
-.urb-bus-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.urb-badge-pulse {
-  font-size: 0.75rem;
-  color: #16a34a;
-  background: #f0fdf4;
-  padding: 0.2rem 0.6rem;
-  border-radius: 1rem;
-  font-weight: 600;
-}
-
-/* Campo de Pesquisa */
-.urb-search-box {
-  position: relative;
-  width: 210px;
-}
-
-.urb-search-box input {
-  width: 100%;
-  padding: 0.45rem 2rem 0.45rem 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  font-size: 0.8125rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.urb-search-box input:focus {
-  border-color: #16a34a;
-}
-
-.urb-search-box .search-icon {
-  position: absolute;
-  right: 0.6rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
-  stroke: #9ca3af;
-}
-
-/* Lista */
-.urb-bus-items {
-  flex: 1;
-  max-height: none;
-  overflow: visible;
-}
-
-.urb-bus-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.6rem 0.75rem;
-  background: #f9fafb;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-}
-
-.urb-bus-item:hover {
-  background: #ffffff;
-  border-color: #16a34a;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.urb-bus-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.urb-bus-tag {
-  background: #16a34a;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 0.8125rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.375rem;
-  min-width: 42px;
-  text-align: center;
-}
-
-.urb-bus-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.urb-bus-details strong {
-  font-size: 0.875rem;
-  color: #111827;
-}
-
-.urb-bus-details small {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.urb-bus-time {
-  font-weight: 700;
-  font-size: 0.875rem;
-  color: #374151;
-}
-
-.urb-bus-time--fast {
-  color: #16a34a;
-}
-.urb-virtual-card {
-  position: relative;
-  width: 230px;
-  height: 350px;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
-}
-
-.urb-virtual-card .urb-vertical-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Camada de texto sobre o cartão */
-.urb-card-overlay-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 1.5rem 1.25rem;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.25) 100%);
-}
-
-.urb-card-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.urb-card-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #1b4332;
-  letter-spacing: 0.5px;
-}
-
-.urb-card-val-text {
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #0f281e;
-  letter-spacing: 0.5px;
-}
-
-/* Alinhamento dos 3 itens inferiores (NÚMERO, CVV, DATA) */
-.urb-card-bottom-grid {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr;
-  gap: 0.4rem;
-  align-items: flex-end;
-}
-
-.urb-card__header .urb-btn-eye {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #666;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.urb-card__header .urb-btn-eye svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Container Externo do Cartão */
-.card-display-box {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.card-display-box__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.card-display-box__title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #666;
-}
-
-.card-display-box__eye-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    z-index: 20;
-}
-
-.card-display-box__eye-btn svg {
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
-}
-
-/* Área Central do Cartão (Flex para centralizar e expandir) */
-.card-display-box__body {
   display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  flex: 1 !important;
-  padding: 0 !important;
-}
-
-/* Estrutura do Cartão em Si (Aumentando largura e altura) */
-/* Container pai do cartão */
-.virtual-card-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-.virtual-card-wrapper__img {
-    width: 100%;
-    display: block;
-    border-radius: 16px;
-}
-
-/* Camada de Texto Sobreposta ao Cartão */
-.virtual-card-wrapper__info {
-    position: absolute;
-    inset: 0;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    box-sizing: border-box;
-    z-index: 10;
-}
-
-/* Grupos internos de texto */
-.virtual-card-wrapper__group {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-/* Rótulos (NOME, NÚMERO, CVV, DATA) */
-.virtual-card-wrapper__label {
-    color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 0.6rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.5px !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
-    text-transform: uppercase;
-}
-
-/* Valores impressos */
-.virtual-card-wrapper__value {
-    color: #FFFFFF !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
-}
-
-/* Grid com Número, CVV e Data */
-.virtual-card-wrapper__grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-    align-items: flex-end;
-}
-
-/* Rodapé do Container */
-.card-display-box__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  color: #444;
-  margin-top: 0.5rem;
-}
-
-.card-display-box__status {
-  color: #10b981;
-  font-weight: 600;
-}
-
-
-
-
-
-
-.dashboard-sidebar {
-  width: 240px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
-  position: sticky;
-  top: 20px;
-  margin-top: 10px;
-  margin-left: 330px;
-}
-
-.dashboard-sidebar h3 {
-  margin-bottom: 20px;
-  color: #3b4a42;
-}
-
-.menu-item {
-  width: 100%;
-  border: none;
-  background: transparent;
-  padding: 12px;
-  text-align: left;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.menu-item:hover {
-  background: #edf3ee;
-}
-
-.menu-item.active {
-  background: #5d7b67;
-  color: white;
-}
-
-.dashboard-content {
-  flex: 1;
-}
-
-.aba {
-  display: none;
-}
-
-.aba.ativa {
-  display: block;
-}
-/*
-.dashboard-layout {
-  display: flex;
-  gap: 24px;
-  flex-direction: row;
-  justify-content:center;
-  align-items: center;
-}
-*/
-.dashboard-content {
-  flex: 1;
-}
-
-.history-hero__summary {
-  width: 100%;
-}
-
-
-.history-layout{
-  display:flex;
-  gap:24px;
-  align-items:flex-start;
-}
-
-.history-left{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:24px;
-}
-/*
-.dashboard-sidebar{
-  width:240px;
-  margin-left: auto;
-  margin-top: 10px;
-}
-*/
-
-.menu-item{
-  font-weight:500;
-}
-
-.menu-item:hover{
-  background:#e8f0ea;
-  transform:translateX(4px);
-}
-
-.menu-item.active{
-  background:#5d7b67;
-  color:#fff;
-}
-
-
-.metric-card{
-    transition:.25s;
-}
-
-.metric-card:hover{
-    transform:translateY(-4px);
-    box-shadow:0 10px 20px rgba(0,0,0,.08);
-}
-
-
-
-.terms-modal{
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,.7);
-  z-index: 999999;
-}
-
-.terms-modal.show{
-  display:flex;
-}
-
-.terms-modal-content{
-  width:700px;
-  max-width:90%;
-  background:#fff;
-  border-radius:20px;
-  padding:30px;
-}
-
-.terms-text{
-  max-height:300px;
-  overflow-y:auto;
-  margin:20px 0;
-}
-
-.terms-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-}
-
-
-/* =========================
-   HAMBURGER
-========================= */
-
-.urb-hamburger {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 12px;
-  background: #ffffff;
-  color: #0f172a;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
-}
-
-/* =========================
-   OVERLAY
-========================= */
-
-.urb-sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.45);
-  opacity: 0;
-  visibility: hidden;
-  transition: .3s ease;
-  z-index: 998;
-}
-
-.urb-sidebar-overlay.is-open {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 768px) {
-
-  .urb-hamburger {
-    display: flex;
-  }
-
-  .urb-sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px;
-    width: 280px;
-    height: 100vh;
-    z-index: 999;
-    transition: left .3s ease;
-    overflow-y: auto;
-  }
-
-  .urb-sidebar.is-open {
-    left: 0;
-  }
-
-  .urb-main {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .urb-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-}
-
-/* Responsividade para telas menores (celulares) */
-@media (max-width: 768px) {
-  .urb-overview.urb-overview--clean {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-
-
-/* BREAKPOINT MOBILE (Telas menores que 768px) */
-@media (max-width: 768px) {
-  /* Força o botão hambúrguer a aparecer */
-  .mobile-toggle {
-    display: flex !important;
-  }
-
-  /* Força o menu a ficar ESCONDIDO por padrão */
-  .topbar .site-menu,
-  nav.site-menu {
-    display: none !important;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: #ffffff;
-    flex-direction: column;
-    padding: 1.5rem;
-    gap: 1.25rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    border-radius: 0 0 16px 16px;
-    z-index: 999;
-  }
-
-  /* Só exibe quando o JS adicionar a classe "is-active" */
-  .topbar .site-menu.is-active,
-  nav.site-menu.is-active {
-    display: flex !important;
-  }
-}
-
-/* Força a cor branca em todos os rótulos e valores dentro do cartão */
-.virtual-card-wrapper__info .virtual-card-wrapper__label {
-    color: rgba(255, 255, 255, 0.75) !important; /* Rótulos (NOME, NÚMERO, CVV, DATA) em branco suave */
-}
-
-.virtual-card-wrapper__info .virtual-card-wrapper__value {
-    color: #ffffff !important; /* Dados em branco puro */
-}
-
-/* Garante que o modal fique sobreposto e oculto por padrão */
-.urb-modal {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 9999 !important;
-  
-  /* Escondido por padrão */
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
-}
-
-/* Estado Visível quando a classe .is-open for adicionada pelo JS */
-.urb-modal.is-open {
-  opacity: 1 !important;
-  pointer-events: all !important;
-  visibility: visible !important;
-}
-
-.urb-modal__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.urb-modal__content {
-  position: relative;
-  background: #ffffff;
-  width: 100%;
-  max-width: 480px;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-  z-index: 10000;
-}
-
-/* Modal Container Base */
-.urb-modal {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 9999 !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-  transition: all 0.25s ease;
-}
-
-.urb-modal.is-open {
-  opacity: 1 !important;
-  pointer-events: all !important;
-  visibility: visible !important;
-}
-
-.urb-modal__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(4px);
-}
-
-.urb-modal__content {
-  position: relative;
-  background: #ffffff;
-  width: 90%;
-  max-width: 460px;
-  border-radius: 20px;
-  padding: 28px;
-  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.12);
-  z-index: 10000;
-  font-family: inherit;
-}
-
-.urb-modal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-.urb-modal__title-group h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a202c;
-}
-
-.urb-modal__title-group p {
-  margin: 4px 0 0 0;
-  font-size: 0.875rem;
-  color: #718096;
-}
-
-.urb-modal__close {
-  background: #f1f5f9;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  color: #64748b;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-
-.urb-modal__close:hover {
-  background: #e2e8f0;
-}
-
-.urb-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
-.urb-form-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #2d3748;
-}
-
-/* Picker Seletor de Cartões em Grid */
-.urb-card-picker {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.urb-card-picker__item input[type="radio"] {
-  display: none;
-}
-
-.urb-card-picker__card {
-  border: 2px solid #edf2f7;
-  border-radius: 12px;
-  padding: 8px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #fafafa;
-}
-
-.urb-card-picker__card img {
-  width: 100%;
-  height: auto;
-  border-radius: 6px;
-  margin-bottom: 6px;
-}
-
-.urb-card-picker__card span {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #4a5568;
-}
-
-/* Destaque do cartão selecionado */
-.urb-card-picker__item input[type="radio"]:checked + .urb-card-picker__card {
-  border-color: #10b981;
-  background: #ecfdf5;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
-}
-
-.urb-card-picker__item input[type="radio"]:checked + .urb-card-picker__card span {
-  color: #047857;
-}
-
-/* Select Estilizado */
-.urb-input-styled {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background: #f8fafc;
-  font-size: 0.9rem;
-  color: #2d3748;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.urb-input-styled:focus {
-  border-color: #10b981;
-  background: #ffffff;
-}
-
-/* Botões da Ação Modal */
-.urb-modal__footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.urb-btn-flat {
-  background: transparent;
-  border: none;
-  padding: 10px 18px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.urb-btn-flat:hover {
-  background: #f1f5f9;
-}
-
-.urb-btn-brand {
-  background: #10b981;
-  border: none;
-  padding: 10px 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #ffffff;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.urb-btn-brand:hover {
-  background: #059669;
-}
-
-.urb-btn-brand:active {
-  transform: scale(0.98);
-}
-
-/* Container que encapsula os cartões e as setas */
-.urb-cards-carousel-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-/* Força a trilha a se comportar como linha com rolagem suave */
-.urb-cards-carousel-track {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  gap: 20px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  padding: 10px 4px;
-  width: 100%;
-  
-  /* Esconde as barras de rolagem */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.urb-cards-carousel-track::-webkit-scrollbar {
-  display: none;
-}
-
-/* Cada cartão ocupa largura fixa e não encolhe */
-.urb-card-slide {
-  flex: 0 0 280px !important;
-  scroll-snap-align: center;
-}
-
-/* Estilização das Setas do Carrossel */
-.urb-carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 20;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.4rem;
-  color: #1a202c;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.urb-carousel-btn:hover {
-  background: #10b981;
-  color: #ffffff;
-  border-color: #10b981;
-}
-
-.urb-carousel-btn.prev { left: -16px; }
-.urb-carousel-btn.next { right: -16px; }
-
-.urb-cards-carousel-track {
-  display: flex;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  /* Esconde a barra de rolagem visual mantendo a funcionalidade */
-  scrollbar-width: none; /* Firefox */
-}
-
-.urb-cards-carousel-track::-webkit-scrollbar {
-  display: none; /* Chrome, Safari e Edge */
-}
-
-.urb-card-slide {
-  flex: 0 0 auto; /* Impede que os cartões encolham */
-  scroll-snap-align: center;
-}
-
-/* ============================================================
-   1. ESTILOS DO CARTÃO DA TELA INICIAL (.virtual-card-wrapper)
-   ============================================================ */
-.virtual-card-wrapper__info .virtual-card-wrapper__label {
-    color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 0.6rem !important;
-    font-weight: 600 !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
-}
-
-.virtual-card-wrapper__info .virtual-card-wrapper__value {
-    color: #FFFFFF !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
-}
-
-
-/* ============================================================
-   2. ESTILOS DO CARTÃO DA ABA MEU CARTÃO (.urb-card-overlay)
-   ============================================================ */
-.urb-card-overlay {
-    position: absolute;
-    inset: 0;
-    padding: 1rem;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-/* Rótulos (NOME, SALDO, CVV, DATA) */
-.urb-card-overlay .urb-card-overlay__label {
-    color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.5px !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-}
-
-/* Informações e valores em branco com sombra */
-.urb-card-overlay,
-.urb-card-overlay__holder,
-.urb-card-overlay__value,
-.urb-card-overlay__badge {
-    color: #FFFFFF !important;
-    font-weight: 700 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
-}
-
-/* Estrutura do rodapé e limitação de estouro do CVV */
-.urb-card-overlay__holder {
-    text-align: left;
-    margin-bottom: 0.75rem;
-    word-break: break-word;
-}
-
-.urb-card-overlay__meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 0.25rem;
-    width: 100%;
-}
-
-.urb-card-overlay__meta > div {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-}
-
-.urb-card-overlay__value {
-    font-size: 0.75rem !important;
-}
-
-/* Trata textos longos ou IDs exibidos incorretamente no CVV */
-.urb-card-overlay__meta > div:nth-child(2) .urb-card-overlay__value {
-    max-width: 45px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: inline-block;
-}
-
-/* Container Externo da Caixa */
-.card-display-box {
-    max-width: 320px;
-    padding: 1.25rem;
-    box-sizing: border-box;
-}
-
-.card-display-box__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.card-display-box__eye-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #333;
-    padding: 4px;
-}
-
-/* Trava de Dimensão do Cartão Virtual */
-.virtual-card-wrapper {
-    position: relative;
-    width: 230px; /* Controla a largura total */
-    height: 360px; /* Controla a altura total */
-    margin: 0 auto;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-.virtual-card-wrapper__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* Camada de Dados por cima */
-.virtual-card-wrapper__info {
-    position: absolute;
-    inset: 0;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    box-sizing: border-box;
-    z-index: 2;
-}
-
-.virtual-card-wrapper__name {
-    color: #FFFFFF !important;
-    font-size: 0.95rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    display: block;
-    margin-bottom: 0.75rem;
-}
-
-.virtual-card-wrapper__grid {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 0.5rem;
-}
-
-.virtual-card-wrapper__group {
-    display: flex;
-    flex-direction: column;
-}
-
-.virtual-card-wrapper__label {
-    color: rgba(255, 255, 255, 0.75) !important;
-    font-size: 0.55rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px;
-    margin-bottom: 2px;
-}
-
-.virtual-card-wrapper__value {
-    color: #FFFFFF !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-/* Substitua as regras do container principal por estas */
-.dashboard-grid {
-    display: flex !important;
-    justify-content: flex-start !important; /* Encosta os blocos na esquerda */
-    align-items: flex-start !important;
-    gap: 1.25rem !important; /* Controla o espaçamento exato entre eles */
-    width: 100%;
-}
-
-.dashboard-grid > *:first-child {
-    flex: 0 0 280px !important; /* Trava a largura da coluna do cartão */
-    max-width: 280px !important;
-}
-
-.dashboard-grid > *:last-child {
-    flex: 1 !important; /* Faz o bloco de saldo/linhas preencher o resto */
-}
-
-/* Força o layout da grade principal */
-.urb-main-grid {
-  display: flex !important;
-  flex-direction: row !important;
+  flex-direction: column !important;
   justify-content: flex-start !important;
-  align-items: stretch !important;
-  gap: 12px !important;
-  width: 100% !important;
+  height: auto !important;
 }
-
-/* Força a largura da coluna do cartão */
-.urb-main-grid > div:first-child,
-.urb-main-grid .card-display-box {
-  flex: 0 0 500px !important;
-  width: 500px !important;
-  max-width: 500px !important;
-  height: 100% !important;
-}
-
-/* Força a coluna da direita a ocupar o resto do espaço */
-.urb-right-column {
-  flex: 1 !important;
-  min-width: 0 !important;
-}
-/* Força o alinhamento da grade principal para esticar os itens */
-.urb-main-grid {
-  display: flex !important;
-  align-items: stretch !important;
-}
-
-/* Força a caixa externa do cartão a ocupar toda a altura da coluna */
-.card-display-box {
-  height: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  box-sizing: border-box !important;
-}
-
-/* Centraliza a imagem do cartão no espaço que vai sobrar no meio */
-.card-display-box__body {
-  flex: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-
-
-/* Força o container pai e as duas colunas a terem a mesma altura */
-.urb-main-grid {
-  display: flex !important;
-  align-items: stretch !important;
-}
-
-.urb-main-grid > article,
-.urb-main-grid > div,
-.card-display-box {
-  height: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* Força a coluna da direita a esticar e preencher a altura até o fim */
-.urb-right-column {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  height: 100% !important;
-}
-
-/* Faz o bloco de 'Linhas Próximas' crescer para alinhar o fundo com o cartão */
-.urb-card--bus-list {
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-}
-
 /* Settings modal: larger desktop viewport with UrbPay scrollbar. */
 #settings-modal.urb-modal-overlay {
   padding: 16px !important;
@@ -10689,10 +9575,6 @@ html[data-theme="dark"] #settings-modal .urb-modal-container::-webkit-scrollbar-
   background: #2563eb;
 }
 
-.urb-locate-dot--bus {
-  background: #16a34a;
-}
-
 .urb-locate-dot--train {
   background: #7c3aed;
 }
@@ -10776,10 +9658,6 @@ html[data-theme="dark"] #settings-modal .urb-modal-container::-webkit-scrollbar-
   height: 19px;
 }
 
-.urb-map-marker--bus {
-  background: #16a34a;
-}
-
 .urb-map-marker--train {
   background: #7c3aed;
 }
@@ -10858,6 +9736,7 @@ html[data-theme="dark"] .urb-locate-result strong {
     align-items: stretch;
   }
 }
+
 
 
 

@@ -3,29 +3,103 @@
 {% block title %}UrbPay | Catraca Digital{% endblock %}
 
 {% block content %}
-  <main class="gate-shell">
-    <section class="gate-card">
-      <span class="eyebrow">Compra por QR Code</span>
-      <h1>Comprar passagem</h1>
-      <p>Ao confirmar, a simulacao da catraca recebe a autorizacao e o saldo do cartao e atualizado na hora.</p>
+<main class="gate-shell gate-shell--reader">
+  <section class="gate-reader-card" aria-labelledby="gate-reader-title">
+    <div class="gate-reader-card__header">
+      <span class="gate-reader-status">
+        <i></i>
+        Catraca aguardando leitura
+      </span>
+      <span class="gate-reader-code">Terminal UrbPay • QR</span>
+    </div>
 
-      <div class="gate-user">
-        <img src="{{ url_for('static', path=profile_image) }}" alt="Foto do usuario" class="gate-user__avatar" />
-        <div>
-          <strong>{{ current_user.nome }}</strong>
-          <p>Cartao {{ card_number }}</p>
-          <p>Saldo atual R$ {{ current_balance }}</p>
+    <div class="gate-reader-hero">
+      <div class="gate-reader-copy">
+        <span class="eyebrow">Simulacao de catraca</span>
+        <h1 id="gate-reader-title">Validar passagem</h1>
+        <p>A catraca confere o QR Code, valida o cartao ativo e libera a passagem quando houver saldo suficiente.</p>
+      </div>
+
+      <div class="gate-turnstile-visual" aria-label="Leitor da catraca">
+        <div class="gate-turnstile-visual__scan">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7V5a1 1 0 0 1 1-1h2"></path>
+            <path d="M17 4h2a1 1 0 0 1 1 1v2"></path>
+            <path d="M20 17v2a1 1 0 0 1-1 1h-2"></path>
+            <path d="M7 20H5a1 1 0 0 1-1-1v-2"></path>
+            <path d="M8 8h3v3H8z"></path>
+            <path d="M13 8h3"></path>
+            <path d="M13 11h3"></path>
+            <path d="M8 13h3"></path>
+            <path d="M13 13h1"></path>
+            <path d="M16 13h1"></path>
+            <path d="M8 16h1"></path>
+            <path d="M11 16h5"></path>
+          </svg>
         </div>
+        <div class="gate-turnstile-visual__arms">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <strong>Leitor da catraca</strong>
+        <small>Aguardando confirmacao</small>
       </div>
+    </div>
 
-      <div class="gate-amount">
-        <span>Valor da passagem</span>
-        <strong>R$ {{ amount }}</strong>
-      </div>
+    <div class="gate-reader-layout">
+      <article class="gate-active-card">
+        <div class="gate-active-card__media">
+          <img src="{{ url_for('static', path='imgs/' ~ card_model) }}" alt="Cartao UrbPay {{ card_display_name }}"
+            onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+          <div class="gate-active-card__overlay">
+            <span class="gate-active-card__brand">UrbPay</span>
+            <span class="gate-active-card__badge">{{ card_badge }}</span>
+            <div class="gate-active-card__data">
+              <span>NOME</span>
+              <strong>{{ card_display_name }}</strong>
+              <span>NUMERO</span>
+              <strong>{{ card_number_masked }}</strong>
+              <div>
+                <p>
+                  <span>DATA</span>
+                  <strong>{{ card_validity }}</strong>
+                </p>
+                <p>
+                  <span>CVV</span>
+                  <strong>{{ card_cvv }}</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
 
-      <form action="/passagem/{{ token }}/confirmar" method="post" class="gate-form">
-        <button type="submit" class="primary-action gate-confirm">Comprar passagem</button>
-      </form>
-    </section>
-  </main>
+      <aside class="gate-reader-summary">
+        <div class="gate-reader-summary__row">
+          <span>Cartao ativo</span>
+          <strong>Final {{ card_digits }}</strong>
+        </div>
+        <div class="gate-reader-summary__row">
+          <span>Saldo atual</span>
+          <strong>R$ {{ current_balance }}</strong>
+        </div>
+        <div class="gate-reader-summary__amount">
+          <span>Tarifa da passagem</span>
+          <strong>R$ {{ amount }}</strong>
+        </div>
+        <div class="gate-reader-legend">
+          <span><i class="is-waiting"></i> QR lido pela catraca</span>
+          <span><i class="is-processing"></i> Saldo conferido no cartao ativo</span>
+          <span><i class="is-approved"></i> Liberacao registrada no historico</span>
+        </div>
+      </aside>
+    </div>
+
+    <form action="/passagem/{{ token }}/confirmar" method="post" class="gate-form gate-reader-form">
+      <button type="submit" class="primary-action gate-confirm">Liberar catraca</button>
+    </form>
+  </section>
+</main>
 {% endblock %}

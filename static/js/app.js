@@ -1,4 +1,4 @@
-const body = document.body;
+﻿const body = document.body;
 const root = document.documentElement;
 const revealItems = document.querySelectorAll("[data-reveal]");
 const magneticItems = document.querySelectorAll("[data-magnetic]");
@@ -620,9 +620,11 @@ const locateState = {
   userMarker: null,
   userLatLng: null,
   locationRequested: false,
-  busLayer: null,
   trainLayer: null,
+  followUser: true,
+  watchId: null,
   moveTimeoutId: null,
+  refreshIntervalId: null,
 };
 
 const setLocateStatus = (message, isError = false) => {
@@ -655,7 +657,7 @@ const setLocateDetails = (title, description, rows = []) => {
           ${row.meta ? `<small>${escapeHtml(row.meta)}</small>` : ""}
         </article>
       `).join("")
-    : '<article class="urb-locate-result"><strong>Sem dados</strong><p>Nenhuma previsao disponivel agora.</p></article>';
+    : '<article class="urb-locate-result"><strong>Sem dados</strong><p>Nenhuma estacao encontrada nesta area.</p></article>';
 };
 
 const createLocateIcon = (type) => {
@@ -706,53 +708,51 @@ const getLocateCenter = () => {
   return locateState.userLatLng || [-23.5505, -46.6333];
 };
 
-const renderLocateStops = async (searchTerm = "") => {
-  if (!locateState.busLayer || !locateState.trainLayer) {
+const renderLocateStations = async (searchTerm = "") => {
+  if (!locateState.trainLayer) {
     return;
   }
 
   const [lat, lng] = getLocateCenter();
-  setLocateStatus("Buscando pontos");
+  setLocateStatus("Buscando estacoes");
   const params = new URLSearchParams({
     lat: String(lat),
     lng: String(lng),
     q: searchTerm || "",
+    type: "train",
   });
   const payload = await locateFetchJson(`/dashboard/localizar/gtfs/pontos?${params.toString()}`);
-  const stops = Array.isArray(payload.items) ? payload.items : [];
-  locateState.busLayer.clearLayers();
+  const stations = Array.isArray(payload.items) ? payload.items : [];
   locateState.trainLayer.clearLayers();
 
-  stops.forEach((stop) => {
-    const lat = Number(stop.lat);
-    const lng = Number(stop.lng);
+  stations.forEach((station) => {
+    const lat = Number(station.lat);
+    const lng = Number(station.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
       return;
     }
 
-    const markerType = stop.type === "train" ? "train" : "bus";
-    const targetLayer = markerType === "train" ? locateState.trainLayer : locateState.busLayer;
-    L.marker([lat, lng], { icon: createLocateIcon(markerType) })
+    L.marker([lat, lng], { icon: createLocateIcon("train") })
       .bindPopup(`
         <div class="urb-locate-popup">
-          <strong>${escapeHtml(stop.name)}</strong>
-          <span>${escapeHtml(stop.mode_label || "Transporte")}<br>${escapeHtml(stop.address || "Ponto GTFS")}<br>${escapeHtml(stop.distance_km)} km de distancia</span>
-          <button type="button" data-locate-prediction="${escapeHtml(stop.id)}" data-locate-stop-name="${escapeHtml(stop.name)}">Ver proximas chegadas</button>
+          <strong>${escapeHtml(station.name)}</strong>
+          <span>${escapeHtml(station.mode_label || "Trem")}<br>${escapeHtml(station.distance_km)} km de distancia</span>
+          <button type="button" data-locate-prediction="${escapeHtml(station.id)}" data-locate-stop-name="${escapeHtml(station.name)}">Ver proximas chegadas</button>
         </div>
       `)
-      .addTo(targetLayer);
+      .addTo(locateState.trainLayer);
   });
 
   setLocateDetails(
-    `${stops.length} pontos encontrados`,
-    searchTerm ? `Busca "${searchTerm}" no GTFS local.` : "Pontos mais proximos pela sua localizacao.",
-    stops.slice(0, 5).map((stop) => ({
-      title: stop.name,
-      description: stop.mode_label || "Transporte",
-      meta: `${stop.distance_km} km`,
+    `${stations.length} estacoes encontradas`,
+    searchTerm ? `Busca "${searchTerm}" no GTFS local.` : "Estacoes de trem e metro mais proximas da area do mapa.",
+    stations.slice(0, 5).map((station) => ({
+      title: station.name,
+      description: station.mode_label || "Trem",
+      meta: `${station.distance_km} km`,
     }))
   );
-  setLocateStatus("GTFS carregado");
+  setLocateStatus("Mapa atualizado");
 };
 
 const loadLocatePrediction = async (stopCode, stopName) => {
@@ -760,11 +760,11 @@ const loadLocatePrediction = async (stopCode, stopName) => {
   const payload = await locateFetchJson(`/dashboard/localizar/gtfs/previsao/${encodeURIComponent(stopCode)}`);
   const predictions = Array.isArray(payload.predictions) ? payload.predictions : [];
   setLocateDetails(
-    stopName || payload.stop?.name || "Parada selecionada",
+    stopName || payload.stop?.name || "Estacao selecionada",
     payload.note || "Previsao estimada pela grade GTFS.",
     predictions.map((item) => ({
       title: `${item.line} - ${item.destination}`,
-      description: item.type === "bus" ? "Onibus" : "Trilho",
+      description: "Trem / metro",
       meta: `Proxima chegada: ${item.next_arrival} (${item.scheduled_time})`,
     }))
   );
@@ -814,7 +814,7 @@ const requestLocateUserPosition = ({ recenter = false, refreshStops = false } = 
         return;
       }
 
-      renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+      renderLocateStations(locateSearchInput?.value || "").catch((error) => {
         console.error(error);
         setLocateStatus(error.message, true);
       });
@@ -831,9 +831,11 @@ const requestLocateUserPosition = ({ recenter = false, refreshStops = false } = 
 };
 
 const centerLocateOnUser = () => {
+  locateState.followUser = true;
+
   if (locateState.userLatLng) {
     upsertLocateUserMarker(locateState.userLatLng, true);
-    renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+    renderLocateStations(locateSearchInput?.value || "").catch((error) => {
       console.error(error);
       setLocateStatus(error.message, true);
     });
@@ -843,11 +845,49 @@ const centerLocateOnUser = () => {
   requestLocateUserPosition({ recenter: true, refreshStops: true });
 };
 
+const refreshLocateStationsSoon = () => {
+  window.clearTimeout(locateState.moveTimeoutId);
+  locateState.moveTimeoutId = window.setTimeout(() => {
+    renderLocateStations(locateSearchInput?.value || "").catch((error) => {
+      console.error(error);
+      setLocateStatus(error.message, true);
+    });
+  }, 250);
+};
+
+const startLocateWatch = () => {
+  const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  if (!navigator.geolocation || (!window.isSecureContext && !isLocalhost) || locateState.watchId !== null) {
+    return;
+  }
+
+  locateState.watchId = navigator.geolocation.watchPosition(
+    (position) => {
+      const latLng = [position.coords.latitude, position.coords.longitude];
+      locateState.userLatLng = latLng;
+      upsertLocateUserMarker(latLng, locateState.followUser);
+
+      if (locateState.followUser) {
+        refreshLocateStationsSoon();
+      }
+    },
+    () => {
+      setLocateStatus("Permita a localizacao", true);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 5000,
+    }
+  );
+};
+
 const initializeLocateMap = () => {
   if (!locateMapElement || locateState.initialized || typeof L === "undefined") {
     if (locateState.map) {
       window.setTimeout(() => locateState.map?.invalidateSize(), 80);
-      centerLocateOnUser();
+      startLocateWatch();
+      refreshLocateStationsSoon();
     }
     return;
   }
@@ -863,7 +903,6 @@ const initializeLocateMap = () => {
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(locateState.map);
 
-  locateState.busLayer = L.layerGroup().addTo(locateState.map);
   locateState.trainLayer = L.layerGroup().addTo(locateState.map);
 
   if (locateState.userLatLng) {
@@ -872,20 +911,17 @@ const initializeLocateMap = () => {
     requestLocateUserPosition({ recenter: true, refreshStops: true });
   }
 
-  locateState.map.on("moveend", () => {
-    window.clearTimeout(locateState.moveTimeoutId);
-    locateState.moveTimeoutId = window.setTimeout(() => {
-      renderLocateStops(locateSearchInput?.value || "").catch((error) => {
-        console.error(error);
-        setLocateStatus(error.message, true);
-      });
-    }, 250);
+  locateState.map.on("dragstart zoomstart", () => {
+    locateState.followUser = false;
   });
 
-  renderLocateStops(locateSearchInput?.value || "").catch((error) => {
-    console.error(error);
-    setLocateStatus(error.message, true);
+  locateState.map.on("moveend", () => {
+    refreshLocateStationsSoon();
   });
+
+  startLocateWatch();
+  refreshLocateStationsSoon();
+  locateState.refreshIntervalId = window.setInterval(refreshLocateStationsSoon, 15000);
 
   window.setTimeout(() => locateState.map?.invalidateSize(), 150);
 };
@@ -1657,6 +1693,7 @@ creditConfirmButton?.addEventListener("click", async () => {
 
 syncDashboardViewButtons(dashboardState.activeView);
 requestLocateUserPosition();
+startLocateWatch();
 
 dashboardViewButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -1712,7 +1749,8 @@ dashboardShortcutButtons.forEach((button) => {
 
 locateSearchButton?.addEventListener("click", () => {
   initializeLocateMap();
-  renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+  locateState.followUser = false;
+  renderLocateStations(locateSearchInput?.value || "").catch((error) => {
     console.error(error);
     setLocateStatus(error.message, true);
   });
@@ -1970,7 +2008,7 @@ const getQrSimulatorCopy = (snapshot) => {
       summaryTitle: "Validacao em andamento",
       summaryCopy: "A leitura foi detectada e o sistema esta processando a autorizacao da passagem.",
       consoleTitle: "Validando bilhete",
-      consoleCopy: "O QR foi lido. A simulacao agora executa a mesma etapa de conferência que antecede a liberacao do bloqueio.",
+      consoleCopy: "O QR foi lido. A simulacao agora executa a mesma etapa de conferÃªncia que antecede a liberacao do bloqueio.",
     };
   }
 
@@ -2597,9 +2635,9 @@ setupModal(
 );
 
 
-// Função para abrir o modal
+// FunÃ§Ã£o para abrir o modal
 // ==========================================
-// 1. GERENCIAMENTO DE MODAL (Configurações)
+// 1. GERENCIAMENTO DE MODAL (ConfiguraÃ§Ãµes)
 // ==========================================
 function openUrbModal() {
   const modal = document.getElementById('settings-modal');
@@ -2619,24 +2657,6 @@ function closeUrbModal() {
   }
 }
 
-// ==========================================
-// 2. FILTRO DE LINHAS DE ÔNIBUS
-// ==========================================
-function filterBuses() {
-  const input = document.getElementById('bus-search-input');
-  if (!input) return;
-  
-  const filter = input.value.toLowerCase();
-  const ul = document.getElementById('bus-list');
-  if (!ul) return;
-  
-  const li = ul.getElementsByTagName('li');
-
-  for (let i = 0; i < li.length; i++) {
-    const text = li[i].textContent || li[i].innerText;
-    li[i].style.display = text.toLowerCase().includes(filter) ? "" : "none";
-  }
-}
 
 // ==========================================
 // 3. EVENTOS AO CARREGAR O DOM
@@ -2698,7 +2718,7 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmTerms.addEventListener("click", () => {
 
       if (!acceptTerms.checked) {
-        alert("Você precisa aceitar os Termos de Uso.");
+        alert("VocÃª precisa aceitar os Termos de Uso.");
         return;
       }
 
@@ -2737,25 +2757,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// Filtra as linhas conforme o usuário digita na busca
-function filterBuses() {
-  const input = document.getElementById('bus-search-input');
-  const filter = input.value.toLowerCase();
-  const ul = document.getElementById('bus-list');
-  const li = ul.getElementsByTagName('li');
-
-  for (let i = 0; i < li.length; i++) {
-    const text = li[i].textContent || li[i].innerText;
-    if (text.toLowerCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-  }
-}
 
 document.addEventListener("click", function (e) {
-  // Procura se o elemento clicado é o botão ou está dentro dele
+  // Procura se o elemento clicado Ã© o botÃ£o ou estÃ¡ dentro dele
   const toggleBtn = e.target.closest("#toggle-card-data");
   
   if (toggleBtn) {
@@ -2767,11 +2771,11 @@ document.addEventListener("click", function (e) {
     const valElem = document.getElementById("card-validity");
 
     if (!numElem || !cvvElem || !valElem) {
-      console.error("Elementos com ID card-number, card-cvv ou card-validity não foram encontrados.");
+      console.error("Elementos com ID card-number, card-cvv ou card-validity nÃ£o foram encontrados.");
       return;
     }
 
-    const isHidden = numElem.textContent.includes("••••");
+    const isHidden = numElem.textContent.includes("â€¢â€¢â€¢â€¢");
 
     numElem.textContent = isHidden ? numElem.dataset.full : numElem.dataset.masked;
     cvvElem.textContent = isHidden ? cvvElem.dataset.full : cvvElem.dataset.masked;
@@ -2816,24 +2820,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Estado: Bloqueado
                 lockLabel.innerText = "Desbloquear";
                 if (cardStatus) {
-                    cardStatus.innerText = "● Bloqueado";
+                    cardStatus.innerText = "â— Bloqueado";
                     cardStatus.style.color = "#e53e3e"; // Cor vermelha
                 }
                 if (cardImg) {
                     cardImg.style.filter = "grayscale(100%) opacity(0.6)"; // Efeito visual de bloqueado
                 }
-                alert("Cartão UrbPay bloqueado temporariamente com sucesso!");
+                alert("CartÃ£o UrbPay bloqueado temporariamente com sucesso!");
             } else {
                 // Estado: Ativo
                 lockLabel.innerText = "Bloquear";
                 if (cardStatus) {
-                    cardStatus.innerText = "● Ativo";
+                    cardStatus.innerText = "â— Ativo";
                     cardStatus.style.color = "#38a169"; // Cor verde
                 }
                 if (cardImg) {
                     cardImg.style.filter = "none";
                 }
-                alert("Cartão UrbPay reativado com sucesso!");
+                alert("CartÃ£o UrbPay reativado com sucesso!");
             }
         });
     }
@@ -2841,7 +2845,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // 1. NAVEGAÇÃO ENTRE PAINÉIS / TELAS (SIDEBAR E NAVEGAÇÃO)
+  // 1. NAVEGAÃ‡ÃƒO ENTRE PAINÃ‰IS / TELAS (SIDEBAR E NAVEGAÃ‡ÃƒO)
   const navLinks = document.querySelectorAll('[data-dashboard-view]');
   const panels = document.querySelectorAll('[data-dashboard-panel]');
 
@@ -2850,17 +2854,17 @@ document.addEventListener('DOMContentLoaded', function () {
       link.addEventListener('click', function (e) {
         const viewTarget = link.getAttribute('data-dashboard-view');
 
-        // Se não for o botão de abrir a modal de cartão
+        // Se nÃ£o for o botÃ£o de abrir a modal de cartÃ£o
         if (viewTarget && viewTarget !== 'new-card') {
           e.preventDefault();
 
-          // Atualiza estado ativo nos botões do menu
+          // Atualiza estado ativo nos botÃµes do menu
           navLinks.forEach(function (l) {
             l.classList.remove('is-active');
           });
           link.classList.add('is-active');
 
-          // Alterna exibição dos painéis
+          // Alterna exibiÃ§Ã£o dos painÃ©is
           panels.forEach(function (panel) {
             if (panel.getAttribute('data-dashboard-panel') === viewTarget) {
               panel.removeAttribute('hidden');
@@ -2873,7 +2877,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 2. MODAL DE SOLICITAR NOVO CARTÃO
+  // 2. MODAL DE SOLICITAR NOVO CARTÃƒO
   const cardModal = document.getElementById('modalNewCard');
   const triggerBtns = document.querySelectorAll('[data-open-card-modal], [data-dashboard-view="new-card"]');
   const closeBtns = cardModal ? cardModal.querySelectorAll('[data-modal-close]') : [];
@@ -2900,15 +2904,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Envio do Formulário (Permite o submit real para o Python/FastAPI)
+  // Envio do FormulÃ¡rio (Permite o submit real para o Python/FastAPI)
   if (formNewCard) {
     formNewCard.addEventListener('submit', function () {
-      // Removemos o preventDefault() e o alert() fictício.
-      // O formulário agora envia a requisição normalmente para o banco de dados.
+      // Removemos o preventDefault() e o alert() fictÃ­cio.
+      // O formulÃ¡rio agora envia a requisiÃ§Ã£o normalmente para o banco de dados.
     });
   }
 
-  // 3. NAVEGAÇÃO DO CARROSSEL DE CARTÕES
+  // 3. NAVEGAÃ‡ÃƒO DO CARROSSEL DE CARTÃ•ES
   const track = document.getElementById('cardsCarouselTrack');
   const prevBtn = document.getElementById('cardsCarouselPrev');
   const nextBtn = document.getElementById('cardsCarouselNext');
@@ -2943,10 +2947,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (!num || !cvv || !val) return;
 
-  const isMasked = num.textContent.trim().includes("•");
+  const isMasked = num.textContent.trim().includes("â€¢");
 
   num.textContent = isMasked ? num.dataset.full : num.dataset.masked;
   cvv.textContent = isMasked ? cvv.dataset.full : cvv.dataset.masked;
   val.textContent = isMasked ? val.dataset.full : val.dataset.masked;
 });
                         
+
