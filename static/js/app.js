@@ -2432,70 +2432,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const cardModal = document.getElementById('modalNewCard');
-  
-  // Seleciona o botão por qualquer um dos dois atributos possíveis
-  const triggerBtns = document.querySelectorAll('[data-open-card-modal], [data-dashboard-view="new-card"]');
-  const closeBtns = cardModal?.querySelectorAll('[data-modal-close]');
-  const formNewCard = document.getElementById('formNewCard');
-
-  // Abrir Modal
-  triggerBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (cardModal) {
-        cardModal.classList.add('is-open');
-        cardModal.setAttribute('aria-hidden', 'false');
-      }
-    });
-  });
-
-  // Fechar Modal (botão X, botão Cancelar e overlay)
-  closeBtns?.forEach(btn => {
-    btn.addEventListener('click', () => {
-      cardModal.classList.remove('is-open');
-      cardModal.setAttribute('aria-hidden', 'true');
-    });
-  });
-
-  if (formNewCard) {
-    formNewCard.addEventListener('submit', () => {
-      e.preventDefault();
-      alert('Solicitação enviada com sucesso!');
-      cardModal.classList.remove('is-open');
-      formNewCard.reset();
-    });
-  }
-  // Envio do Formulário
-  if (formNewCard) {
-    formNewCard.addEventListener('submit', (e) => {
-      
-    });
-  }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
 
   // 1. NAVEGAÇÃO ENTRE PAINÉIS / TELAS (SIDEBAR E NAVEGAÇÃO)
   const navLinks = document.querySelectorAll('[data-dashboard-view]');
   const panels = document.querySelectorAll('[data-dashboard-panel]');
 
   if (navLinks.length > 0 && panels.length > 0) {
-    navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function (e) {
         const viewTarget = link.getAttribute('data-dashboard-view');
-        
-        // Se não for um link comum de redirecionamento HTTP
+
+        // Se não for o botão de abrir a modal de cartão
         if (viewTarget && viewTarget !== 'new-card') {
           e.preventDefault();
 
-          // Atualiza o estado ativo nos botões do menu
-          navLinks.forEach(l => l.classList.remove('is-active'));
+          // Atualiza estado ativo nos botões do menu
+          navLinks.forEach(function (l) {
+            l.classList.remove('is-active');
+          });
           link.classList.add('is-active');
 
-          // Alterna a exibição dos painéis do dashboard
-          panels.forEach(panel => {
+          // Alterna exibição dos painéis
+          panels.forEach(function (panel) {
             if (panel.getAttribute('data-dashboard-panel') === viewTarget) {
               panel.removeAttribute('hidden');
             } else {
@@ -2510,10 +2469,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. MODAL DE SOLICITAR NOVO CARTÃO
   const cardModal = document.getElementById('modalNewCard');
   const triggerBtns = document.querySelectorAll('[data-open-card-modal], [data-dashboard-view="new-card"]');
-  const closeBtns = cardModal?.querySelectorAll('[data-modal-close]');
+  const closeBtns = cardModal ? cardModal.querySelectorAll('[data-modal-close]') : [];
+  const formNewCard = document.getElementById('formNewCard');
 
-  triggerBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Abrir Modal
+  triggerBtns.forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
       e.preventDefault();
       if (cardModal) {
         cardModal.classList.add('is-open');
@@ -2522,12 +2483,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  closeBtns?.forEach(btn => {
-    btn.addEventListener('click', () => {
-      cardModal?.classList.remove('is-open');
-      cardModal?.setAttribute('aria-hidden', 'true');
+  // Fechar Modal
+  closeBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (cardModal) {
+        cardModal.classList.remove('is-open');
+        cardModal.setAttribute('aria-hidden', 'true');
+      }
     });
   });
+
+  // Envio do Formulário (Permite o submit real para o Python/FastAPI)
+  if (formNewCard) {
+    formNewCard.addEventListener('submit', function () {
+      // Removemos o preventDefault() e o alert() fictício.
+      // O formulário agora envia a requisição normalmente para o banco de dados.
+    });
+  }
 
   // 3. NAVEGAÇÃO DO CARROSSEL DE CARTÕES
   const track = document.getElementById('cardsCarouselTrack');
@@ -2535,13 +2507,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextBtn = document.getElementById('cardsCarouselNext');
 
   if (track) {
-    nextBtn?.addEventListener('click', () => {
-      track.scrollBy({ left: track.offsetWidth, behavior: 'smooth' });
-    });
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        const firstCard = track.querySelector('.urb-card-slide');
+        const scrollAmount = firstCard ? firstCard.offsetWidth + 16 : track.offsetWidth;
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      });
+    }
 
-    prevBtn?.addEventListener('click', () => {
-      track.scrollBy({ left: -track.offsetWidth, behavior: 'smooth' });
-    });
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        const firstCard = track.querySelector('.urb-card-slide');
+        const scrollAmount = firstCard ? firstCard.offsetWidth + 16 : track.offsetWidth;
+        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      });
+    }
   }
 
 });

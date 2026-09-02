@@ -10093,7 +10093,24 @@ html[data-theme="dark"] .urb-empty-state {
 .urb-carousel-btn.prev { left: -16px; }
 .urb-carousel-btn.next { right: -16px; }
 
+.urb-cards-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  /* Esconde a barra de rolagem visual mantendo a funcionalidade */
+  scrollbar-width: none; /* Firefox */
+}
 
+.urb-cards-carousel-track::-webkit-scrollbar {
+  display: none; /* Chrome, Safari e Edge */
+}
+
+.urb-card-slide {
+  flex: 0 0 auto; /* Impede que os cartões encolham */
+  scroll-snap-align: center;
+}
 
 
 

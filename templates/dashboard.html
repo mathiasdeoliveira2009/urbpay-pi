@@ -60,16 +60,16 @@
 
         <!-- NOVO ITEM: Solicitar cartão (substituindo Extrato) -->
         <button type="button" class="urb-nav-link" data-open-card-modal>
-  <span class="urb-nav-link__icon">
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-      stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="5" width="18" height="14" rx="2.5"></rect>
-      <path d="M12 9v6"></path>
-      <path d="M9 12h6"></path>
-    </svg>
-  </span>
-  <span>Solicitar cartão</span>
-</button>
+          <span class="urb-nav-link__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2.5"></rect>
+              <path d="M12 9v6"></path>
+              <path d="M9 12h6"></path>
+            </svg>
+          </span>
+          <span>Solicitar cartão</span>
+        </button>
 
         <button type="button" class="urb-nav-link" data-dashboard-view="requests">
           <span class="urb-nav-link__icon">
@@ -148,7 +148,7 @@
 
       <section class="urb-main-grid">
 
-        <!-- COLUNA ESQUERDA: CARTÃO VERTICAL COM DADOS MASCARADOS -->
+        <!-- COLUNA ESQUERDA: CARTÃO VERTICAL COM BOTÕES DE NAVEGAÇÃO -->
         <article class="card-display-box">
           <div class="card-display-box__header">
             <span class="card-display-box__title">Meu cartão virtual</span>
@@ -163,50 +163,70 @@
           </div>
 
           <div class="card-display-box__body">
-            <div class="virtual-card-wrapper">
-              <!-- Imagem Dinâmica do Cartão -->
-              <img
-                src="/static/imgs/{{ (primary_card.model if primary_card and primary_card.model else 'cartao-verde.png') | replace('imgs/', '') | replace('/static/', '') }}"
-                alt="Cartão UrbPay" class="virtual-card-wrapper__img"
-                onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+            <!-- CONTAINER COM BOTÕES DE NAVEGAÇÃO LATERAIS -->
+            <div class="card-slider-wrapper"
+              style="position: relative; display: flex; align-items: center; justify-content: center; width: 100%;">
 
-              <div class="virtual-card-wrapper__info">
-                <!-- Nome impresso no cartão -->
-                <div class="virtual-card-wrapper__group">
-                  <span class="virtual-card-wrapper__label">NOME</span>
-                  <strong class="virtual-card-wrapper__value">
-                    {{ primary_card.display_name if primary_card else current_user.nome }}
-                  </strong>
-                </div>
+              <!-- Botão Anterior -->
+              <button type="button" class="card-slider-btn card-slider-btn--prev" id="prev-card-btn"
+                aria-label="Cartão anterior"
+                style="position: absolute; left: -15px; z-index: 15; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 18px; display: flex; align-items: center; justify-content: center;">
+                ‹
+              </button>
 
-                <!-- Dados mascarados do cartão -->
-                <div class="virtual-card-wrapper__grid">
+              <div class="virtual-card-wrapper">
+                <!-- Imagem Dinâmica do Cartão -->
+                <img
+                  src="/static/imgs/{{ (primary_card.model if primary_card and primary_card.model else 'cartao-verde.png') | replace('imgs/', '') | replace('/static/', '') }}"
+                  alt="Cartão UrbPay" class="virtual-card-wrapper__img"
+                  onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+
+                <div class="virtual-card-wrapper__info">
+                  <!-- Nome impresso no cartão -->
                   <div class="virtual-card-wrapper__group">
-                    <span class="virtual-card-wrapper__label">NÚMERO</span>
-                    <strong class="virtual-card-wrapper__value" id="card-number"
-                      data-masked="{{ primary_card.card_number_masked if primary_card else '•••• 4892' }}"
-                      data-full="{{ primary_card.card_number_full if primary_card else '4589 1234 5678 4892' }}">
-                      {{ primary_card.card_number_masked if primary_card else '•••• 4892' }}
+                    <span class="virtual-card-wrapper__label">NOME</span>
+                    <strong class="virtual-card-wrapper__value">
+                      {{ primary_card.display_name if primary_card else current_user.nome }}
                     </strong>
                   </div>
 
-                  <div class="virtual-card-wrapper__group">
-                    <span class="virtual-card-wrapper__label">CVV</span>
-                    <strong class="virtual-card-wrapper__value" id="card-cvv" data-masked="•••"
-                      data-full="{{ primary_card.cvv if primary_card else '934' }}">
-                      •••
-                    </strong>
-                  </div>
+                  <!-- Dados mascarados do cartão -->
+                  <div class="virtual-card-wrapper__grid">
+                    <div class="virtual-card-wrapper__group">
+                      <span class="virtual-card-wrapper__label">NÚMERO</span>
+                      <strong class="virtual-card-wrapper__value" id="card-number"
+                        data-masked="{{ primary_card.card_number_masked if primary_card else '•••• 4892' }}"
+                        data-full="{{ primary_card.card_number_full if primary_card else '4589 1234 5678 4892' }}">
+                        {{ primary_card.card_number_masked if primary_card else '•••• 4892' }}
+                      </strong>
+                    </div>
 
-                  <div class="virtual-card-wrapper__group">
-                    <span class="virtual-card-wrapper__label">DATA</span>
-                    <strong class="virtual-card-wrapper__value" id="card-validity" data-masked="••/••"
-                      data-full="{{ primary_card.validity if primary_card else '08/30' }}">
-                      ••/••
-                    </strong>
+                    <div class="virtual-card-wrapper__group">
+                      <span class="virtual-card-wrapper__label">CVV</span>
+                      <strong class="virtual-card-wrapper__value" id="card-cvv" data-masked="•••"
+                        data-full="{{ primary_card.cvv if primary_card else '934' }}">
+                        •••
+                      </strong>
+                    </div>
+
+                    <div class="virtual-card-wrapper__group">
+                      <span class="virtual-card-wrapper__label">DATA</span>
+                      <strong class="virtual-card-wrapper__value" id="card-validity" data-masked="••/••"
+                        data-full="{{ primary_card.validity if primary_card else '08/30' }}">
+                        ••/••
+                      </strong>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <!-- Botão Próximo -->
+              <button type="button" class="card-slider-btn card-slider-btn--next" id="next-card-btn"
+                aria-label="Próximo cartão"
+                style="position: absolute; right: -15px; z-index: 15; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 18px; display: flex; align-items: center; justify-content: center;">
+                ›
+              </button>
+
             </div>
           </div>
 
@@ -215,6 +235,7 @@
             <span class="card-display-box__status">● Ativo</span>
           </div>
         </article>
+
         <!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS -->
         <div class="urb-right-column">
           <!-- BLOCO 1: SALDO -->
@@ -284,7 +305,6 @@
           </article>
         </div>
       </section>
-
       <!-- 2. Script da Biblioteca + Inicialização do Mapa (Logo abaixo da section) -->
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <script>
@@ -413,6 +433,7 @@
         </div>
       </section>
 
+      {#
       <section class="urb-workspace">
         <section class="urb-panel urb-workspace__panel" data-dashboard-panel="cards">
           <div class="urb-panel__head urb-panel__head--inline">
@@ -427,50 +448,66 @@
 
           <!-- Wrapper do Carrossel com Botões -->
           <div class="urb-cards-carousel-wrapper">
-            <button type="button" class="urb-carousel-btn prev" id="cardsCarouselPrev" aria-label="Cartão anterior">‹</button>
+  <!-- Botão Anterior -->
+  <button type="button" class="urb-carousel-btn prev" id="cardsCarouselPrev" aria-label="Cartão anterior">‹</button>
 
-            <div class="my-cards-grid urb-cards-carousel-track" id="cardsCarouselTrack">
-              {% for item in my_cards %}
-              <article class="my-card-tile official-card-showcase__card-field urb-card-slide" data-card-kind="{{ item.service_key }}"
-                data-card-id="{{ item.id }}" data-card-balance="{{ item.balance }}">
+  <!-- Contêiner do Carrossel (Track) -->
+  <div class="my-cards-grid urb-cards-carousel-track" id="cardsCarouselTrack">
+    {% for item in my_cards %}
+    <article class="my-card-tile official-card-showcase__card-field urb-card-slide"
+      data-card-kind="{{ item.service_key }}" 
+      data-card-id="{{ item.id }}"
+      data-card-balance="{{ item.balance }}">
+      
+      <div class="urb-card-vertical-wrapper">
+        <div class="urb-card-display">
+          <img src="{{ url_for('static', path='imgs/' ~ (item.modelo or 'cartao-verde.png')) }}"
+            alt="Cartao UrbPay {{ item.display_name }}" class="urb-card-vertical-img" />
 
-                <div class="urb-card-vertical-wrapper">
-                  <div class="urb-card-display">
-                    <img src="{{ url_for('static', path='imgs/' ~ (item.modelo or 'cartao-verde.png')) }}"
-                      alt="Cartao UrbPay {{ item.display_name }}" class="urb-card-vertical-img" />
+          <div class="urb-card-overlay">
+            <div class="urb-card-overlay__top">
+              <span class="urb-card-overlay__badge">{{ item.badge or 'Comum' }}</span>
+            </div>
 
-                    <div class="urb-card-overlay">
-                      <div class="urb-card-overlay__top">
-                        <span class="urb-card-overlay__badge">{{ item.badge or 'Comum' }}</span>
-                      </div>
+            <div class="urb-card-overlay__bottom">
+              <div class="urb-card-overlay__holder">
+                <span class="urb-card-overlay__label">NOME</span>
+                {{ item.display_name }}
+              </div>
 
-                      <div class="urb-card-overlay__bottom">
-                        <div class="urb-card-overlay__holder">
-                          <span class="urb-card-overlay__label">NOME</span>
-                          {{ item.display_name }}
-                        </div>
-
-                        <div class="urb-card-overlay__meta">
-                          <div>
-                            <span class="urb-card-overlay__label">SALDO</span>
-                            <span class="urb-card-overlay__value" data-card-balance-id="{{ item.id }}"
-                              data-balance-amount="{{ item.balance_value }}">
-                              {{ item.balance }}
-                            </span>
-                          </div>
-                          <div>
-                            <span class="urb-card-overlay__label">CVV</span>
-                            <span class="urb-card-overlay__value">{{ item.cvv or '•••' }}</span>
-                          </div>
-                          <div>
-                            <span class="urb-card-overlay__label">DATA</span>
-                            <span class="urb-card-overlay__value">{{ item.validity or '--/--' }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div class="urb-card-overlay__meta">
+                <div>
+                  <span class="urb-card-overlay__label">SALDO</span>
+                  <span class="urb-card-overlay__value" data-card-balance-id="{{ item.id }}"
+                    data-balance-amount="{{ item.balance_value }}">
+                    {{ item.balance }}
+                  </span>
                 </div>
+                <div>
+                  <span class="urb-card-overlay__label">CVV</span>
+                  <span class="urb-card-overlay__value">{{ item.cvv or '•••' }}</span>
+                </div>
+                <div>
+                  <span class="urb-card-overlay__label">DATA</span>
+                  <span class="urb-card-overlay__value">{{ item.validity or '--/--' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <article class="my-card-empty">
+      <strong>Nenhum cartão vinculado</strong>
+      <p>Quando houver mais de um cartão associado ao usuário, eles serão exibidos aqui automaticamente.</p>
+    </article>
+    {% endfor %}
+  </div>
+
+  <!-- Botão Próximo -->
+  <button type="button" class="urb-carousel-btn next" id="cardsCarouselNext" aria-label="Próximo cartão">›</button>
+</div>
               </article>
               {% else %}
               <article class="my-card-empty">
@@ -480,10 +517,12 @@
               {% endfor %}
             </div>
 
-            <button type="button" class="urb-carousel-btn next" id="cardsCarouselNext" aria-label="Próximo cartão">›</button>
+            <button type="button" class="urb-carousel-btn next" id="cardsCarouselNext"
+              aria-label="Próximo cartão">›</button>
           </div>
         </section>
       </section>
+      #}
 
       <section class="urb-panel urb-workspace__panel" data-dashboard-panel="services" hidden>
         <div class="urb-panel__head">
@@ -2319,7 +2358,7 @@
                 {% if primary_card %}
                 <div class="urb-virtual-card">
                   <div class="urb-virtual-card__top">
-                    
+
                     <div class="urb-virtual-card__media">
                       <img
                         src="{{ url_for('static', path='imgs/' ~ (primary_card.card_model or primary_card.modelo or 'cartao-verde.png')) }}"
@@ -2513,7 +2552,7 @@
         <p>Abra o codigo somente quando for usar. Se precisar, gere um novo token ou acompanhe a simulacao de
           leitura.</p>
 
-<div class="urb-qr-modal__stats">
+        <div class="urb-qr-modal__stats">
           <div>
             <span>Passagem</span>
             <strong>{{ passage_value }}</strong>
@@ -2546,7 +2585,7 @@
 <div class="urb-modal" id="modalNewCard" aria-hidden="true">
   <div class="urb-modal__overlay" data-modal-close></div>
   <div class="urb-modal__content">
-    
+
     <div class="urb-modal__header">
       <div class="urb-modal__title-group">
         <h3>Solicitar Novo Cartão</h3>
@@ -2556,12 +2595,12 @@
     </div>
 
     <form class="urb-modal__body" id="formNewCard" action="/dashboard/cards/new" method="post">
-      
+
       <!-- Seleção Visual do Modelo de Cartão -->
       <div class="urb-form-group">
         <label class="urb-form-label">Selecione o Modelo</label>
         <div class="urb-card-picker">
-          
+
           <label class="urb-card-picker__item">
             <input type="radio" name="card_model" value="comum" checked>
             <div class="urb-card-picker__card">

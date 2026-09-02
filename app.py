@@ -1451,7 +1451,9 @@ def build_dashboard_context(
     qr_token: str | None = None,
 ) -> dict:
     cards = get_user_cards(db, user.id_usuario)
-    card = cards[-1] if cards else user.cartao
+    
+    # FIX 1: Pega o cartão mais recente (cards[0]) em vez do mais antigo (cards[-1])
+    card = cards[0] if cards else user.cartao
 
     dashboard_cards = build_dashboard_cards(user, cards)
     if not dashboard_cards and card:
@@ -1501,7 +1503,7 @@ def build_dashboard_context(
         "profile_identity": profile_identity,
         "primary_card": primary_card,
         "card_preview": card,
-        "my_cards": dashboard_cards,
+        "my_cards": dashboard_cards, # Recebe todos os cartões cadastrados
         "service_menu": build_dashboard_services(active_service_key),
         "request_items": request_items,
         "common_support_cases": build_common_support_cases(),
@@ -1524,7 +1526,6 @@ def build_dashboard_context(
         "qr_issued_at": issued_iso,
         "qr_validity_minutes": QR_TOKEN_MAX_AGE_SECONDS // 60,
     }
-
 
 def build_history_context(request: Request, db: Session, user: Usuario) -> dict:
     card = user.cartao
