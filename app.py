@@ -2135,3 +2135,51 @@ if __name__ == "__main__":
     }
 
     uvicorn.run("app:app", host=host, port=port, reload=reload)
+
+
+    # ... (suas rotas e códigos anteriores do FastAPI) ...
+
+
+# ROTA: Emissão de Novo Cartão UrbPay
+@app.post("/dashboard/cards/new")
+async def create_new_card(
+    request: Request,
+    card_model: str = Form(...),
+    reason: str = Form(...)
+):
+    # Mapeamento do modelo para imagem e título
+    model_images = {
+        "comum": "cartao-verde.png",
+        "estudante": "cartao-estudante.png",
+        "trabalhador": "cartao-trabalhador.png"
+    }
+
+    model_names = {
+        "comum": "UrbPay Comum",
+        "estudante": "UrbPay Estudante",
+        "trabalhador": "UrbPay Vale-Transporte"
+    }
+
+    # Objeto do novo cartão
+    new_card = {
+        "id": 99,  # Substitua pela lógica de ID do banco
+        "service_key": card_model,
+        "display_name": model_names.get(card_model, "UrbPay Comum"),
+        "modelo": model_images.get(card_model, "cartao-verde.png"),
+        "badge": card_model.capitalize(),
+        "balance": "R$ 0,00",
+        "balance_value": 0.0,
+        "cvv": "123",
+        "validity": "08/30"
+    }
+
+    # Insira o 'new_card' na sua lista de cartões ou no banco de dados aqui
+
+    # Redireciona o usuário para o dashboard atualizado
+    return RedirectResponse(url="/dashboard", status_code=303)
+
+
+# Se houver inicialização do uvicorn no final do arquivo, mantenha-a por último:
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

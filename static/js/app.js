@@ -2393,4 +2393,158 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    const lockBtn = document.getElementById('btn-toggle-lock-card');
+    const lockLabel = document.getElementById('label-lock-card');
+    const cardStatus = document.querySelector('.card-display-box__status');
+    const cardImg = document.querySelector('.virtual-card-wrapper__img');
+
+    if (lockBtn) {
+        let isLocked = false;
+
+        lockBtn.addEventListener('click', () => {
+            isLocked = !isLocked;
+
+            if (isLocked) {
+                // Estado: Bloqueado
+                lockLabel.innerText = "Desbloquear";
+                if (cardStatus) {
+                    cardStatus.innerText = "● Bloqueado";
+                    cardStatus.style.color = "#e53e3e"; // Cor vermelha
+                }
+                if (cardImg) {
+                    cardImg.style.filter = "grayscale(100%) opacity(0.6)"; // Efeito visual de bloqueado
+                }
+                alert("Cartão UrbPay bloqueado temporariamente com sucesso!");
+            } else {
+                // Estado: Ativo
+                lockLabel.innerText = "Bloquear";
+                if (cardStatus) {
+                    cardStatus.innerText = "● Ativo";
+                    cardStatus.style.color = "#38a169"; // Cor verde
+                }
+                if (cardImg) {
+                    cardImg.style.filter = "none";
+                }
+                alert("Cartão UrbPay reativado com sucesso!");
+            }
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const cardModal = document.getElementById('modalNewCard');
+  
+  // Seleciona o botão por qualquer um dos dois atributos possíveis
+  const triggerBtns = document.querySelectorAll('[data-open-card-modal], [data-dashboard-view="new-card"]');
+  const closeBtns = cardModal?.querySelectorAll('[data-modal-close]');
+  const formNewCard = document.getElementById('formNewCard');
+
+  // Abrir Modal
+  triggerBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (cardModal) {
+        cardModal.classList.add('is-open');
+        cardModal.setAttribute('aria-hidden', 'false');
+      }
+    });
+  });
+
+  // Fechar Modal (botão X, botão Cancelar e overlay)
+  closeBtns?.forEach(btn => {
+    btn.addEventListener('click', () => {
+      cardModal.classList.remove('is-open');
+      cardModal.setAttribute('aria-hidden', 'true');
+    });
+  });
+
+  if (formNewCard) {
+    formNewCard.addEventListener('submit', () => {
+      e.preventDefault();
+      alert('Solicitação enviada com sucesso!');
+      cardModal.classList.remove('is-open');
+      formNewCard.reset();
+    });
+  }
+  // Envio do Formulário
+  if (formNewCard) {
+    formNewCard.addEventListener('submit', (e) => {
+      
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // 1. NAVEGAÇÃO ENTRE PAINÉIS / TELAS (SIDEBAR E NAVEGAÇÃO)
+  const navLinks = document.querySelectorAll('[data-dashboard-view]');
+  const panels = document.querySelectorAll('[data-dashboard-panel]');
+
+  if (navLinks.length > 0 && panels.length > 0) {
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const viewTarget = link.getAttribute('data-dashboard-view');
+        
+        // Se não for um link comum de redirecionamento HTTP
+        if (viewTarget && viewTarget !== 'new-card') {
+          e.preventDefault();
+
+          // Atualiza o estado ativo nos botões do menu
+          navLinks.forEach(l => l.classList.remove('is-active'));
+          link.classList.add('is-active');
+
+          // Alterna a exibição dos painéis do dashboard
+          panels.forEach(panel => {
+            if (panel.getAttribute('data-dashboard-panel') === viewTarget) {
+              panel.removeAttribute('hidden');
+            } else {
+              panel.setAttribute('hidden', '');
+            }
+          });
+        }
+      });
+    });
+  }
+
+  // 2. MODAL DE SOLICITAR NOVO CARTÃO
+  const cardModal = document.getElementById('modalNewCard');
+  const triggerBtns = document.querySelectorAll('[data-open-card-modal], [data-dashboard-view="new-card"]');
+  const closeBtns = cardModal?.querySelectorAll('[data-modal-close]');
+
+  triggerBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (cardModal) {
+        cardModal.classList.add('is-open');
+        cardModal.setAttribute('aria-hidden', 'false');
+      }
+    });
+  });
+
+  closeBtns?.forEach(btn => {
+    btn.addEventListener('click', () => {
+      cardModal?.classList.remove('is-open');
+      cardModal?.setAttribute('aria-hidden', 'true');
+    });
+  });
+
+  // 3. NAVEGAÇÃO DO CARROSSEL DE CARTÕES
+  const track = document.getElementById('cardsCarouselTrack');
+  const prevBtn = document.getElementById('cardsCarouselPrev');
+  const nextBtn = document.getElementById('cardsCarouselNext');
+
+  if (track) {
+    nextBtn?.addEventListener('click', () => {
+      track.scrollBy({ left: track.offsetWidth, behavior: 'smooth' });
+    });
+
+    prevBtn?.addEventListener('click', () => {
+      track.scrollBy({ left: -track.offsetWidth, behavior: 'smooth' });
+    });
+  }
+
+});
+
+
 
