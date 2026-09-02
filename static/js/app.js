@@ -2267,6 +2267,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeUrbModal();
     }
   });
+});
 
 function mostrarAba(id, botao) {
 
