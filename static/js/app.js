@@ -2210,47 +2210,64 @@ setupModal(
 
 
 // Função para abrir o modal
+// ==========================================
+// 1. GERENCIAMENTO DE MODAL (Configurações)
+// ==========================================
 function openUrbModal() {
   const modal = document.getElementById('settings-modal');
   if (modal) {
     modal.removeAttribute('hidden');
     modal.style.setProperty('display', 'flex', 'important');
-    document.body.style.overflow = 'hidden'; // Bloqueia a rolagem do fundo
+    document.body.style.overflow = 'hidden';
   }
 }
 
-// Função para fechar o modal
 function closeUrbModal() {
   const modal = document.getElementById('settings-modal');
   if (modal) {
     modal.setAttribute('hidden', 'true');
     modal.style.setProperty('display', 'none', 'important');
-    document.body.style.overflow = ''; // Libera a rolagem do fundo
+    document.body.style.overflow = '';
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const modal = document.getElementById('settings-modal');
+// ==========================================
+// 2. FILTRO DE LINHAS DE ÔNIBUS
+// ==========================================
+function filterBuses() {
+  const input = document.getElementById('bus-search-input');
+  if (!input) return;
+  
+  const filter = input.value.toLowerCase();
+  const ul = document.getElementById('bus-list');
+  if (!ul) return;
+  
+  const li = ul.getElementsByTagName('li');
 
-  // Fechar ao clicar no fundo escurecido (fora da caixa branca)
+  for (let i = 0; i < li.length; i++) {
+    const text = li[i].textContent || li[i].innerText;
+    li[i].style.display = text.toLowerCase().includes(filter) ? "" : "none";
+  }
+}
+
+// ==========================================
+// 3. EVENTOS AO CARREGAR O DOM
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Modal: Fechamento por clique fora ou ESC
+  const modal = document.getElementById('settings-modal');
   if (modal) {
     modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        closeUrbModal();
-      }
+      if (e.target === modal) closeUrbModal();
     });
   }
 
-  // Fechar ao pressionar a tecla ESC
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal && !modal.hasAttribute('hidden')) {
       closeUrbModal();
     }
   });
 });
-
-
-
 
 function mostrarAba(id, botao) {
 
@@ -2383,7 +2400,6 @@ document.addEventListener('DOMContentLoaded', () => {
       menu.classList.toggle('is-active');
     });
 
-    // Fecha o menu automaticamente quando o usuário clica em um link
     document.querySelectorAll('.site-menu__link').forEach(link => {
       link.addEventListener('click', () => {
         menu.classList.remove('is-active');
@@ -2392,6 +2408,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+document.addEventListener("click", function (e) {
+  const eyeBtn = e.target.closest("#toggle-card-data");
+  if (!eyeBtn) return;
 
 document.addEventListener('DOMContentLoaded', () => {
     const lockBtn = document.getElementById('btn-toggle-lock-card');
@@ -2528,3 +2547,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+  e.preventDefault();
+
+  const num = document.getElementById("card-number");
+  const cvv = document.getElementById("card-cvv");
+  const val = document.getElementById("card-validity");
+
+  if (!num || !cvv || !val) return;
+
+  const isMasked = num.textContent.trim().includes("•");
+
+  num.textContent = isMasked ? num.dataset.full : num.dataset.masked;
+  cvv.textContent = isMasked ? cvv.dataset.full : cvv.dataset.masked;
+  val.textContent = isMasked ? val.dataset.full : val.dataset.masked;
+});
+                        

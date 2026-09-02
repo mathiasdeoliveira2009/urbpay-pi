@@ -17,7 +17,7 @@ import qrcode
 from dotenv import load_dotenv
 from fastapi import Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
@@ -1584,6 +1584,11 @@ async def home(request: Request, status: str | None = None, db: Session = Depend
     if user:
         return RedirectResponse(url="/dashboard", status_code=303)
     return templates.TemplateResponse("index.html", build_landing_context(request, status=status))
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> FileResponse:
+    return FileResponse(BASE_DIR / "static" / "imgs" / "logo_urbpay.png")
 
 
 @app.post("/signup")

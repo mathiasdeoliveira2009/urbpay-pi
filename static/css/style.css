@@ -5415,6 +5415,15 @@ html[data-theme="dark"] .common-support-message--agent {
   color: #a13f31;
 }
 
+/* Exemplo para o container principal da dashboard */
+.dashboard-grid {
+    display: grid;
+    /* Coluna esquerda (cartão) com largura definida e coluna direita expansível */
+    grid-template-columns: 320px 1fr; 
+    gap: 1.25rem !important; /* Aproxima os blocos na horizontal */
+    align-items: start; /* Impede que os blocos estiquem verticalmente */
+}
+
 @media (max-width: 1180px) {
   .qr-landing,
   .dashboard-hub,
@@ -9404,18 +9413,17 @@ html[data-theme="dark"] .urb-empty-state {
 }
 
 .card-display-box__eye-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #333;
-  padding: 4px;
-  display: flex;
-  align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 20;
 }
 
 .card-display-box__eye-btn svg {
-  width: 22px;
-  height: 22px;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
 }
 
 /* Área Central do Cartão (Flex para centralizar e expandir) */
@@ -9428,61 +9436,62 @@ html[data-theme="dark"] .urb-empty-state {
 }
 
 /* Estrutura do Cartão em Si (Aumentando largura e altura) */
+/* Container pai do cartão */
 .virtual-card-wrapper {
-  position: relative !important;
-  width: 100% !important;
-  max-width: 240px !important; /* Ajustado de 260px para 240px */
-  height: 380px !important;    /* Proporção ideal para não achatar */
-  border-radius: 20px !important;
-  overflow: hidden !important;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12) !important;
+    position: relative;
+    width: 100%;
 }
 
 .virtual-card-wrapper__img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: fill !important; /* Força a imagem a esticar na altura toda */
-  display: block !important;
+    width: 100%;
+    display: block;
+    border-radius: 16px;
 }
 
-/* Dados posicionados sobre a imagem */
+/* Camada de Texto Sobreposta ao Cartão */
 .virtual-card-wrapper__info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 1.25rem 1rem;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    z-index: 10;
 }
 
+/* Grupos internos de texto */
 .virtual-card-wrapper__group {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
 }
 
+/* Rótulos (NOME, NÚMERO, CVV, DATA) */
 .virtual-card-wrapper__label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #1b4332;
-  letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
+    text-transform: uppercase;
 }
 
+/* Valores impressos */
 .virtual-card-wrapper__value {
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #0f281e;
-  letter-spacing: 0.5px;
+    color: #FFFFFF !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
 }
 
+/* Grid com Número, CVV e Data */
 .virtual-card-wrapper__grid {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr;
-  gap: 0.4rem;
-  align-items: flex-end;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    align-items: flex-end;
 }
 
 /* Rodapé do Container */
@@ -9767,6 +9776,7 @@ html[data-theme="dark"] .urb-empty-state {
   }
 }
 
+<<<<<<< HEAD
 
 /* Força a cor branca em todos os rótulos e valores dentro do cartão */
 .virtual-card-wrapper__info .virtual-card-wrapper__label {
@@ -10110,6 +10120,397 @@ html[data-theme="dark"] .urb-empty-state {
 .urb-card-slide {
   flex: 0 0 auto; /* Impede que os cartões encolham */
   scroll-snap-align: center;
+=======
+/* ============================================================
+   1. ESTILOS DO CARTÃO DA TELA INICIAL (.virtual-card-wrapper)
+   ============================================================ */
+.virtual-card-wrapper__info .virtual-card-wrapper__label {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
+}
+
+.virtual-card-wrapper__info .virtual-card-wrapper__value {
+    color: #FFFFFF !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+}
+
+
+/* ============================================================
+   2. ESTILOS DO CARTÃO DA ABA MEU CARTÃO (.urb-card-overlay)
+   ============================================================ */
+.urb-card-overlay {
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Rótulos (NOME, SALDO, CVV, DATA) */
+.urb-card-overlay .urb-card-overlay__label {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Informações e valores em branco com sombra */
+.urb-card-overlay,
+.urb-card-overlay__holder,
+.urb-card-overlay__value,
+.urb-card-overlay__badge {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Estrutura do rodapé e limitação de estouro do CVV */
+.urb-card-overlay__holder {
+    text-align: left;
+    margin-bottom: 0.75rem;
+    word-break: break-word;
+}
+
+.urb-card-overlay__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 0.25rem;
+    width: 100%;
+}
+
+.urb-card-overlay__meta > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.urb-card-overlay__value {
+    font-size: 0.75rem !important;
+}
+
+/* Trata textos longos ou IDs exibidos incorretamente no CVV */
+.urb-card-overlay__meta > div:nth-child(2) .urb-card-overlay__value {
+    max-width: 45px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* Container Externo da Caixa */
+.card-display-box {
+    max-width: 320px;
+    padding: 1.25rem;
+    box-sizing: border-box;
+}
+
+.card-display-box__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-display-box__eye-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    padding: 4px;
+}
+
+/* Trava de Dimensão do Cartão Virtual */
+.virtual-card-wrapper {
+    position: relative;
+    width: 230px; /* Controla a largura total */
+    height: 360px; /* Controla a altura total */
+    margin: 0 auto;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.virtual-card-wrapper__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Camada de Dados por cima */
+.virtual-card-wrapper__info {
+    position: absolute;
+    inset: 0;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+.virtual-card-wrapper__name {
+    color: #FFFFFF !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.virtual-card-wrapper__grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.virtual-card-wrapper__group {
+    display: flex;
+    flex-direction: column;
+}
+
+.virtual-card-wrapper__label {
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-size: 0.55rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.virtual-card-wrapper__value {
+    color: #FFFFFF !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Substitua as regras do container principal por estas */
+.dashboard-grid {
+    display: flex !important;
+    justify-content: flex-start !important; /* Encosta os blocos na esquerda */
+    align-items: flex-start !important;
+    gap: 1.25rem !important; /* Controla o espaçamento exato entre eles */
+    width: 100%;
+}
+
+.dashboard-grid > *:first-child {
+    flex: 0 0 280px !important; /* Trava a largura da coluna do cartão */
+    max-width: 280px !important;
+}
+
+.dashboard-grid > *:last-child {
+    flex: 1 !important; /* Faz o bloco de saldo/linhas preencher o resto */
+}
+
+/* Força o layout da grade principal */
+.urb-main-grid {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* Força a largura da coluna do cartão */
+.urb-main-grid > div:first-child,
+.urb-main-grid .card-display-box {
+  flex: 0 0 500px !important;
+  width: 500px !important;
+  max-width: 500px !important;
+  height: 100% !important;
+}
+
+/* Força a coluna da direita a ocupar o resto do espaço */
+.urb-right-column {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+/* Força o alinhamento da grade principal para esticar os itens */
+.urb-main-grid {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+/* Força a caixa externa do cartão a ocupar toda a altura da coluna */
+.card-display-box {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+/* Centraliza a imagem do cartão no espaço que vai sobrar no meio */
+.card-display-box__body {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+
+
+/* Força o container pai e as duas colunas a terem a mesma altura */
+.urb-main-grid {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.urb-main-grid > article,
+.urb-main-grid > div,
+.card-display-box {
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Força a coluna da direita a esticar e preencher a altura até o fim */
+.urb-right-column {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+}
+
+/* Faz o bloco de 'Linhas Próximas' crescer para alinhar o fundo com o cartão */
+.urb-card--bus-list {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+/* Settings modal: larger desktop viewport with UrbPay scrollbar. */
+#settings-modal.urb-modal-overlay {
+  padding: 16px !important;
+}
+
+#settings-modal .urb-modal-container {
+  box-sizing: border-box !important;
+  width: min(1240px, calc(100vw - 32px)) !important;
+  max-width: none !important;
+  height: calc(100vh - 32px) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 32px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 22px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #2f8541 rgba(46, 128, 63, 0.12) !important;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar-track {
+  background: rgba(46, 128, 63, 0.1);
+  border-radius: 999px;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar-thumb {
+  background: #2f8541;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+}
+
+#settings-modal .urb-modal-container::-webkit-scrollbar-thumb:hover {
+  background: #26703d;
+}
+
+#settings-modal .urb-settings-surface {
+  box-sizing: border-box !important;
+  gap: 14px !important;
+  min-height: calc(100vh - 76px) !important;
+  padding: 22px !important;
+}
+
+#settings-modal .urb-settings-surface__head h2 {
+  font-size: 1.55rem !important;
+  line-height: 1.1 !important;
+}
+
+#settings-modal .urb-settings-tabs {
+  gap: 2px 16px !important;
+}
+
+#settings-modal .urb-settings-tab {
+  min-height: 44px !important;
+  font-size: 0.94rem !important;
+}
+
+#settings-modal .urb-settings-layout {
+  grid-template-columns: minmax(0, 1.75fr) minmax(260px, 0.7fr) !important;
+  gap: 16px !important;
+}
+
+#settings-modal .urb-settings-content,
+#settings-modal .urb-settings-sidebar,
+#settings-modal .urb-settings-group {
+  gap: 14px !important;
+}
+
+#settings-modal .urb-settings-card,
+#settings-modal .urb-settings-sidecard {
+  padding: 16px 18px !important;
+}
+
+#settings-modal .urb-settings-card__head {
+  margin-bottom: 12px !important;
+}
+
+#settings-modal .urb-settings-card__head p,
+#settings-modal .urb-settings-row__copy p,
+#settings-modal .urb-settings-side-note p,
+#settings-modal .urb-settings-checklist__item p {
+  line-height: 1.45 !important;
+}
+
+#settings-modal .urb-settings-row {
+  gap: 14px !important;
+  padding: 12px 0 !important;
+}
+
+#settings-modal .urb-settings-row__copy {
+  gap: 4px !important;
+}
+
+#settings-modal .urb-settings-surface .urb-virtual-card {
+  width: 100% !important;
+  max-width: 230px !important;
+  height: 350px !important;
+  margin: 0 auto !important;
+}
+
+#settings-modal .urb-settings-surface .urb-virtual-card__media {
+  margin-bottom: 10px !important;
+}
+
+@media (max-width: 900px) {
+  #settings-modal .urb-modal-container {
+    overflow-y: auto !important;
+  }
+
+  #settings-modal .urb-settings-surface {
+    min-height: auto !important;
+  }
+
+  #settings-modal .urb-settings-layout {
+    grid-template-columns: 1fr !important;
+  }
+>>>>>>> d5b357a1a2be151451f5ce35c864656c255b5814
 }
 
 
