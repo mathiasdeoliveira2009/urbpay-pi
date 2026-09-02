@@ -9250,8 +9250,8 @@ html[data-theme="dark"] .urb-empty-state {
 /* Lista */
 .urb-bus-items {
   flex: 1;
-  max-height: 230px; /* Ajustado proporcionalmente */
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 .urb-bus-item {
@@ -10164,6 +10164,354 @@ html[data-theme="dark"] .urb-empty-state {
 
   #settings-modal .urb-settings-layout {
     grid-template-columns: 1fr !important;
+  }
+}
+
+/* Dark theme overrides for the dashboard and settings modal. */
+html[data-theme="dark"] .urb-modal-container {
+  background: rgba(12, 21, 17, 0.98) !important;
+  border: 1px solid rgba(159, 212, 189, 0.16) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45) !important;
+}
+
+html[data-theme="dark"] .urb-modal-close {
+  background: #1b2a23 !important;
+  color: #dff3e6 !important;
+  border: 1px solid rgba(159, 212, 189, 0.18) !important;
+}
+
+html[data-theme="dark"] .urb-modal-close:hover {
+  background: #284034 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .urb-settings-surface,
+html[data-theme="dark"] .urb-settings-card,
+html[data-theme="dark"] .urb-settings-sidecard,
+html[data-theme="dark"] .urb-settings-preview {
+  background: rgba(18, 30, 24, 0.98) !important;
+  border-color: rgba(159, 212, 189, 0.14) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .urb-settings-tab {
+  color: #9eb0a8;
+}
+
+html[data-theme="dark"] .urb-settings-tab:hover,
+html[data-theme="dark"] .urb-settings-tab.is-active {
+  color: #9fd4bd;
+}
+
+html[data-theme="dark"] .urb-settings-inline-field,
+html[data-theme="dark"] .urb-settings-block--separated,
+html[data-theme="dark"] .urb-settings-row {
+  border-color: rgba(159, 212, 189, 0.12) !important;
+}
+
+html[data-theme="dark"] .urb-card,
+html[data-theme="dark"] .card-display-box,
+html[data-theme="dark"] .urb-card--compact-balance,
+html[data-theme="dark"] .urb-card--bus-list {
+  background: rgba(18, 30, 24, 0.96) !important;
+  border-color: rgba(159, 212, 189, 0.14) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22) !important;
+  color: var(--text) !important;
+}
+
+html[data-theme="dark"] .urb-balance-top h2,
+html[data-theme="dark"] .urb-bus-details strong {
+  color: #edf6f0;
+}
+
+html[data-theme="dark"] .urb-btn--outline {
+  background: #1d2b25;
+  color: #d7e7dc;
+  border: 1px solid rgba(159, 212, 189, 0.14);
+}
+
+html[data-theme="dark"] .urb-btn--outline:hover,
+html[data-theme="dark"] .urb-bus-item:hover {
+  background: #263a2f;
+}
+
+html[data-theme="dark"] .urb-btn-eye {
+  color: #a8bbb1;
+}
+
+html[data-theme="dark"] .urb-badge-pulse {
+  background: rgba(34, 91, 52, 0.62);
+  color: #9fd4bd;
+}
+
+html[data-theme="dark"] .urb-search-box input {
+  background: #17251f;
+  border-color: rgba(159, 212, 189, 0.2);
+  color: #edf6f0;
+}
+
+html[data-theme="dark"] .urb-search-box input::placeholder {
+  color: #8fa69a;
+}
+
+html[data-theme="dark"] .urb-bus-item {
+  background: #17251f;
+  border-color: rgba(159, 212, 189, 0.08);
+}
+
+html[data-theme="dark"] .urb-bus-details small,
+html[data-theme="dark"] .urb-bus-time,
+html[data-theme="dark"] .urb-label {
+  color: #a8bbb1;
+}
+
+html[data-theme="dark"] #settings-modal .urb-modal-container::-webkit-scrollbar-thumb {
+  border-color: #0c1511;
+}
+
+[data-dashboard-home-section][hidden] {
+  display: none !important;
+}
+
+/* Locate map panel. */
+.urb-quick-action--locate .urb-quick-action__icon {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0f8bb8;
+}
+
+.urb-locate-panel {
+  overflow: hidden;
+}
+
+.urb-locate-shell {
+  display: grid;
+  gap: 16px;
+}
+
+.urb-locate-toolbar,
+.urb-locate-search,
+.urb-locate-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.urb-locate-toolbar {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 14px;
+  border: 1px solid rgba(43, 72, 60, 0.1);
+  border-radius: 16px;
+  background: rgba(246, 250, 247, 0.86);
+}
+
+.urb-locate-search {
+  flex: 1 1 520px;
+}
+
+.urb-locate-search input {
+  min-width: 240px;
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(43, 72, 60, 0.14);
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1b2f25;
+  font: inherit;
+  outline: none;
+}
+
+.urb-locate-search input:focus {
+  border-color: #2f8541;
+  box-shadow: 0 0 0 3px rgba(47, 133, 65, 0.12);
+}
+
+.urb-locate-legend {
+  color: #53665b;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.urb-locate-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+.urb-locate-dot--user {
+  background: #2563eb;
+}
+
+.urb-locate-dot--bus {
+  background: #16a34a;
+}
+
+.urb-locate-dot--train {
+  background: #7c3aed;
+}
+
+.urb-locate-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 16px;
+  min-height: 560px;
+}
+
+.urb-locate-map {
+  min-height: 560px;
+  border: 1px solid rgba(43, 72, 60, 0.12);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #eaf4ed;
+}
+
+.urb-locate-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(43, 72, 60, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.urb-locate-side h3 {
+  margin: 6px 0;
+  font-family: "Sora", sans-serif;
+  font-size: 1.1rem;
+  color: #183226;
+}
+
+.urb-locate-side p {
+  margin: 0;
+  color: #64756a;
+  line-height: 1.45;
+}
+
+.urb-locate-results {
+  display: grid;
+  gap: 10px;
+}
+
+.urb-locate-result {
+  padding: 12px;
+  border: 1px solid rgba(43, 72, 60, 0.1);
+  border-radius: 14px;
+  background: rgba(246, 250, 247, 0.86);
+}
+
+.urb-locate-result strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #183226;
+}
+
+.urb-locate-result small {
+  display: block;
+  margin-top: 6px;
+  color: #2f8541;
+  font-weight: 700;
+}
+
+.urb-map-marker {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+}
+
+.urb-map-marker svg {
+  width: 19px;
+  height: 19px;
+}
+
+.urb-map-marker--bus {
+  background: #16a34a;
+}
+
+.urb-map-marker--train {
+  background: #7c3aed;
+}
+
+.urb-map-marker--user {
+  width: 24px;
+  height: 24px;
+  background: #2563eb;
+  border: 4px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.22), 0 8px 22px rgba(37, 99, 235, 0.36);
+}
+
+.urb-locate-popup {
+  min-width: 220px;
+}
+
+.urb-locate-popup strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.urb-locate-popup button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: #2f8541;
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .urb-locate-toolbar,
+html[data-theme="dark"] .urb-locate-side,
+html[data-theme="dark"] .urb-locate-result {
+  background: rgba(18, 30, 24, 0.96);
+  border-color: rgba(159, 212, 189, 0.14);
+}
+
+html[data-theme="dark"] .urb-locate-search input {
+  background: #17251f;
+  border-color: rgba(159, 212, 189, 0.2);
+  color: #edf6f0;
+}
+
+html[data-theme="dark"] .urb-locate-legend,
+html[data-theme="dark"] .urb-locate-side p {
+  color: #a8bbb1;
+}
+
+html[data-theme="dark"] .urb-locate-side h3,
+html[data-theme="dark"] .urb-locate-result strong {
+  color: #edf6f0;
+}
+
+@media (max-width: 980px) {
+  .urb-locate-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .urb-locate-map {
+    min-height: 460px;
+  }
+}
+
+@media (max-width: 640px) {
+  .urb-locate-search,
+  .urb-locate-search .urb-btn {
+    width: 100%;
+  }
+
+  .urb-locate-search {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 

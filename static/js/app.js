@@ -33,6 +33,8 @@ const creditSelectedTypes = document.querySelectorAll("[data-credit-selected-cre
 const creditSelectedAmounts = document.querySelectorAll("[data-credit-selected-amount]");
 const currentBalanceDisplays = document.querySelectorAll("[data-current-balance-display]");
 const cardBalanceDisplays = document.querySelectorAll("[data-card-balance-id]");
+const recentTransactions = document.querySelector("[data-recent-transactions]");
+const recentTransactionsFooter = document.querySelector("[data-recent-transactions-footer]");
 const qrSimulatorRoot = document.querySelector("[data-qr-simulator-root]");
 const requestBoard = document.querySelector("[data-request-board]");
 const requestBoardSearchInput = requestBoard?.querySelector("[data-request-search]");
@@ -64,8 +66,17 @@ const commonSupportPlaceholderText = document.querySelector("[data-common-suppor
 const dashboardShortcutButtons = document.querySelectorAll("[data-dashboard-shortcut]");
 const dashboardViewButtons = document.querySelectorAll("[data-dashboard-view]");
 const dashboardPanels = document.querySelectorAll("[data-dashboard-panel]");
+const dashboardHomeSections = document.querySelectorAll("[data-dashboard-home-section]");
 const dashboardPlaceholder = document.querySelector("[data-dashboard-placeholder]");
 const dashboardWorkspace = document.querySelector(".urb-workspace");
+const locateMapElement = document.querySelector("[data-locate-map]");
+const locateStatus = document.querySelector("[data-locate-status]");
+const locateSearchInput = document.querySelector("[data-locate-search]");
+const locateSearchButton = document.querySelector("[data-locate-search-button]");
+const locateCenterUserButton = document.querySelector("[data-locate-center-user]");
+const locateTitle = document.querySelector("[data-locate-title]");
+const locateDescription = document.querySelector("[data-locate-description]");
+const locateResults = document.querySelector("[data-locate-results]");
 const settingsTabButtons = document.querySelectorAll("[data-settings-tab]");
 const settingsSections = document.querySelectorAll("[data-settings-section]");
 const settingsOpenTabButtons = document.querySelectorAll("[data-settings-open-tab]");
@@ -582,6 +593,10 @@ const setDashboardView = (viewName, { scrollIntoView = true } = {}) => {
     panel.hidden = panel.dataset.dashboardPanel !== normalizedView;
   });
 
+  dashboardHomeSections.forEach((section) => {
+    section.hidden = normalizedView !== "home";
+  });
+
   if (dashboardPlaceholder) {
     dashboardPlaceholder.hidden = normalizedView !== "home";
   }
@@ -591,6 +606,288 @@ const setDashboardView = (viewName, { scrollIntoView = true } = {}) => {
   if (scrollIntoView && normalizedView !== "home" && dashboardWorkspace) {
     dashboardWorkspace.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  if (normalizedView === "locate") {
+    window.setTimeout(() => {
+      initializeLocateMap();
+    }, 50);
+  }
+};
+
+const locateState = {
+  initialized: false,
+  map: null,
+  userMarker: null,
+  userLatLng: null,
+  locationRequested: false,
+  busLayer: null,
+  trainLayer: null,
+  moveTimeoutId: null,
+};
+
+const setLocateStatus = (message, isError = false) => {
+  if (!locateStatus) {
+    return;
+  }
+
+  locateStatus.textContent = message;
+  locateStatus.classList.toggle("is-error", isError);
+};
+
+const setLocateDetails = (title, description, rows = []) => {
+  if (locateTitle) {
+    locateTitle.textContent = title;
+  }
+
+  if (locateDescription) {
+    locateDescription.textContent = description;
+  }
+
+  if (!locateResults) {
+    return;
+  }
+
+  locateResults.innerHTML = rows.length
+    ? rows.map((row) => `
+        <article class="urb-locate-result">
+          <strong>${escapeHtml(row.title)}</strong>
+          <p>${escapeHtml(row.description)}</p>
+          ${row.meta ? `<small>${escapeHtml(row.meta)}</small>` : ""}
+        </article>
+      `).join("")
+    : '<article class="urb-locate-result"><strong>Sem dados</strong><p>Nenhuma previsao disponivel agora.</p></article>';
+};
+
+const createLocateIcon = (type) => {
+  if (type === "user") {
+    return L.divIcon({
+      className: "",
+      html: '<span class="urb-map-marker urb-map-marker--user"></span>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -14],
+    });
+  }
+
+  const path = type === "train"
+    ? '<path d="M6 4.5h12a2 2 0 0 1 2 2v8.5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V6.5a2 2 0 0 1 2-2Z"></path><path d="M8 18l-2 2.5"></path><path d="M16 18l2 2.5"></path><path d="M8 8h8"></path><path d="M8 13h.01"></path><path d="M16 13h.01"></path>'
+    : '<path d="M6 4.5h12a2 2 0 0 1 2 2V16a2 2 0 0 1-2 2h-1l1.5 2"></path><path d="M6 18H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2h1"></path><path d="M7 4.5h10"></path><path d="M7 9h10"></path><path d="M7.5 14h.01"></path><path d="M16.5 14h.01"></path><path d="M5.5 20 7 18"></path>';
+
+  return L.divIcon({
+    className: "",
+    html: `<span class="urb-map-marker urb-map-marker--${type}"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg></span>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+    popupAnchor: [0, -18],
+  });
+};
+
+const locateFetchJson = async (url) => {
+  const response = await window.fetch(url, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.detail || "Nao foi possivel consultar a localizacao agora.");
+  }
+
+  return payload;
+};
+
+const getLocateCenter = () => {
+  if (locateState.map) {
+    const center = locateState.map.getCenter();
+    return [center.lat, center.lng];
+  }
+
+  return locateState.userLatLng || [-23.5505, -46.6333];
+};
+
+const renderLocateStops = async (searchTerm = "") => {
+  if (!locateState.busLayer || !locateState.trainLayer) {
+    return;
+  }
+
+  const [lat, lng] = getLocateCenter();
+  setLocateStatus("Buscando pontos");
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lng: String(lng),
+    q: searchTerm || "",
+  });
+  const payload = await locateFetchJson(`/dashboard/localizar/gtfs/pontos?${params.toString()}`);
+  const stops = Array.isArray(payload.items) ? payload.items : [];
+  locateState.busLayer.clearLayers();
+  locateState.trainLayer.clearLayers();
+
+  stops.forEach((stop) => {
+    const lat = Number(stop.lat);
+    const lng = Number(stop.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return;
+    }
+
+    const markerType = stop.type === "train" ? "train" : "bus";
+    const targetLayer = markerType === "train" ? locateState.trainLayer : locateState.busLayer;
+    L.marker([lat, lng], { icon: createLocateIcon(markerType) })
+      .bindPopup(`
+        <div class="urb-locate-popup">
+          <strong>${escapeHtml(stop.name)}</strong>
+          <span>${escapeHtml(stop.mode_label || "Transporte")}<br>${escapeHtml(stop.address || "Ponto GTFS")}<br>${escapeHtml(stop.distance_km)} km de distancia</span>
+          <button type="button" data-locate-prediction="${escapeHtml(stop.id)}" data-locate-stop-name="${escapeHtml(stop.name)}">Ver proximas chegadas</button>
+        </div>
+      `)
+      .addTo(targetLayer);
+  });
+
+  setLocateDetails(
+    `${stops.length} pontos encontrados`,
+    searchTerm ? `Busca "${searchTerm}" no GTFS local.` : "Pontos mais proximos pela sua localizacao.",
+    stops.slice(0, 5).map((stop) => ({
+      title: stop.name,
+      description: stop.mode_label || "Transporte",
+      meta: `${stop.distance_km} km`,
+    }))
+  );
+  setLocateStatus("GTFS carregado");
+};
+
+const loadLocatePrediction = async (stopCode, stopName) => {
+  setLocateStatus("Consultando horarios");
+  const payload = await locateFetchJson(`/dashboard/localizar/gtfs/previsao/${encodeURIComponent(stopCode)}`);
+  const predictions = Array.isArray(payload.predictions) ? payload.predictions : [];
+  setLocateDetails(
+    stopName || payload.stop?.name || "Parada selecionada",
+    payload.note || "Previsao estimada pela grade GTFS.",
+    predictions.map((item) => ({
+      title: `${item.line} - ${item.destination}`,
+      description: item.type === "bus" ? "Onibus" : "Trilho",
+      meta: `Proxima chegada: ${item.next_arrival} (${item.scheduled_time})`,
+    }))
+  );
+  setLocateStatus("Horarios atualizados");
+};
+
+const upsertLocateUserMarker = (latLng, shouldCenter = false) => {
+  if (!locateState.map || typeof L === "undefined") {
+    return;
+  }
+
+  if (locateState.userMarker) {
+    locateState.userMarker.setLatLng(latLng);
+  } else {
+    locateState.userMarker = L.marker(latLng, { icon: createLocateIcon("user") })
+      .bindPopup("Sua localizacao")
+      .addTo(locateState.map);
+  }
+
+  if (shouldCenter) {
+    locateState.map.setView(latLng, 15);
+  }
+};
+
+const requestLocateUserPosition = ({ recenter = false, refreshStops = false } = {}) => {
+  const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  if (!window.isSecureContext && !isLocalhost) {
+    setLocateStatus("Use HTTPS para liberar GPS", true);
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    setLocateStatus("GPS indisponivel", true);
+    return;
+  }
+
+  locateState.locationRequested = true;
+  setLocateStatus("Localizando voce");
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const latLng = [position.coords.latitude, position.coords.longitude];
+      locateState.userLatLng = latLng;
+      upsertLocateUserMarker(latLng, recenter);
+
+      setLocateStatus("GPS ativo");
+      if (!refreshStops) {
+        return;
+      }
+
+      renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+        console.error(error);
+        setLocateStatus(error.message, true);
+      });
+    },
+    () => {
+      setLocateStatus("Permita a localizacao", true);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 8000,
+      maximumAge: 30000,
+    }
+  );
+};
+
+const centerLocateOnUser = () => {
+  if (locateState.userLatLng) {
+    upsertLocateUserMarker(locateState.userLatLng, true);
+    renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+      console.error(error);
+      setLocateStatus(error.message, true);
+    });
+    return;
+  }
+
+  requestLocateUserPosition({ recenter: true, refreshStops: true });
+};
+
+const initializeLocateMap = () => {
+  if (!locateMapElement || locateState.initialized || typeof L === "undefined") {
+    if (locateState.map) {
+      window.setTimeout(() => locateState.map?.invalidateSize(), 80);
+      centerLocateOnUser();
+    }
+    return;
+  }
+
+  locateState.initialized = true;
+  locateState.map = L.map(locateMapElement, {
+    zoomControl: true,
+    scrollWheelZoom: true,
+  }).setView([-23.5505, -46.6333], 12);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(locateState.map);
+
+  locateState.busLayer = L.layerGroup().addTo(locateState.map);
+  locateState.trainLayer = L.layerGroup().addTo(locateState.map);
+
+  if (locateState.userLatLng) {
+    upsertLocateUserMarker(locateState.userLatLng, true);
+  } else {
+    requestLocateUserPosition({ recenter: true, refreshStops: true });
+  }
+
+  locateState.map.on("moveend", () => {
+    window.clearTimeout(locateState.moveTimeoutId);
+    locateState.moveTimeoutId = window.setTimeout(() => {
+      renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+        console.error(error);
+        setLocateStatus(error.message, true);
+      });
+    }, 250);
+  });
+
+  renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+    console.error(error);
+    setLocateStatus(error.message, true);
+  });
+
+  window.setTimeout(() => locateState.map?.invalidateSize(), 150);
 };
 
 const cloneCommonSupportMessages = (messages) => Array.isArray(messages)
@@ -1158,8 +1455,58 @@ const applyCreditAmount = (amount, activeButton = null, preserveCustomValue = fa
   updateCreditSummary();
 };
 
+const prependRecentRechargeTransaction = (payload) => {
+  if (!recentTransactions) {
+    return;
+  }
+
+  const title = escapeHtml(payload.movement_title || "Recarga via Pix");
+  const location = escapeHtml(payload.movement_location || "Rede UrbPay");
+  const time = escapeHtml(payload.movement_time || dateTimeFormatter.format(new Date()));
+  const amount = escapeHtml(payload.movement_amount || `+ ${currencyFormatter.format(creditState.amount || 0)}`);
+  const emptyState = recentTransactions.querySelector(".urb-empty-state");
+
+  emptyState?.remove();
+  recentTransactions.insertAdjacentHTML(
+    "afterbegin",
+    `
+      <article class="urb-transaction-row">
+        <span class="urb-transaction-row__icon urb-transaction-row__icon--topup">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m7 12 5-5 5 5"></path>
+            <path d="m7 17 5-5 5 5"></path>
+          </svg>
+        </span>
+        <div class="urb-transaction-row__content">
+          <strong>${title}</strong>
+          <p>${location}</p>
+        </div>
+        <span class="urb-transaction-row__time">${time}</span>
+        <strong class="urb-transaction-row__amount urb-transaction-row__amount--positive">${amount}</strong>
+      </article>
+    `
+  );
+
+  const rows = recentTransactions.querySelectorAll(".urb-transaction-row");
+  rows.forEach((row, index) => {
+    if (index >= 4) {
+      row.remove();
+    }
+  });
+
+  if (recentTransactionsFooter) {
+    const visibleCount = recentTransactions.querySelectorAll(".urb-transaction-row").length;
+    const currentTotal = Number.parseInt(recentTransactionsFooter.dataset.movementCount || "0", 10) || 0;
+    const nextTotal = currentTotal + 1;
+    recentTransactionsFooter.dataset.movementCount = String(nextTotal);
+    recentTransactionsFooter.textContent = `Mostrando ${visibleCount} de ${nextTotal} transacoes.`;
+  }
+};
+
 const updateCardBalanceDisplays = (cardId, nextBalance) => {
   const normalizedBalance = Number(nextBalance.toFixed(2));
+  const formattedBalance = currencyFormatter.format(normalizedBalance);
 
   cardBalanceDisplays.forEach((node) => {
     if (node.dataset.cardBalanceId === cardId) {
@@ -1176,7 +1523,11 @@ const updateCardBalanceDisplays = (cardId, nextBalance) => {
 
   currentBalanceDisplays.forEach((node) => {
     if (!node.dataset.currentCardId || node.dataset.currentCardId === cardId) {
-      node.textContent = currencyFormatter.format(normalizedBalance);
+      node.dataset.full = formattedBalance;
+
+      const sensitiveContainer = node.closest("[data-sensitive]");
+      const isMasked = sensitiveContainer && !sensitiveContainer.classList.contains("is-revealed");
+      node.textContent = isMasked && node.dataset.masked ? node.dataset.masked : formattedBalance;
     }
   });
 };
@@ -1289,6 +1640,7 @@ creditConfirmButton?.addEventListener("click", async () => {
 
     creditState.currentBalance = nextBalance;
     updateCardBalanceDisplays(creditState.cardId, nextBalance);
+    prependRecentRechargeTransaction(payload);
     showToolbarToast(`Recarga salva no banco. Saldo atual: ${currencyFormatter.format(nextBalance)}.`);
     clearCreditAmountSelection();
     updateCreditSummary();
@@ -1304,6 +1656,7 @@ creditConfirmButton?.addEventListener("click", async () => {
 });
 
 syncDashboardViewButtons(dashboardState.activeView);
+requestLocateUserPosition();
 
 dashboardViewButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -1354,6 +1707,41 @@ dashboardShortcutButtons.forEach((button) => {
     }
 
     showToolbarToast("Este atalho entra na proxima etapa.");
+  });
+});
+
+locateSearchButton?.addEventListener("click", () => {
+  initializeLocateMap();
+  renderLocateStops(locateSearchInput?.value || "").catch((error) => {
+    console.error(error);
+    setLocateStatus(error.message, true);
+  });
+});
+
+locateSearchInput?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    locateSearchButton?.click();
+  }
+});
+
+locateCenterUserButton?.addEventListener("click", () => {
+  initializeLocateMap();
+  centerLocateOnUser();
+});
+
+document.addEventListener("click", (event) => {
+  const predictionButton = event.target.closest("[data-locate-prediction]");
+  if (!predictionButton) {
+    return;
+  }
+
+  loadLocatePrediction(
+    predictionButton.dataset.locatePrediction,
+    predictionButton.dataset.locateStopName
+  ).catch((error) => {
+    console.error(error);
+    setLocateStatus(error.message, true);
   });
 });
 

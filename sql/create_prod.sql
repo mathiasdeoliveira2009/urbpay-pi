@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS cartao (
     saldo DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     data_validade DATE NOT NULL,
     status ENUM('ATIVO', 'BLOQUEADO', 'EXPIRADO') DEFAULT 'ATIVO',
+    modelo VARCHAR(100) NOT NULL DEFAULT 'cartao-verde.png',
     id_usuario INT NOT NULL,
 
     CONSTRAINT pk_cartao PRIMARY KEY (id_cartao),

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}UrbPay | Painel do Cliente{% endblock %}
 
@@ -56,6 +56,17 @@
             </svg>
           </span>
           <span>Passagem digital</span>
+        </button>
+
+        <button type="button" class="urb-nav-link" data-dashboard-view="locate">
+          <span class="urb-nav-link__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z"></path>
+              <circle cx="12" cy="10" r="2.5"></circle>
+            </svg>
+          </span>
+          <span>Localizar</span>
         </button>
 
         <button type="button" class="urb-nav-link urb-nav-link--button" data-dashboard-view="services"
@@ -158,7 +169,7 @@
       <!-- 1. Estilo do Leaflet (Coloque no topo do bloco) -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-     <section class="urb-main-grid" style="display: flex !important; justify-content: flex-start !important; align-items: stretch !important; gap: 0.75rem !important; width: 100% !important;">
+     <section class="urb-main-grid" data-dashboard-home-section style="display: flex !important; justify-content: flex-start !important; align-items: stretch !important; gap: 0.75rem !important; width: 100% !important;">
 
   <!-- COLUNA ESQUERDA: Envolto em div flexível para forçar altura total de 100% -->
   <div style="flex: 0 0 500px !important; max-width: 500px !important; width: 500px !important; display: flex !important; flex-direction: column !important;">
@@ -239,15 +250,16 @@
   </div>
 
   <!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS (Estruturada para esticar e igualar a altura) -->
-<!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS (Altura total cravada em 490px) -->
-<div class="urb-right-column" style="flex: 1 !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; gap: 0.75rem !important; max-height: 490px !important;">
+<!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS -->
+<div class="urb-right-column" style="flex: 1 !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; gap: 0.75rem !important;">
   
   <!-- BLOCO 1: SALDO -->
   <article class="urb-card urb-card--compact-balance" data-sensitive style="flex: 0 0 auto !important;">
     <div class="urb-balance-top">
       <div>
         <span class="urb-label">Saldo disponível</span>
-        <h2 data-sensitive-value data-masked="R$ ••••" data-full="{{ current_balance }}">{{ current_balance }}</h2>
+        <h2 data-sensitive-value data-current-balance-display data-current-card-id="{{ current_card_id }}"
+          data-masked="R$ ••••" data-full="{{ current_balance }}">{{ current_balance }}</h2>
       </div>
       <button type="button" class="urb-btn-eye" data-sensitive-toggle aria-label="Alternar exibição do saldo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -264,8 +276,8 @@
     </div>
   </article>
 
-  <!-- BLOCO 2: LINHAS PRÓXIMAS (Altura fixa e lista com scroll para não vazar) -->
-  <article class="urb-card urb-card--bus-list" style="height: 300px !important; display: flex !important; flex-direction: column !important; overflow: hidden !important;">
+  <!-- BLOCO 2: LINHAS PRÓXIMAS -->
+  <article class="urb-card urb-card--bus-list" style="display: flex !important; flex-direction: column !important;">
     <div class="urb-bus-header" style="flex: 0 0 auto !important;">
       <div class="urb-bus-title">
         <span class="urb-label">Linhas próximas</span>
@@ -281,7 +293,7 @@
       </div>
     </div>
 
-    <ul class="urb-bus-items" id="bus-list" style="flex: 1 !important; max-height: 200px !important; overflow-y: auto !important;">
+    <ul class="urb-bus-items" id="bus-list">
       {% if bus_lines %}
       {% for bus in bus_lines %}
       <li class="urb-bus-item"
@@ -308,50 +320,7 @@
 
 </div>
 </section>
-      <!-- 2. Script da Biblioteca + Inicialização do Mapa (Logo abaixo da section) -->
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-      <script>
-        document.addEventListener("DOMContentLoaded", function () {
-          const statusBadge = document.getElementById("map-status");
-
-          if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const userLat = position.coords.latitude;
-                const userLng = position.coords.longitude;
-
-                if (statusBadge) statusBadge.innerText = "● Ao vivo";
-
-                const map = L.map("urb-bus-map").setView([userLat, userLng], 15);
-
-                L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-                  maxZoom: 19
-                }).addTo(map);
-
-                L.circleMarker([userLat, userLng], {
-                  color: "#0d6efd",
-                  fillColor: "#0d6efd",
-                  fillOpacity: 0.8,
-                  radius: 7
-                }).addTo(map).bindPopup("Sua localização");
-
-                L.marker([userLat + 0.0018, userLng + 0.0012])
-                  .addTo(map)
-                  .bindPopup("🚌 <b>Linha 063 - Centro</b><br>Chega em 3 min");
-              },
-              (error) => {
-                if (statusBadge) {
-                  statusBadge.innerText = "Sem permissão";
-                  statusBadge.style.color = "#dc2626";
-                }
-                const map = L.map("urb-bus-map").setView([-23.6666, -46.5322], 13);
-                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-              }
-            );
-          }
-        });
-      </script>
-      <section class="urb-panel urb-quick-panel">
+      <section class="urb-panel urb-quick-panel" data-dashboard-home-section>
 
         <div class="urb-quick-actions">
           <button type="button" class="urb-quick-action" data-dashboard-view="services"
@@ -383,18 +352,6 @@
             <span>Gerar passagem</span>
           </button>
 
-          <button type="button" class="urb-quick-action" data-dashboard-view="cards">
-            <span class="urb-quick-action__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="5" width="18" height="14" rx="2.5"></rect>
-                <path d="M3 10h18"></path>
-                <path d="M7 15h4"></path>
-              </svg>
-            </span>
-            <span>Meus cartoes</span>
-          </button>
-
           <a href="/dashboard/extrato" class="urb-quick-action">
             <span class="urb-quick-action__icon">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -420,6 +377,17 @@
             <span>Cobrar alguem</span>
           </button>
 
+          <button type="button" class="urb-quick-action urb-quick-action--locate" data-dashboard-view="locate">
+            <span class="urb-quick-action__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z"></path>
+                <circle cx="12" cy="10" r="2.5"></circle>
+              </svg>
+            </span>
+            <span>LOCALIZAR</span>
+          </button>
+
           <button type="button" class="urb-quick-action" onclick="openUrbModal()">
             <span class="urb-quick-action__icon">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -435,7 +403,7 @@
         </div>
       </section>
 
-      <section class="urb-panel" id="transacoes">
+      <section class="urb-panel" id="transacoes" data-dashboard-home-section>
         <div class="urb-panel__head urb-panel__head--inline">
           <div>
             <h2>Transacoes recentes</h2>
@@ -444,7 +412,7 @@
           <a href="/dashboard/extrato" class="urb-inline-link">Ver todas</a>
         </div>
 
-        <div class="urb-transactions">
+        <div class="urb-transactions" data-recent-transactions>
           {% for item in recent_movements[:4] %}
           <article class="urb-transaction-row">
             <span
@@ -491,7 +459,7 @@
           {% endfor %}
         </div>
 
-        <p class="urb-panel__footer">Mostrando {{ recent_movements[:4] | length }} de {{ movement_count }} transacoes.
+        <p class="urb-panel__footer" data-recent-transactions-footer data-movement-count="{{ movement_count }}">Mostrando {{ recent_movements[:4] | length }} de {{ movement_count }} transacoes.
         </p>
       </section>
 
@@ -558,6 +526,56 @@
               <p>Quando houver mais de um cartao associado ao usuario, eles serao exibidos aqui automaticamente.</p>
             </article>
             {% endfor %}
+        </div>
+      </section>
+
+      <section class="urb-panel urb-workspace__panel urb-locate-panel" data-dashboard-panel="locate" hidden>
+        <div class="urb-panel__head urb-panel__head--inline">
+          <div>
+            <h2>LOCALIZAR</h2>
+            <p>Mapa ao vivo com sua posicao, pontos de onibus e estacoes proximas.</p>
+          </div>
+          <span class="urb-pill-muted" data-locate-status>Carregando mapa</span>
+        </div>
+
+        <div class="urb-locate-shell">
+          <div class="urb-locate-toolbar">
+            <div class="urb-locate-search">
+              <input type="text" placeholder="Busque linha, estacao ou destino"
+                data-locate-search />
+              <button type="button" class="urb-btn urb-btn--fill" data-locate-search-button>Buscar paradas</button>
+              <button type="button" class="urb-btn urb-btn--outline" data-locate-center-user>Minha localizacao</button>
+            </div>
+
+            <div class="urb-locate-legend" aria-label="Legenda do mapa">
+              <span><i class="urb-locate-dot urb-locate-dot--user"></i>Voce</span>
+              <span><i class="urb-locate-dot urb-locate-dot--bus"></i>Onibus</span>
+              <span><i class="urb-locate-dot urb-locate-dot--train"></i>Trem</span>
+            </div>
+          </div>
+
+          <div class="urb-locate-layout">
+            <div id="urb-locate-map" class="urb-locate-map" data-locate-map></div>
+
+            <aside class="urb-locate-side">
+              <div>
+                <span class="urb-label">Detalhes</span>
+                <h3 data-locate-title>Selecione um ponto no mapa</h3>
+                <p data-locate-description>Permita a localizacao para iniciar no seu ponto atual e use a busca para
+                  carregar pontos do GTFS local.</p>
+              </div>
+              <div class="urb-locate-results" data-locate-results>
+                <article class="urb-locate-result">
+                  <strong>Onibus, metro e CPTM</strong>
+                  <p>Dados carregados do GTFS local com pontos e estacoes proximas.</p>
+                </article>
+                <article class="urb-locate-result">
+                  <strong>Proximas chegadas</strong>
+                  <p>Previsao estimada pela grade de horarios do GTFS.</p>
+                </article>
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
 

@@ -1,5 +1,7 @@
 import hashlib
+import csv
 import json
+import math
 import os
 import secrets
 import smtplib
@@ -10,6 +12,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from email.message import EmailMessage
 from email.utils import formataddr
+from functools import lru_cache
 from io import BytesIO
 from pathlib import Path
 
@@ -46,6 +49,19 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 qr_signer = URLSafeTimedSerializer(SESSION_SECRET_KEY, salt="urbpay-passage")
 CARD_ISSUER_NAME = "UrbPay"
+GTFS_DIR = BASE_DIR / "data" / "gtfs"
+GTFS_ROUTE_TYPES = {
+    "0": "tram",
+    "1": "subway",
+    "2": "train",
+    "3": "bus",
+}
+GTFS_MODE_LABELS = {
+    "tram": "VLT",
+    "subway": "Metro",
+    "train": "Trem",
+    "bus": "Onibus",
+}
 
 QR_PATTERN = [
     [1, 1, 1, 0, 1, 0, 1, 1, 1],
@@ -719,6 +735,11 @@ def ensure_database_schema() -> None:
                 column["name"]
                 for column in inspector.get_columns("cartao")
             }
+            if "modelo" not in existing_card_columns:
+                connection.execute(
+                    text("ALTER TABLE cartao ADD COLUMN modelo VARCHAR(100) DEFAULT 'cartao-verde.png' NOT NULL")
+                )
+
             if "saldo" not in existing_card_columns:
                 money_type = "DECIMAL(10, 2)" if connection.dialect.name == "mysql" else "NUMERIC(10, 2)"
                 connection.execute(
@@ -952,6 +973,285 @@ def create_movement(
     )
     db.add(movement)
     return movement
+
+
+def gtfs_read_csv(filename: str) -> list[dict[str, str]]:
+    path = GTFS_DIR / filename
+    if not path.exists():
+        return []
+
+    with path.open(newline="", encoding="utf-8-sig") as file:
+        return list(csv.DictReader(file))
+
+
+def normalize_gtfs_text(value: str | None) -> str:
+    return (value or "").replace("\ufeff", "").strip()
+
+
+def parse_gtfs_seconds(value: str | None) -> int | None:
+    if not value:
+        return None
+
+    parts = value.split(":")
+    if len(parts) != 3:
+        return None
+
+    try:
+        hours, minutes, seconds = (int(part) for part in parts)
+    except ValueError:
+        return None
+
+    return hours * 3600 + minutes * 60 + seconds
+
+
+def format_gtfs_time(total_seconds: int) -> str:
+    total_seconds %= 24 * 3600
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    return f"{hours:02d}:{minutes:02d}"
+
+
+def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    radius_km = 6371.0
+    d_lat = math.radians(lat2 - lat1)
+    d_lng = math.radians(lng2 - lng1)
+    a = (
+        math.sin(d_lat / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(d_lng / 2) ** 2
+    )
+    return 2 * radius_km * math.asin(math.sqrt(a))
+
+
+def active_gtfs_service_ids(now: datetime | None = None) -> set[str]:
+    current = now or datetime.now()
+    weekday_field = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"][current.weekday()]
+    current_date = current.strftime("%Y%m%d")
+    active_services = set()
+
+    for row in gtfs_read_csv("calendar.txt"):
+        if row.get(weekday_field) != "1":
+            continue
+        if row.get("start_date", "00000000") <= current_date <= row.get("end_date", "99999999"):
+            active_services.add(row.get("service_id", ""))
+
+    return active_services
+
+
+@lru_cache(maxsize=1)
+def load_gtfs_index() -> dict[str, object]:
+    routes = {}
+    trips = {}
+    stop_routes: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
+    stop_times_by_stop: dict[str, list[dict[str, object]]] = defaultdict(list)
+    trip_first_seconds: dict[str, int] = {}
+    frequencies_by_trip: dict[str, list[dict[str, int]]] = defaultdict(list)
+
+    for row in gtfs_read_csv("routes.txt"):
+        route_id = normalize_gtfs_text(row.get("route_id"))
+        route_type = normalize_gtfs_text(row.get("route_type"))
+        mode = GTFS_ROUTE_TYPES.get(route_type, "bus")
+        routes[route_id] = {
+            "id": route_id,
+            "short_name": normalize_gtfs_text(row.get("route_short_name")),
+            "long_name": normalize_gtfs_text(row.get("route_long_name")),
+            "type": mode,
+            "color": normalize_gtfs_text(row.get("route_color")) or ("7c3aed" if mode != "bus" else "16a34a"),
+        }
+
+    for row in gtfs_read_csv("trips.txt"):
+        trip_id = normalize_gtfs_text(row.get("trip_id"))
+        route_id = normalize_gtfs_text(row.get("route_id"))
+        route = routes.get(route_id, {})
+        trips[trip_id] = {
+            "id": trip_id,
+            "route_id": route_id,
+            "service_id": normalize_gtfs_text(row.get("service_id")),
+            "headsign": normalize_gtfs_text(row.get("trip_headsign")),
+            "mode": route.get("type", "bus"),
+        }
+
+    stops = {}
+    for row in gtfs_read_csv("stops.txt"):
+        stop_id = normalize_gtfs_text(row.get("stop_id"))
+        try:
+            lat = float(row.get("stop_lat") or "")
+            lng = float(row.get("stop_lon") or "")
+        except ValueError:
+            continue
+        stops[stop_id] = {
+            "id": stop_id,
+            "name": normalize_gtfs_text(row.get("stop_name")) or "Ponto",
+            "address": normalize_gtfs_text(row.get("stop_desc")),
+            "lat": lat,
+            "lng": lng,
+            }
+
+    for row in gtfs_read_csv("stop_times.txt"):
+        trip_id = normalize_gtfs_text(row.get("trip_id"))
+        seconds = parse_gtfs_seconds(row.get("departure_time") or row.get("arrival_time"))
+        if seconds is None:
+            continue
+        trip_first_seconds[trip_id] = min(seconds, trip_first_seconds.get(trip_id, seconds))
+
+    for row in gtfs_read_csv("frequencies.txt"):
+        trip_id = normalize_gtfs_text(row.get("trip_id"))
+        start_time = parse_gtfs_seconds(row.get("start_time"))
+        end_time = parse_gtfs_seconds(row.get("end_time"))
+        try:
+            headway_secs = int(row.get("headway_secs") or "0")
+        except ValueError:
+            headway_secs = 0
+        if trip_id and start_time is not None and end_time is not None and headway_secs > 0:
+            frequencies_by_trip[trip_id].append(
+                {
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "headway_secs": headway_secs,
+                }
+            )
+
+    for row in gtfs_read_csv("stop_times.txt"):
+        stop_id = normalize_gtfs_text(row.get("stop_id"))
+        trip_id = normalize_gtfs_text(row.get("trip_id"))
+        trip = trips.get(trip_id)
+        if not trip or stop_id not in stops:
+            continue
+        route = routes.get(trip["route_id"], {})
+        stop_routes[stop_id][trip["route_id"]] = route
+        seconds = parse_gtfs_seconds(row.get("departure_time") or row.get("arrival_time"))
+        if seconds is None:
+            continue
+        first_seconds = trip_first_seconds.get(trip_id, seconds)
+        stop_times_by_stop[stop_id].append(
+            {
+                "seconds": seconds,
+                "offset_seconds": max(0, seconds - first_seconds),
+                "trip_id": trip_id,
+                "route_id": trip["route_id"],
+                "service_id": trip["service_id"],
+                "headsign": trip["headsign"],
+            }
+        )
+
+    for stop_id, route_map in stop_routes.items():
+        modes = {route.get("type", "bus") for route in route_map.values()}
+        stops[stop_id]["type"] = "bus" if modes == {"bus"} else "train"
+        stops[stop_id]["modes"] = sorted(modes)
+        stops[stop_id]["routes"] = [
+            {
+                "id": route.get("id", ""),
+                "short_name": route.get("short_name", ""),
+                "long_name": route.get("long_name", ""),
+                "type": route.get("type", "bus"),
+            }
+            for route in list(route_map.values())[:8]
+        ]
+
+    return {
+        "routes": routes,
+        "trips": trips,
+        "stops": stops,
+        "stop_times_by_stop": stop_times_by_stop,
+        "frequencies_by_trip": frequencies_by_trip,
+    }
+
+
+def gtfs_nearby_points(lat: float, lng: float, *, search: str = "", limit: int = 160) -> list[dict[str, object]]:
+    index = load_gtfs_index()
+    stops = index["stops"].values()
+    normalized_search = search.strip().lower()
+    points = []
+
+    for stop in stops:
+        name = str(stop.get("name", ""))
+        routes = stop.get("routes", [])
+        route_text = " ".join(
+            f"{route.get('short_name', '')} {route.get('long_name', '')}"
+            for route in routes
+            if isinstance(route, dict)
+        )
+        haystack = f"{name} {stop.get('address', '')} {route_text}".lower()
+        distance_km = haversine_km(lat, lng, float(stop["lat"]), float(stop["lng"]))
+
+        if normalized_search and normalized_search not in haystack:
+            continue
+        if not normalized_search and distance_km > 8:
+            continue
+
+        points.append(
+            {
+                **stop,
+                "distance_km": round(distance_km, 2),
+                "mode_label": " / ".join(GTFS_MODE_LABELS.get(mode, mode) for mode in stop.get("modes", [])),
+                "source": "GTFS CittaMobi",
+            }
+        )
+
+    points.sort(key=lambda item: item["distance_km"])
+    return points[:limit]
+
+
+def gtfs_predictions_for_stop(stop_id: str, *, limit: int = 8) -> tuple[dict[str, object] | None, list[dict[str, object]]]:
+    index = load_gtfs_index()
+    stop = index["stops"].get(str(stop_id))
+    if not stop:
+        return None, []
+
+    now = datetime.now()
+    now_seconds = now.hour * 3600 + now.minute * 60 + now.second
+    active_services = active_gtfs_service_ids(now)
+    routes = index["routes"]
+    frequencies_by_trip = index["frequencies_by_trip"]
+    predictions = []
+
+    for stop_time in index["stop_times_by_stop"].get(str(stop_id), []):
+        if active_services and stop_time.get("service_id") not in active_services:
+            continue
+
+        raw_seconds = int(stop_time["seconds"])
+        adjusted_seconds = raw_seconds
+        trip_frequencies = frequencies_by_trip.get(str(stop_time["trip_id"]), [])
+
+        if trip_frequencies:
+            offset_seconds = int(stop_time.get("offset_seconds") or 0)
+            next_candidates = []
+            for frequency in trip_frequencies:
+                first_arrival = int(frequency["start_time"]) + offset_seconds
+                last_arrival = int(frequency["end_time"]) + offset_seconds
+                headway = int(frequency["headway_secs"])
+                if now_seconds <= first_arrival:
+                    next_candidates.append(first_arrival)
+                    continue
+                if first_arrival <= now_seconds <= last_arrival:
+                    steps = math.ceil((now_seconds - first_arrival) / headway)
+                    candidate = first_arrival + steps * headway
+                    if candidate <= last_arrival:
+                        next_candidates.append(candidate)
+
+            if next_candidates:
+                raw_seconds = min(next_candidates)
+                adjusted_seconds = raw_seconds
+            elif adjusted_seconds < now_seconds:
+                adjusted_seconds += 24 * 3600
+        elif adjusted_seconds < now_seconds:
+            adjusted_seconds += 24 * 3600
+
+        wait_minutes = max(0, math.ceil((adjusted_seconds - now_seconds) / 60))
+        route = routes.get(stop_time["route_id"], {})
+        predictions.append(
+            {
+                "line": route.get("short_name") or stop_time["route_id"],
+                "destination": stop_time.get("headsign") or route.get("long_name") or "Destino nao informado",
+                "origin": stop.get("name", ""),
+                "next_arrival": f"{wait_minutes} min" if wait_minutes else "Agora",
+                "scheduled_time": format_gtfs_time(raw_seconds),
+                "type": route.get("type", "bus"),
+                "source": "GTFS",
+            }
+        )
+
+    predictions.sort(key=lambda item: int(item["next_arrival"].split()[0]) if item["next_arrival"][0].isdigit() else 0)
+    return stop, predictions[:limit]
 
 
 def apply_card_recharge(
@@ -1783,6 +2083,7 @@ async def recharge_card_credit(request: Request, db: Session = Depends(get_db)) 
         raise HTTPException(status_code=500, detail="Nao foi possivel salvar a recarga no banco.") from exc
 
     db.refresh(card)
+    db.refresh(movement)
 
     saved_balance = money_decimal(card.saldo)
     return {
@@ -1793,6 +2094,56 @@ async def recharge_card_credit(request: Request, db: Session = Depends(get_db)) 
         "amount": f"{amount:.2f}",
         "balance_value": f"{saved_balance:.2f}",
         "current_balance": currency(saved_balance),
+        "movement_title": "Recarga via Pix",
+        "movement_location": movement.localizacao_operacao or "Rede UrbPay",
+        "movement_time": movement.data_movimentacao.strftime("%d/%m/%Y, %H:%M"),
+        "movement_amount": f"+ {currency(amount)}",
+    }
+
+
+@app.get("/dashboard/localizar/gtfs/pontos")
+def dashboard_locate_gtfs_points(
+    request: Request,
+    lat: float = -23.5505,
+    lng: float = -46.6333,
+    q: str = "",
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    user = get_user_from_session(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Login required.")
+
+    if not GTFS_DIR.exists():
+        raise HTTPException(status_code=503, detail="Base GTFS nao encontrada em data/gtfs.")
+
+    points = gtfs_nearby_points(lat, lng, search=q)
+    return {
+        "items": points,
+        "source": "GTFS CittaMobi",
+        "search": q,
+        "center": {"lat": lat, "lng": lng},
+    }
+
+
+@app.get("/dashboard/localizar/gtfs/previsao/{stop_id}")
+def dashboard_locate_gtfs_prediction(
+    stop_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    user = get_user_from_session(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Login required.")
+
+    stop, predictions = gtfs_predictions_for_stop(stop_id)
+    if not stop:
+        raise HTTPException(status_code=404, detail="Ponto ou estacao nao encontrado no GTFS.")
+
+    return {
+        "stop": stop,
+        "predictions": predictions,
+        "source": "GTFS CittaMobi",
+        "note": "Previsao estimada pela grade de horarios do GTFS local.",
     }
 
 
