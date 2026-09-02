@@ -987,7 +987,10 @@ def apply_card_recharge(
 
 
 def seed_initial_activity(db: Session, card: Cartao) -> None:
-    card.saldo = money_decimal(INITIAL_TOPUP - DEFAULT_PASSAGE_VALUE)
+    # 1. Define o saldo inicial zerado (R$ 0.00)
+    card.saldo = money_decimal(INITIAL_TOPUP)
+    
+    # 2. Cria apenas a movimentacao de boas-vindas zerada
     create_movement(
         db,
         card,
