@@ -2412,6 +2412,140 @@ document.addEventListener("click", function (e) {
   const eyeBtn = e.target.closest("#toggle-card-data");
   if (!eyeBtn) return;
 
+document.addEventListener('DOMContentLoaded', () => {
+    const lockBtn = document.getElementById('btn-toggle-lock-card');
+    const lockLabel = document.getElementById('label-lock-card');
+    const cardStatus = document.querySelector('.card-display-box__status');
+    const cardImg = document.querySelector('.virtual-card-wrapper__img');
+
+    if (lockBtn) {
+        let isLocked = false;
+
+        lockBtn.addEventListener('click', () => {
+            isLocked = !isLocked;
+
+            if (isLocked) {
+                // Estado: Bloqueado
+                lockLabel.innerText = "Desbloquear";
+                if (cardStatus) {
+                    cardStatus.innerText = "● Bloqueado";
+                    cardStatus.style.color = "#e53e3e"; // Cor vermelha
+                }
+                if (cardImg) {
+                    cardImg.style.filter = "grayscale(100%) opacity(0.6)"; // Efeito visual de bloqueado
+                }
+                alert("Cartão UrbPay bloqueado temporariamente com sucesso!");
+            } else {
+                // Estado: Ativo
+                lockLabel.innerText = "Bloquear";
+                if (cardStatus) {
+                    cardStatus.innerText = "● Ativo";
+                    cardStatus.style.color = "#38a169"; // Cor verde
+                }
+                if (cardImg) {
+                    cardImg.style.filter = "none";
+                }
+                alert("Cartão UrbPay reativado com sucesso!");
+            }
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+
+  // 1. NAVEGAÇÃO ENTRE PAINÉIS / TELAS (SIDEBAR E NAVEGAÇÃO)
+  const navLinks = document.querySelectorAll('[data-dashboard-view]');
+  const panels = document.querySelectorAll('[data-dashboard-panel]');
+
+  if (navLinks.length > 0 && panels.length > 0) {
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        const viewTarget = link.getAttribute('data-dashboard-view');
+
+        // Se não for o botão de abrir a modal de cartão
+        if (viewTarget && viewTarget !== 'new-card') {
+          e.preventDefault();
+
+          // Atualiza estado ativo nos botões do menu
+          navLinks.forEach(function (l) {
+            l.classList.remove('is-active');
+          });
+          link.classList.add('is-active');
+
+          // Alterna exibição dos painéis
+          panels.forEach(function (panel) {
+            if (panel.getAttribute('data-dashboard-panel') === viewTarget) {
+              panel.removeAttribute('hidden');
+            } else {
+              panel.setAttribute('hidden', '');
+            }
+          });
+        }
+      });
+    });
+  }
+
+  // 2. MODAL DE SOLICITAR NOVO CARTÃO
+  const cardModal = document.getElementById('modalNewCard');
+  const triggerBtns = document.querySelectorAll('[data-open-card-modal], [data-dashboard-view="new-card"]');
+  const closeBtns = cardModal ? cardModal.querySelectorAll('[data-modal-close]') : [];
+  const formNewCard = document.getElementById('formNewCard');
+
+  // Abrir Modal
+  triggerBtns.forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (cardModal) {
+        cardModal.classList.add('is-open');
+        cardModal.setAttribute('aria-hidden', 'false');
+      }
+    });
+  });
+
+  // Fechar Modal
+  closeBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (cardModal) {
+        cardModal.classList.remove('is-open');
+        cardModal.setAttribute('aria-hidden', 'true');
+      }
+    });
+  });
+
+  // Envio do Formulário (Permite o submit real para o Python/FastAPI)
+  if (formNewCard) {
+    formNewCard.addEventListener('submit', function () {
+      // Removemos o preventDefault() e o alert() fictício.
+      // O formulário agora envia a requisição normalmente para o banco de dados.
+    });
+  }
+
+  // 3. NAVEGAÇÃO DO CARROSSEL DE CARTÕES
+  const track = document.getElementById('cardsCarouselTrack');
+  const prevBtn = document.getElementById('cardsCarouselPrev');
+  const nextBtn = document.getElementById('cardsCarouselNext');
+
+  if (track) {
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        const firstCard = track.querySelector('.urb-card-slide');
+        const scrollAmount = firstCard ? firstCard.offsetWidth + 16 : track.offsetWidth;
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      });
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        const firstCard = track.querySelector('.urb-card-slide');
+        const scrollAmount = firstCard ? firstCard.offsetWidth + 16 : track.offsetWidth;
+        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      });
+    }
+  }
+
+});
+
+
 
   e.preventDefault();
 

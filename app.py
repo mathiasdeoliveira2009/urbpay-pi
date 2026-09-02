@@ -987,7 +987,10 @@ def apply_card_recharge(
 
 
 def seed_initial_activity(db: Session, card: Cartao) -> None:
-    card.saldo = money_decimal(INITIAL_TOPUP - DEFAULT_PASSAGE_VALUE)
+    # 1. Define o saldo inicial zerado (R$ 0.00)
+    card.saldo = money_decimal(INITIAL_TOPUP)
+    
+    # 2. Cria apenas a movimentacao de boas-vindas zerada
     create_movement(
         db,
         card,
@@ -1448,7 +1451,9 @@ def build_dashboard_context(
     qr_token: str | None = None,
 ) -> dict:
     cards = get_user_cards(db, user.id_usuario)
-    card = cards[-1] if cards else user.cartao
+    
+    # FIX 1: Pega o cartão mais recente (cards[0]) em vez do mais antigo (cards[-1])
+    card = cards[0] if cards else user.cartao
 
     dashboard_cards = build_dashboard_cards(user, cards)
     if not dashboard_cards and card:
@@ -1498,7 +1503,7 @@ def build_dashboard_context(
         "profile_identity": profile_identity,
         "primary_card": primary_card,
         "card_preview": card,
-        "my_cards": dashboard_cards,
+        "my_cards": dashboard_cards, # Recebe todos os cartões cadastrados
         "service_menu": build_dashboard_services(active_service_key),
         "request_items": request_items,
         "common_support_cases": build_common_support_cases(),
@@ -1521,7 +1526,6 @@ def build_dashboard_context(
         "qr_issued_at": issued_iso,
         "qr_validity_minutes": QR_TOKEN_MAX_AGE_SECONDS // 60,
     }
-
 
 def build_history_context(request: Request, db: Session, user: Usuario) -> dict:
     card = user.cartao
@@ -2135,3 +2139,51 @@ if __name__ == "__main__":
     }
 
     uvicorn.run("app:app", host=host, port=port, reload=reload)
+
+
+    # ... (suas rotas e códigos anteriores do FastAPI) ...
+
+
+# ROTA: Emissão de Novo Cartão UrbPay
+@app.post("/dashboard/cards/new")
+async def create_new_card(
+    request: Request,
+    card_model: str = Form(...),
+    reason: str = Form(...)
+):
+    # Mapeamento do modelo para imagem e título
+    model_images = {
+        "comum": "cartao-verde.png",
+        "estudante": "cartao-estudante.png",
+        "trabalhador": "cartao-trabalhador.png"
+    }
+
+    model_names = {
+        "comum": "UrbPay Comum",
+        "estudante": "UrbPay Estudante",
+        "trabalhador": "UrbPay Vale-Transporte"
+    }
+
+    # Objeto do novo cartão
+    new_card = {
+        "id": 99,  # Substitua pela lógica de ID do banco
+        "service_key": card_model,
+        "display_name": model_names.get(card_model, "UrbPay Comum"),
+        "modelo": model_images.get(card_model, "cartao-verde.png"),
+        "badge": card_model.capitalize(),
+        "balance": "R$ 0,00",
+        "balance_value": 0.0,
+        "cvv": "123",
+        "validity": "08/30"
+    }
+
+    # Insira o 'new_card' na sua lista de cartões ou no banco de dados aqui
+
+    # Redireciona o usuário para o dashboard atualizado
+    return RedirectResponse(url="/dashboard", status_code=303)
+
+
+# Se houver inicialização do uvicorn no final do arquivo, mantenha-a por último:
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
