@@ -2061,41 +2061,86 @@ document.addEventListener("click", (event) => {
 const speechStartButton = document.querySelector("[data-speech-start]");
 const speechStopButton = document.querySelector("[data-speech-stop]");
 const speechOutput = document.querySelector("[data-speech-output]");
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let speechRecognition = null;
+const speechSynthesis = window.speechSynthesis;
+let speechReadingEnabled = false;
+let speechHoverTimer = null;
+let speechHoverTarget = null;
+
+const getSpeechTarget = (target) => target.closest(
+  "a, button, input, select, textarea, summary, [role=button], [role=link], [data-a11y-explain], h1, h2, h3, h4, h5, h6, p, label"
+);
+
+const getSpeechText = (target) => {
+  const label = target.getAttribute("aria-label") || target.getAttribute("title");
+  const text = label || target.dataset.a11yExplain || target.textContent;
+  return text?.replace(/\s+/g, " ").trim();
+};
+
+const cancelSpeechHover = () => {
+  window.clearTimeout(speechHoverTimer);
+  speechHoverTimer = null;
+  speechHoverTarget = null;
+};
+
+const readSpeechTarget = (target) => {
+  const text = getSpeechText(target);
+  if (!text || !speechSynthesis) {
+    return;
+  }
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+  speechOutput.textContent = `Lendo: ${text}`;
+};
+
+const scheduleSpeechReading = (event) => {
+  if (!speechReadingEnabled) {
+    return;
+  }
+
+  const target = getSpeechTarget(event.target);
+  if (!target || target.closest("[data-speech-start], [data-speech-stop]")) {
+    return;
+  }
+
+  cancelSpeechHover();
+  speechHoverTarget = target;
+  speechHoverTimer = window.setTimeout(() => {
+    if (speechHoverTarget === target) {
+      readSpeechTarget(target);
+    }
+  }, 3000);
+};
 
 if (speechStartButton && speechStopButton && speechOutput) {
-  if (SpeechRecognition) {
-    speechRecognition = new SpeechRecognition();
-    speechRecognition.continuous = true;
-    speechRecognition.interimResults = true;
-    speechRecognition.lang = root.lang || "pt-BR";
-
-    speechRecognition.addEventListener("result", (event) => {
-      speechOutput.textContent = Array.from(event.results)
-        .map((result) => result[0].transcript)
-        .join(" ");
+  if (speechSynthesis) {
+    document.addEventListener("mouseover", scheduleSpeechReading);
+    document.addEventListener("mouseout", (event) => {
+      const target = getSpeechTarget(event.target);
+      if (target && (!event.relatedTarget || !target.contains(event.relatedTarget))) {
+        cancelSpeechHover();
+      }
     });
-    speechRecognition.addEventListener("start", () => {
+    document.addEventListener("focusin", scheduleSpeechReading);
+    document.addEventListener("focusout", cancelSpeechHover);
+
+    speechStartButton.addEventListener("click", () => {
+      speechReadingEnabled = true;
       speechStartButton.disabled = true;
       speechStopButton.disabled = false;
-      speechOutput.textContent = "Ouvindo...";
+      speechOutput.textContent = "Leitura ativada. Pare o mouse sobre um item por 3 segundos.";
     });
-    speechRecognition.addEventListener("end", () => {
+    speechStopButton.addEventListener("click", () => {
+      speechReadingEnabled = false;
+      cancelSpeechHover();
+      speechSynthesis.cancel();
       speechStartButton.disabled = false;
       speechStopButton.disabled = true;
+      speechOutput.textContent = "A leitura por repouso está desativada.";
     });
-    speechRecognition.addEventListener("error", () => {
-      speechOutput.textContent = "Não foi possível acessar o microfone ou reconhecer a fala.";
-      speechStartButton.disabled = false;
-      speechStopButton.disabled = true;
-    });
-
-    speechStartButton.addEventListener("click", () => speechRecognition.start());
-    speechStopButton.addEventListener("click", () => speechRecognition.stop());
   } else {
     speechStartButton.disabled = true;
-    speechOutput.textContent = "A transcrição de voz não é suportada neste navegador.";
+    speechOutput.textContent = "A leitura em voz alta não é suportada neste navegador.";
   }
 }
 
