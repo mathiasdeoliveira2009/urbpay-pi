@@ -1898,11 +1898,6 @@ serviceTriggers.forEach((button) => {
       }
     }
 
-    if (panelName === "student" || panelName === "teacher") {
-      showToolbarToast("Este serviço entra na próxima etapa.");
-      return;
-    }
-
     if (panelName === "credit-home" && button.classList.contains("service-item--action")) {
       resetCreditFlow();
     }
@@ -3006,10 +3001,18 @@ const widgetCards = document.querySelectorAll("[data-widget]");
 const widgetStorageKey = "urbpay-history-widgets";
 
 const renderEmptyState = (container, message) => {
+  if (!container) {
+    return;
+  }
+
   container.innerHTML = `<div class="chart-empty">${message}</div>`;
 };
 
 const renderMonthlyChart = (container, items) => {
+  if (!container) {
+    return;
+  }
+
   if (!items?.length) {
     renderEmptyState(container, "Ainda não há dados suficientes para o fluxo mensal.");
     return;
@@ -3032,6 +3035,10 @@ const renderMonthlyChart = (container, items) => {
 };
 
 const renderProgressChart = (container, items) => {
+  if (!container) {
+    return;
+  }
+
   if (!items?.length || items.every((item) => !item.value)) {
     renderEmptyState(container, "Sem informações suficientes para este painel no momento.");
     return;
@@ -3052,6 +3059,10 @@ const renderProgressChart = (container, items) => {
 };
 
 const renderTimelineChart = (container, items) => {
+  if (!container) {
+    return;
+  }
+
   if (!items?.length) {
     renderEmptyState(container, "Nenhuma movimentacao recente para compor a linha visual.");
     return;
@@ -3090,11 +3101,13 @@ const applyWidgetVisibility = (state) => {
 if (historyChartsScript) {
   const chartData = JSON.parse(historyChartsScript.textContent);
   const monthlyChart = document.querySelector("[data-chart-monthly]");
+  const yearlyChart = document.querySelector("[data-chart-yearly]");
   const statusChart = document.querySelector("[data-chart-status]");
   const locationChart = document.querySelector("[data-chart-locations]");
   const timelineChart = document.querySelector("[data-chart-timeline]");
 
   renderMonthlyChart(monthlyChart, chartData.monthly);
+  renderProgressChart(yearlyChart, chartData.yearly);
   renderProgressChart(statusChart, chartData.status);
   renderProgressChart(locationChart, chartData.locations);
   renderTimelineChart(timelineChart, chartData.timeline);

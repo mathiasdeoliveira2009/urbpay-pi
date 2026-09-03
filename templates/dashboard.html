@@ -69,6 +69,20 @@
           <span>Adicionar saldo</span>
         </button>
 
+        <button type="button" class="urb-nav-link" data-dashboard-view="analytics">
+          <span class="urb-nav-link__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19V5"></path>
+              <path d="M4 19h16"></path>
+              <path d="M8 16v-5"></path>
+              <path d="M12 16V8"></path>
+              <path d="M16 16v-7"></path>
+            </svg>
+          </span>
+          <span>Dashboard</span>
+        </button>
+
         <button type="button" class="urb-nav-link" data-dashboard-view="statement">
           <span class="urb-nav-link__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -377,6 +391,86 @@
 
       <section class="urb-workspace">
 
+        <section class="urb-panel urb-workspace__panel urb-analytics-panel" data-dashboard-panel="analytics" hidden>
+          <div class="urb-panel__head urb-panel__head--inline">
+            <div>
+              <h2>Dashboard</h2>
+              <p>Leitura visual do uso do cartão ao longo do mês e do ano.</p>
+            </div>
+            <span class="urb-pill-muted">{{ analytics_summary.total_movements }} lançamentos</span>
+          </div>
+
+          <div class="urb-analytics-summary">
+            <article class="metric-card">
+              <span class="metric-card__label">Viagens no mês</span>
+              <strong>{{ analytics_summary.current_month_trips }}</strong>
+              <p>Quantidade de passagens registradas neste mês.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-card__label">Média mensal</span>
+              <strong>{{ analytics_summary.average_monthly_trips }}</strong>
+              <p>Média de viagens por mês ativo.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-card__label">Gasto acumulado</span>
+              <strong>R$ {{ analytics_summary.spent_total }}</strong>
+              <p>Total consumido em passagens.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-card__label">Ticket médio</span>
+              <strong>R$ {{ analytics_summary.average_ticket }}</strong>
+              <p>Média por utilização aprovada.</p>
+            </article>
+          </div>
+
+          <div class="urb-analytics-grid">
+            <article class="dashboard-card chart-card">
+              <div class="dashboard-card__head">
+                <span class="eyebrow">Mês a mês</span>
+                <h3>Fluxo financeiro</h3>
+                <p>Comparativo entre recargas e passagens nos últimos meses.</p>
+              </div>
+              <div class="chart-area chart-area--bars" data-chart-monthly></div>
+            </article>
+
+            <article class="dashboard-card chart-card">
+              <div class="dashboard-card__head">
+                <span class="eyebrow">Ano</span>
+                <h3>Uso anual</h3>
+                <p>Quantidade de movimentações agrupadas por ano.</p>
+              </div>
+              <div class="chart-area chart-area--progress" data-chart-yearly></div>
+            </article>
+
+            <article class="dashboard-card chart-card">
+              <div class="dashboard-card__head">
+                <span class="eyebrow">Operações</span>
+                <h3>Status</h3>
+                <p>Aprovadas, recusadas e saldo insuficiente.</p>
+              </div>
+              <div class="chart-area chart-area--progress" data-chart-status></div>
+            </article>
+
+            <article class="dashboard-card chart-card">
+              <div class="dashboard-card__head">
+                <span class="eyebrow">Recorrência</span>
+                <h3>Locais frequentes</h3>
+                <p>Onde o cartão aparece mais vezes no histórico.</p>
+              </div>
+              <div class="chart-area chart-area--progress" data-chart-locations></div>
+            </article>
+
+            <article class="dashboard-card chart-card urb-analytics-grid__wide">
+              <div class="dashboard-card__head">
+                <span class="eyebrow">Linha recente</span>
+                <h3>Últimos movimentos</h3>
+                <p>Sequência visual dos registros mais recentes.</p>
+              </div>
+              <div class="chart-area chart-area--timeline" data-chart-timeline></div>
+            </article>
+          </div>
+        </section>
+
         <section class="urb-panel urb-workspace__panel" data-dashboard-panel="statement" hidden>
           <div class="urb-panel__head urb-panel__head--inline">
             <div>
@@ -587,12 +681,7 @@
       </section>
 
       <section class="urb-panel urb-workspace__panel" data-dashboard-panel="services" hidden>
-        <div class="urb-panel__head">
-          <h2>Central de serviços</h2>
-          <p>Abra um fluxo por vez para recarga, suporte e operações do cartão.</p>
-        </div>
-
-        <div class="service-menu service-menu--embedded">
+        <div class="service-menu service-menu--embedded service-menu--hub">
           <div class="service-menu__list">
             <button type="button" class="service-item service-item--action" data-service-trigger="credit-home"
               data-service-button>
@@ -608,7 +697,7 @@
                   <path d="M16.5 11.5v1"></path>
                 </svg>
               </div>
-              <strong>Compra de crédito</strong>
+              <strong>Recarga</strong>
             </button>
 
             <button type="button" class="service-item service-item--action" data-service-trigger="common"
@@ -805,6 +894,181 @@
               </section>
             </section>
 
+            <section class="service-flow__panel service-flow__panel--benefit" data-service-panel="student" hidden>
+              <div class="service-flow__crumbs">
+                <span>Início</span>
+                <span>Serviços</span>
+                <span>Estudante</span>
+              </div>
+              <div class="service-flow__head">
+                <h4>Bilhete Estudante</h4>
+                <p>Solicite, acompanhe ou atualize o benefício estudantil no cartão UrbPay.</p>
+              </div>
+              <div class="service-credit-actions">
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 9.5L12 5l9 4.5L12 14L3 9.5Z"></path>
+                      <path d="M6.5 11.2v4.2L12 18l5.5-2.6v-4.2"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Solicitar benefício</strong>
+                    <p>Envie os dados escolares e acompanhe a análise pelo protocolo.</p>
+                    <span>Iniciar solicitação</span>
+                  </div>
+                </article>
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 7h8"></path>
+                      <path d="M8 12h8"></path>
+                      <path d="M5 4.5h14v15H5z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Acompanhar análise</strong>
+                    <p>Veja pendências, status e histórico de solicitações estudantis.</p>
+                    <span>Consultar status</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="service-flow__panel service-flow__panel--benefit" data-service-panel="teacher" hidden>
+              <div class="service-flow__crumbs">
+                <span>Início</span>
+                <span>Serviços</span>
+                <span>Professor</span>
+              </div>
+              <div class="service-flow__head">
+                <h4>Bilhete Professor</h4>
+                <p>Central para validar vínculo docente, atualizar cadastro e acompanhar solicitações.</p>
+              </div>
+              <div class="service-credit-actions">
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 5.5h10a2 2 0 0 1 2 2v7H8a2 2 0 0 0-2 2V5.5Z"></path>
+                      <path d="M10.5 9h4.5"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Validar vínculo</strong>
+                    <p>Cadastre instituição, matrícula funcional e documentos necessários.</p>
+                    <span>Enviar dados</span>
+                  </div>
+                </article>
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 7h8"></path>
+                      <path d="M8 12h8"></path>
+                      <path d="M8 17h5"></path>
+                      <path d="M5 4.5h14v15H5z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Acompanhar benefício</strong>
+                    <p>Consulte análise, validade e últimas atualizações do cadastro.</p>
+                    <span>Consultar</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="service-flow__panel service-flow__panel--benefit" data-service-panel="pcd" hidden>
+              <div class="service-flow__crumbs">
+                <span>Início</span>
+                <span>Serviços</span>
+                <span>PCD</span>
+              </div>
+              <div class="service-flow__head">
+                <h4>Benefício PCD</h4>
+                <p>Envie laudo, acompanhe análise e mantenha o benefício especial atualizado.</p>
+              </div>
+              <div class="service-credit-actions">
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="5" r="2"></circle>
+                      <path d="M12 7v6l3 5"></path>
+                      <path d="M9 11h6"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Solicitar PCD</strong>
+                    <p>Cadastre os documentos necessários para análise do benefício.</p>
+                    <span>Iniciar solicitação</span>
+                  </div>
+                </article>
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 7h8"></path>
+                      <path d="M8 12h8"></path>
+                      <path d="M5 4.5h14v15H5z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Acompanhar análise</strong>
+                    <p>Veja se há pendências no laudo ou na documentação enviada.</p>
+                    <span>Consultar status</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="service-flow__panel service-flow__panel--benefit" data-service-panel="pregnant" hidden>
+              <div class="service-flow__crumbs">
+                <span>Início</span>
+                <span>Serviços</span>
+                <span>Grávidas</span>
+              </div>
+              <div class="service-flow__head">
+                <h4>Benefício para gestantes</h4>
+                <p>Central para cadastro, renovação e acompanhamento do benefício de gestante.</p>
+              </div>
+              <div class="service-credit-actions">
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 6.5a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5Z"></path>
+                      <path d="M9 22v-6.5a5 5 0 0 1 10 0V22"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Solicitar benefício</strong>
+                    <p>Informe os dados de saúde necessários para abertura do protocolo.</p>
+                    <span>Iniciar cadastro</span>
+                  </div>
+                </article>
+                <article class="service-credit-card service-credit-card--static">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 7h8"></path>
+                      <path d="M8 12h8"></path>
+                      <path d="M8 17h5"></path>
+                      <path d="M5 4.5h14v15H5z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Acompanhar cadastro</strong>
+                    <p>Consulte status, validade e pendências do benefício.</p>
+                    <span>Consultar</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
             <section class="service-flow__panel" data-service-panel="credit-home" hidden>
               <div class="service-flow__crumbs">
                 <span>Início</span>
@@ -812,23 +1076,46 @@
               </div>
               <div class="service-flow__head">
                 <h4>Compra de crédito</h4>
-                <p>Gerencie suas solicitações e serviços relacionados ao compra de crédito.</p>
+                <p>Escolha uma opção para recarregar ou acompanhar suas recargas.</p>
               </div>
-              <button type="button" class="service-option-card" data-service-trigger="credit-choose">
-                <div class="service-option-card__icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                      d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z">
-                    </path>
-                    <path d="M3 9.5h18"></path>
-                    <path d="M7 14h4"></path>
-                    <path d="M16.5 13a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5Z"></path>
-                    <path d="M16.5 11.5v1"></path>
-                  </svg>
-                </div>
-                <strong>Bilhete único - compra de crédito</strong>
-              </button>
+
+              <div class="service-credit-actions">
+                <button type="button" class="service-credit-card service-credit-card--primary" data-service-trigger="credit-choose">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path
+                        d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z">
+                      </path>
+                      <path d="M3 9.5h18"></path>
+                      <path d="M7 14h4"></path>
+                      <path d="M16.5 13a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5Z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Recarregar Bilhete Único</strong>
+                    <p>Adicione créditos ao seu cartão de forma rápida e segura.</p>
+                    <span>Fazer recarga</span>
+                  </div>
+                </button>
+
+                <button type="button" class="service-credit-card" data-dashboard-view="statement">
+                  <div class="service-credit-card__icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 7h8"></path>
+                      <path d="M8 12h8"></path>
+                      <path d="M8 17h5"></path>
+                      <path d="M5 4.5h14v15H5z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>Histórico de recargas</strong>
+                    <p>Consulte as últimas recargas realizadas e acompanhe o status.</p>
+                    <span>Consultar</span>
+                  </div>
+                </button>
+              </div>
             </section>
 
             <section class="service-flow__panel" data-service-panel="credit-choose" hidden>
@@ -839,26 +1126,34 @@
               <div class="service-flow__chooser">
                 <div class="service-flow__head">
                   <h4>Escolher cartão</h4>
-                  <p>Selecione um dos cartoes ja vinculados ao seu perfil para comprar créditos.</p>
+                  <p>Use o cartão ativo da sua conta para comprar créditos.</p>
                 </div>
 
                 <div class="service-card-grid">
-                  {% for item in my_cards %}
-                  <button type="button" class="service-mini-card service-mini-card--selectable"
-                    data-card-kind="{{ item.service_key }}" data-credit-card data-credit-card-id="{{ item.id }}"
-                    data-credit-card-name="{{ item.display_name }}"
-                    data-credit-card-number="{{ item.card_number_masked }}" data-credit-card-label="{{ item.badge }}"
-                    data-credit-card-balance="{{ item.balance_value }}">
-                    <span>{{ item.badge }}</span>
-                    <strong>{{ item.card_number_masked }}</strong>
-                    <p>{{ item.display_name }}</p>
+                  {% set active_recharge_card = my_cards[0] if my_cards else None %}
+                  {% if active_recharge_card %}
+                  <button type="button" class="service-mini-card service-mini-card--selectable service-mini-card--active-card"
+                    data-card-kind="{{ active_recharge_card.service_key }}" data-credit-card data-credit-card-id="{{ active_recharge_card.id }}"
+                    data-credit-card-name="{{ active_recharge_card.display_name }}"
+                    data-credit-card-number="{{ active_recharge_card.card_number_masked }}" data-credit-card-label="{{ active_recharge_card.badge }}"
+                    data-credit-card-balance="{{ active_recharge_card.balance_value }}">
+                    <span class="service-mini-card__preview">
+                      <img src="{{ url_for('static', path='imgs/' ~ (active_recharge_card.modelo or 'cartao-verde.png')) }}"
+                        alt="Cartão UrbPay {{ active_recharge_card.display_name }}" />
+                    </span>
+                    <span class="service-mini-card__content">
+                      <small>Cartão ativo</small>
+                      <strong>{{ active_recharge_card.card_number_masked }}</strong>
+                      <p>{{ active_recharge_card.badge }} · {{ active_recharge_card.display_name }}</p>
+                    </span>
+                    <span class="service-mini-card__action">Usar cartão</span>
                   </button>
                   {% else %}
                   <article class="service-mini-card service-mini-card--empty">
                     <span>Nenhum cartão</span>
                     <strong>Cadastre um cartão para recarga</strong>
                   </article>
-                  {% endfor %}
+                  {% endif %}
                 </div>
 
                 <div class="service-flow__actions">
@@ -916,6 +1211,52 @@
                   <div class="service-choice-card__copy">
                     <strong>Estudante</strong>
                     <p>Segue a mesma mecânica de recarga, com os mesmos valores e confirmação em Pix.</p>
+                  </div>
+                </button>
+
+                <button type="button" class="service-choice-card" data-credit-type="Professor">
+                  <div class="service-choice-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <path d="M6 5.5h10a2 2 0 0 1 2 2v7H8a2 2 0 0 0-2 2V5.5Z"></path>
+                      <path d="M10.5 9h4.5"></path>
+                      <path d="M10.5 12h3.5"></path>
+                    </svg>
+                  </div>
+                  <div class="service-choice-card__copy">
+                    <strong>Professor</strong>
+                    <p>Recarga voltada ao benefício de docente, com confirmação e pagamento via Pix.</p>
+                  </div>
+                </button>
+
+                <button type="button" class="service-choice-card" data-credit-type="PCD">
+                  <div class="service-choice-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <circle cx="12" cy="5" r="2"></circle>
+                      <path d="M12 7v6l3 5"></path>
+                      <path d="M9 11h6"></path>
+                      <path d="M8.5 15.5a4 4 0 1 0 6.8 2.8"></path>
+                    </svg>
+                  </div>
+                  <div class="service-choice-card__copy">
+                    <strong>PCD</strong>
+                    <p>Modalidade especial para pessoa com deficiência, com validação documental no atendimento.</p>
+                  </div>
+                </button>
+
+                <button type="button" class="service-choice-card" data-credit-type="Grávidas">
+                  <div class="service-choice-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <path d="M12 6.5a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5Z"></path>
+                      <path d="M9 22v-6.5a5 5 0 0 1 10 0V22"></path>
+                      <path d="M8 12.5c1.4-1.2 2.8-1.8 4-1.8"></path>
+                    </svg>
+                  </div>
+                  <div class="service-choice-card__copy">
+                    <strong>Grávidas</strong>
+                    <p>Categoria especial para gestantes, com fluxo de cadastro e acompanhamento do benefício.</p>
                   </div>
                 </button>
               </div>
@@ -2034,5 +2375,6 @@
   });
 </script>
 <!-- BIBLIOTECA DO MAPA (LEAFLET) E SEU SCRIPT -->
+<script type="application/json" data-history-charts>{{ analytics_charts_json|safe }}</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 {% endblock %}

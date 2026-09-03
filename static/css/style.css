@@ -5536,11 +5536,73 @@ html[data-theme="dark"] .gate-reader-summary {
   color: #111111;
 }
 
+.service-menu--hub {
+  gap: 30px;
+}
+
+.service-menu--hub .service-menu__list {
+  grid-template-columns: repeat(4, minmax(180px, 220px));
+  width: min(100%, 980px);
+  gap: 22px;
+}
+
+.service-menu--hub .service-item {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  justify-items: start;
+  min-height: 78px;
+  padding: 16px 28px;
+  border: 1px solid rgba(43, 72, 60, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 10px 24px rgba(26, 47, 39, 0.04);
+  text-align: left;
+}
+
+.service-menu--hub .service-item__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: #3d963c;
+  background: #f1faf2;
+  box-shadow: none;
+}
+
+.service-menu--hub .service-item__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.service-menu--hub .service-item strong {
+  color: #111f1a;
+  font: 800 1rem/1.2 "Sora", sans-serif;
+}
+
+.service-menu--hub .service-item:hover,
+.service-menu--hub .service-item.is-active {
+  border-color: rgba(55, 151, 56, 0.48);
+  background: linear-gradient(135deg, rgba(247, 255, 247, 0.98), rgba(255, 255, 255, 0.98));
+  box-shadow: 0 18px 34px rgba(55, 151, 56, 0.12);
+  transform: translateY(-2px);
+}
+
+.service-menu--hub .service-item:hover .service-item__icon,
+.service-menu--hub .service-item.is-active .service-item__icon {
+  background: #e4f6e6;
+  box-shadow: none;
+  transform: none;
+}
+
+.service-menu--hub .service-item:hover strong,
+.service-menu--hub .service-item.is-active strong {
+  color: #32872f;
+}
+
 .service-flow {
   display: grid;
   width: 100%;
   max-width: none;
-  margin-top: 18px;
+  margin-top: 12px;
 }
 
 .request-history {
@@ -5567,10 +5629,11 @@ html[data-theme="dark"] .gate-reader-summary {
 
 .service-flow__panel {
   width: 100%;
-  padding: 24px;
+  padding: 32px 36px 36px;
   border-radius: 24px;
   border: 1px solid rgba(43, 72, 60, 0.12);
-  background: rgba(252, 253, 251, 0.96);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 56px rgba(26, 47, 39, 0.08);
   text-align: left;
 }
 
@@ -5590,6 +5653,11 @@ html[data-theme="dark"] .gate-reader-summary {
 
 .service-flow__head {
   margin-top: 18px;
+}
+
+.service-menu--hub .service-flow__head {
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(43, 72, 60, 0.12);
 }
 
 .service-flow__head h4,
@@ -6160,6 +6228,103 @@ html[data-theme="dark"] .common-support-message--agent {
   height: 34px;
 }
 
+.service-credit-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+  margin-top: 30px;
+}
+
+.service-credit-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  min-height: 178px;
+  padding: 30px 34px;
+  border: 1px solid rgba(43, 72, 60, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text);
+  text-align: left;
+  box-shadow: 0 16px 34px rgba(26, 47, 39, 0.06);
+  cursor: pointer;
+}
+
+.service-credit-card--primary {
+  border-color: rgba(55, 151, 56, 0.42);
+  background: linear-gradient(135deg, rgba(248, 255, 247, 0.98), rgba(255, 255, 255, 0.96));
+}
+
+.service-credit-card--static {
+  cursor: default;
+}
+
+.service-credit-card__icon {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border: 1px solid rgba(43, 72, 60, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(249, 253, 249, 0.98), rgba(238, 249, 239, 0.98));
+  color: #379738;
+  box-shadow: 0 16px 30px rgba(26, 47, 39, 0.08);
+}
+
+.service-credit-card__icon svg {
+  width: 44px;
+  height: 44px;
+}
+
+.service-credit-card strong,
+.service-credit-card p {
+  margin: 0;
+}
+
+.service-credit-card strong {
+  color: #111f1a;
+  font: 850 1.22rem/1.25 "Sora", sans-serif;
+}
+
+.service-credit-card p {
+  max-width: 440px;
+  margin-top: 10px;
+  color: #68746c;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.service-credit-card span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin-top: 22px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: 1px solid rgba(55, 151, 56, 0.42);
+  color: #32872f;
+  font-weight: 850;
+}
+
+.service-credit-card--primary span {
+  background: linear-gradient(135deg, #43a43c, #2e8b31);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(55, 151, 56, 0.24);
+}
+
+.service-credit-card span::after {
+  content: ">";
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.service-credit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 42px rgba(26, 47, 39, 0.1);
+}
+
 .service-flow__chooser {
   padding: 8px 0 0;
 }
@@ -6217,6 +6382,67 @@ html[data-theme="dark"] .common-support-message--agent {
 
 .service-mini-card--empty {
   background: rgba(250, 252, 249, 0.96);
+}
+
+.service-card-grid:has(.service-mini-card--active-card) {
+  justify-items: start;
+}
+
+.service-mini-card--active-card {
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  width: min(100%, 660px);
+  min-height: 112px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(243, 252, 247, 0.98));
+}
+
+.service-mini-card__preview {
+  display: block;
+  width: 86px;
+  height: 58px;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(25, 62, 47, 0.16);
+}
+
+.service-mini-card__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.service-mini-card__content {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.service-mini-card__content small {
+  color: #357f43;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.service-mini-card__content strong {
+  overflow: hidden;
+  color: #14251d;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.service-mini-card__action {
+  justify-self: end;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #e8f6e9;
+  color: #2f8735;
+  font-weight: 850;
+  white-space: nowrap;
 }
 
 .service-selection-grid {
@@ -7002,6 +7228,43 @@ html[data-theme="dark"] .common-support-message--agent {
   margin: 0;
 }
 
+.urb-analytics-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.urb-analytics-panel[hidden] {
+  display: none;
+}
+
+.urb-analytics-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.urb-analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.urb-analytics-grid .chart-card {
+  min-width: 0;
+}
+
+.urb-analytics-grid .dashboard-card__head h3 {
+  margin: 0;
+  color: var(--text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.08rem;
+}
+
+.urb-analytics-grid__wide {
+  grid-column: 1 / -1;
+}
+
 .chart-empty {
   display: grid;
   place-items: center;
@@ -7770,13 +8033,32 @@ html[data-theme="dark"] .common-support-message--agent {
   }
 
   .service-choice-card,
+  .service-credit-card,
+  .service-mini-card--active-card,
   .payment-method-card {
     grid-template-columns: 42px minmax(0, 1fr);
     gap: 12px;
     padding: 16px;
   }
 
+  .service-mini-card--active-card {
+    width: 100%;
+  }
+
+  .service-mini-card--active-card .service-mini-card__preview {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .service-mini-card--active-card .service-mini-card__action {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    text-align: center;
+  }
+
   .service-choice-card__icon,
+  .service-credit-card__icon,
   .payment-method-card__icon {
     width: 42px;
     height: 42px;
@@ -7784,6 +8066,7 @@ html[data-theme="dark"] .common-support-message--agent {
   }
 
   .service-choice-card__icon svg,
+  .service-credit-card__icon svg,
   .payment-method-card__icon svg {
     width: 23px;
     height: 23px;

@@ -1740,6 +1740,8 @@ def build_qr_status_snapshot(user: Usuario | None, token: str) -> dict[str, obje
 
 def build_history_analytics(movements: list[Movimentacao]) -> dict:
     monthly_totals: dict[str, dict[str, float]] = defaultdict(lambda: {"DEBITO": 0.0, "RECARGA": 0.0})
+    monthly_counts: dict[str, dict[str, int]] = defaultdict(lambda: {"DEBITO": 0, "RECARGA": 0})
+    yearly_counts: dict[str, int] = defaultdict(int)
     status_counts: dict[str, int] = defaultdict(int)
     location_counts: dict[str, int] = defaultdict(int)
     timeline: list[dict[str, object]] = []
@@ -1753,6 +1755,8 @@ def build_history_analytics(movements: list[Movimentacao]) -> dict:
         amount = Decimal(str(item.valor)).quantize(Decimal("0.01"))
         month_key = item.data_movimentacao.strftime("%b/%y").upper()
         monthly_totals[month_key][item.tipo_operacao] += float(amount)
+        monthly_counts[month_key][item.tipo_operacao] += 1
+        yearly_counts[item.data_movimentacao.strftime("%Y")] += 1
         status_counts[item.status_operacao] += 1
         location_counts[item.localizacao_operacao or "Rede UrbPay"] += 1
 
@@ -1776,13 +1780,23 @@ def build_history_analytics(movements: list[Movimentacao]) -> dict:
 
     recent_timeline = timeline[-8:]
     average_ticket = (spent_total / approved_total).quantize(Decimal("0.01")) if approved_total else Decimal("0.00")
+    debit_months = [values["DEBITO"] for values in monthly_counts.values() if values["DEBITO"]]
+    average_monthly_trips = round(sum(debit_months) / len(debit_months), 1) if debit_months else 0
+    current_month_key = datetime.now().strftime("%b/%y").upper()
+    current_month_trips = monthly_counts[current_month_key]["DEBITO"]
     monthly_series = [
         {
             "label": label,
             "debit": values["DEBITO"],
             "topup": values["RECARGA"],
+            "trips": monthly_counts[label]["DEBITO"],
+            "recharges": monthly_counts[label]["RECARGA"],
         }
         for label, values in list(monthly_totals.items())[-6:]
+    ]
+    yearly_series = [
+        {"label": label, "value": value}
+        for label, value in sorted(yearly_counts.items())
     ]
     locations_series = [
         {"label": label, "value": value}
@@ -1797,9 +1811,12 @@ def build_history_analytics(movements: list[Movimentacao]) -> dict:
             "spent_total": currency(spent_total),
             "topup_total": currency(topup_total),
             "average_ticket": currency(average_ticket),
+            "current_month_trips": current_month_trips,
+            "average_monthly_trips": str(average_monthly_trips).replace(".", ","),
         },
         "charts": {
             "monthly": monthly_series,
+            "yearly": yearly_series,
             "status": [
                 {"label": "Aprovado", "value": status_counts["APROVADO"]},
                 {"label": "Saldo insuficiente", "value": status_counts["SALDO_INSUFICIENTE"]},
@@ -1860,6 +1877,8 @@ def build_dashboard_context(
         
     active_service_key = dashboard_cards[0]["service_key"] if dashboard_cards else None
     recent_movements = get_recent_movements(db, card.id_cartao) if card else []
+    all_movements = get_all_movements(db, card.id_cartao) if card else []
+    analytics = build_history_analytics(all_movements)
     debit_total = sum(Decimal(str(item.valor)) for item in recent_movements if item.tipo_operacao == "DEBITO")
     topup_total = sum(Decimal(str(item.valor)) for item in recent_movements if item.tipo_operacao == "RECARGA")
     status_kind, status_message = STATUS_MESSAGES.get(status, (None, None))
@@ -1909,6 +1928,8 @@ def build_dashboard_context(
         "formatted_card_number": format_card_number(card.numero_cartao) if card else None,
         "recent_movements": recent_movements,
         "movement_count": len(recent_movements),
+        "analytics_summary": analytics["summary"],
+        "analytics_charts_json": json.dumps(analytics["charts"]),
         "debit_total": currency(debit_total),
         "topup_total": currency(topup_total),
         "status_kind": status_kind,
