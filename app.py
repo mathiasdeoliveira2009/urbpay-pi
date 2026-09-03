@@ -58,10 +58,13 @@ GTFS_ROUTE_TYPES = {
 }
 GTFS_MODE_LABELS = {
     "tram": "VLT",
-    "subway": "Metro",
+    "subway": "Metrô",
     "train": "Trem",
-    "bus": "Onibus",
+    "bus": "Ônibus",
 }
+GTFS_DEFAULT_SERVICE_START_SECONDS = 4 * 3600
+GTFS_SUBWAY_SERVICE_START_SECONDS = 4 * 3600 + 40 * 60
+GTFS_SERVICE_END_SECONDS = 24 * 3600
 
 QR_PATTERN = [
     [1, 1, 1, 0, 1, 0, 1, 1, 1],
@@ -96,7 +99,7 @@ CARD_TYPES = [
 DASHBOARD_SERVICE_MENU = [
     {
         "key": "credito",
-        "title": "Compra de credito",
+        "title": "Compra de crédito",
         "icon_paths": [
             "M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z",
             "M3 9.5h18",
@@ -139,98 +142,98 @@ DASHBOARD_SERVICE_MENU = [
 COMMON_SUPPORT_CASE_DEFINITIONS = [
     {
         "id": "receba-cartao-em-casa",
-        "title": "COMUM - RECEBA SEU CARTAO EM CASA",
-        "description": "Acompanhe a emissao do cartao comum, confirme o endereco e veja a previsao de entrega.",
+        "title": "COMUM - RECEBA SEU CARTÃO EM CASA",
+        "description": "Acompanhe a emissão do cartão comum, confirme o endereço e veja a previsão de entrega.",
         "status": "Em triagem",
-        "response_time": "Retorno em ate 12 min",
-        "queue": "Fila de emissao",
+        "response_time": "Retorno em até 12 min",
+        "queue": "Fila de emissão",
         "agent_name": "Ana Martins",
-        "agent_role": "Especialista em emissao",
-        "auto_reply": "Vou validar a emissao do cartao, confirmar o endereco e te devolver a previsao mais recente para a entrega.",
+        "agent_role": "Especialista em emissão",
+        "auto_reply": "Vou validar a emissão do cartão, confirmar o endereço e te devolver a previsão mais recente para a entrega.",
         "steps": [
-            "Validar emissao do cartao comum",
-            "Confirmar endereco cadastrado",
-            "Enviar previsao de entrega no protocolo",
+            "Validar emissão do cartão comum",
+            "Confirmar endereço cadastrado",
+            "Enviar previsão de entrega no protocolo",
         ],
         "messages": [
-            {"role": "agent", "text": "Ola! Posso acompanhar a entrega do seu cartao comum por aqui."},
-            {"role": "user", "text": "Quero receber meu cartao em casa e verificar o prazo."},
-            {"role": "agent", "text": "Perfeito. Vou conferir a emissao e o endereco cadastrado antes de liberar a previsao."},
+            {"role": "agent", "text": "Olá! Posso acompanhar a entrega do seu cartão comum por aqui."},
+            {"role": "user", "text": "Quero receber meu cartão em casa e verificar o prazo."},
+            {"role": "agent", "text": "Perfeito. Vou conferir a emissão e o endereço cadastrado antes de liberar a previsão."},
         ],
     },
     {
         "id": "analise-bilhete-cancelado",
-        "title": "COMUM - ANALISE DE BILHETE UNICO CANCELADO",
-        "description": "Abra uma revisao para entender cancelamento, bloqueio ou perda de validade do bilhete comum.",
-        "status": "Aguardando analise",
-        "response_time": "Retorno em ate 18 min",
+        "title": "COMUM - ANÁLISE DE BILHETE ÚNICO CANCELADO",
+        "description": "Abra uma revisão para entender cancelamento, bloqueio ou perda de validade do bilhete comum.",
+        "status": "Aguardando análise",
+        "response_time": "Retorno em até 18 min",
         "queue": "Fila operacional",
         "agent_name": "Carlos Nogueira",
         "agent_role": "Analista operacional",
-        "auto_reply": "Vou revisar o historico do bilhete cancelado e confirmar se houve bloqueio, expiracao ou necessidade de reativacao.",
+        "auto_reply": "Vou revisar o histórico do bilhete cancelado e confirmar se houve bloqueio, expiração ou necessidade de reativação.",
         "steps": [
-            "Consultar historico do bilhete",
+            "Consultar histórico do bilhete",
             "Identificar motivo do cancelamento",
-            "Orientar reativacao ou nova emissao",
+            "Orientar reativação ou nova emissão",
         ],
         "messages": [
             {"role": "agent", "text": "Suporte UrbPay online. Vamos revisar o cancelamento do seu bilhete."},
             {"role": "user", "text": "Meu bilhete comum apareceu como cancelado e preciso entender o motivo."},
-            {"role": "agent", "text": "Ja estou separando a analise operacional para te orientar sobre reativacao ou substituicao."},
+            {"role": "agent", "text": "Já estou separando a análise operacional para te orientar sobre reativação ou substituição."},
         ],
     },
     {
         "id": "compra-creditos-incorreta",
-        "title": "COMUM - COMPRA DE CREDITOS INCORRETA",
-        "description": "Use este atendimento quando a recarga entrou com valor diferente ou nao refletiu no saldo.",
-        "status": "Em validacao",
-        "response_time": "Retorno em ate 10 min",
+        "title": "COMUM - COMPRA DE CRÉDITOS INCORRETA",
+        "description": "Use este atendimento quando a recarga entrou com valor diferente ou não refletiu no saldo.",
+        "status": "Em validação",
+        "response_time": "Retorno em até 10 min",
         "queue": "Fila financeira",
         "agent_name": "Juliana Costa",
         "agent_role": "Especialista em recarga",
-        "auto_reply": "Vou confrontar o valor pago com a recarga processada para ajustar o saldo ou registrar a correcao do pedido.",
+        "auto_reply": "Vou confrontar o valor pago com a recarga processada para ajustar o saldo ou registrar a correção do pedido.",
         "steps": [
             "Conferir valor pago e comprovante",
             "Comparar com a recarga processada",
-            "Atualizar saldo ou abrir correcao financeira",
+            "Atualizar saldo ou abrir correção financeira",
         ],
         "messages": [
-            {"role": "agent", "text": "Oi! Posso analisar a compra de creditos com voce agora."},
-            {"role": "user", "text": "A recarga foi feita, mas o valor entrou incorreto no meu cartao comum."},
-            {"role": "agent", "text": "Entendi. Vou validar o pagamento, o valor creditado e o saldo atual para seguir com a correcao."},
+            {"role": "agent", "text": "Oi! Posso analisar a compra de créditos com você agora."},
+            {"role": "user", "text": "A recarga foi feita, mas o valor entrou incorreto no meu cartão comum."},
+            {"role": "agent", "text": "Entendi. Vou validar o pagamento, o valor creditado e o saldo atual para seguir com a correção."},
         ],
     },
     {
         "id": "pedido-restituicao-creditos",
-        "title": "COMUM - PEDIDO DE RESTITUICAO DE CREDITOS",
-        "description": "Solicite estorno ou recuperacao dos creditos comuns quando houver cobranca indevida ou duplicidade.",
-        "status": "Em revisao",
-        "response_time": "Retorno em ate 20 min",
-        "queue": "Fila de restituicao",
+        "title": "COMUM - PEDIDO DE RESTITUIÇÃO DE CRÉDITOS",
+        "description": "Solicite estorno ou recuperação dos créditos comuns quando houver cobrança indevida ou duplicidade.",
+        "status": "Em revisão",
+        "response_time": "Retorno em até 20 min",
+        "queue": "Fila de restituição",
         "agent_name": "Patricia Lima",
         "agent_role": "Atendimento financeiro",
-        "auto_reply": "Vou validar a cobranca, abrir a solicitacao de restituicao e te atualizar com o protocolo financeiro.",
+        "auto_reply": "Vou validar a cobrança, abrir a solicitação de restituição e te atualizar com o protocolo financeiro.",
         "steps": [
-            "Registrar protocolo de restituicao",
-            "Validar cobranca ou debito indevido",
+            "Registrar protocolo de restituição",
+            "Validar cobrança ou débito indevido",
             "Encaminhar retorno financeiro",
         ],
         "messages": [
-            {"role": "agent", "text": "Seu pedido de restituicao pode ser acompanhado por esta central."},
-            {"role": "user", "text": "Preciso pedir restituicao dos creditos porque identifiquei uma cobranca indevida."},
-            {"role": "agent", "text": "Certo. Vou abrir a revisao financeira e organizar a analise do valor para restituicao."},
+            {"role": "agent", "text": "Seu pedido de restituição pode ser acompanhado por esta central."},
+            {"role": "user", "text": "Preciso pedir restituição dos créditos porque identifiquei uma cobrança indevida."},
+            {"role": "agent", "text": "Certo. Vou abrir a revisão financeira e organizar a análise do valor para restituição."},
         ],
     },
     {
         "id": "cancelamento-bilhete",
-        "title": "COMUM - SOLICITACAO DE CANCELAMENTO DO BILHETE",
-        "description": "Inicie o cancelamento do bilhete comum com suporte guiado e confirmacao de bloqueio no protocolo.",
+        "title": "COMUM - SOLICITAÇÃO DE CANCELAMENTO DO BILHETE",
+        "description": "Inicie o cancelamento do bilhete comum com suporte guiado e confirmação de bloqueio no protocolo.",
         "status": "Pronto para abrir",
-        "response_time": "Retorno em ate 8 min",
+        "response_time": "Retorno em até 8 min",
         "queue": "Fila de bloqueio",
         "agent_name": "Rafael Souza",
         "agent_role": "Suporte de bloqueio",
-        "auto_reply": "Vou confirmar os dados do titular, registrar o bloqueio preventivo e devolver o numero do protocolo de cancelamento.",
+        "auto_reply": "Vou confirmar os dados do titular, registrar o bloqueio preventivo e devolver o número do protocolo de cancelamento.",
         "steps": [
             "Validar titularidade do bilhete",
             "Registrar bloqueio preventivo",
@@ -247,29 +250,29 @@ COMMON_SUPPORT_CASE_DEFINITIONS = [
 HOW_IT_WORKS = [
     {
         "title": "Cadastro simples",
-        "description": "Crie sua conta, envie sua foto e deixe seu perfil pronto para o cartao digital.",
+        "description": "Crie sua conta, envie sua foto e deixe seu perfil pronto para o cartão digital.",
     },
     {
         "title": "Login salvo",
-        "description": "Depois do cadastro, o acesso fica associado ao seu CPF e a sessao permanece ativa no navegador.",
+        "description": "Depois do cadastro, o acesso fica associado ao seu CPF e a sessão permanece ativa no navegador.",
     },
     {
         "title": "Dashboard ativo",
-        "description": "Ao entrar, o cliente vai para uma area logada com saldo, gastos recentes e QR Code de passagem.",
+        "description": "Ao entrar, o cliente vai para uma área logada com saldo, gastos recentes e QR Code de passagem.",
     },
     {
-        "title": "Simulacao de catraca",
-        "description": "O QR Code abre uma pagina de confirmacao e registra a passagem no historico do cartao.",
+        "title": "Simulação de catraca",
+        "description": "O QR Code abre uma página de confirmação e registra a passagem no histórico do cartão.",
     },
 ]
 
 STATUS_MESSAGES = {
     "signup-success": ("success", "Cadastro realizado com sucesso. Sua conta ja entrou no dashboard."),
     "login-success": ("success", "Login realizado com sucesso."),
-    "logout-success": ("success", "Sessao encerrada."),
+    "logout-success": ("success", "Sessão encerrada."),
     "qr-ready": ("success", "QR Code pronto para simular a passagem."),
     "qr-success": ("success", "Pagamento efetuado, passagem liberada."),
-    "qr-failed": ("error", "Nao foi possivel concluir a passagem com o saldo atual."),
+    "qr-failed": ("error", "Não foi possível concluir a passagem com o saldo atual."),
 }
 
 DEFAULT_PASSAGE_VALUE = Decimal("5.40")
@@ -282,15 +285,15 @@ ACTIVE_QR_AUTHORIZATIONS: dict[int, dict[str, object]] = {}
 QR_STATUS_DETAILS = {
     "created": {
         "label": "QR pronto",
-        "title": "Aguardando aproximacao",
-        "message": "Posicione o QR Code no leitor da catraca para iniciar a validacao.",
+        "title": "Aguardando aproximação",
+        "message": "Posicione o QR Code no leitor da catraca para iniciar a validação.",
         "appearance": "pending",
         "is_final": False,
     },
     "opened": {
         "label": "Leitura identificada",
         "title": "Validando bilhete",
-        "message": "O leitor reconheceu o QR Code e o sistema esta conferindo autorizacao e saldo.",
+        "message": "O leitor reconheceu o QR Code e o sistema está conferindo autorização e saldo.",
         "appearance": "active",
         "is_final": False,
     },
@@ -311,7 +314,7 @@ QR_STATUS_DETAILS = {
     "failed": {
         "label": "Acesso negado",
         "title": "Passagem recusada",
-        "message": "O cartao nao tinha saldo suficiente para liberar a catraca.",
+        "message": "O cartão não tinha saldo suficiente para liberar a catraca.",
         "appearance": "error",
         "is_final": True,
     },
@@ -324,22 +327,22 @@ QR_STATUS_DETAILS = {
     },
     "replaced": {
         "label": "Novo QR gerado",
-        "title": "Solicitacao substituida",
-        "message": "Um novo QR Code foi emitido e esta solicitacao deixou de ser a ativa.",
+        "title": "Solicitação substituída",
+        "message": "Um novo QR Code foi emitido e esta solicitação deixou de ser a ativa.",
         "appearance": "muted",
         "is_final": True,
     },
     "inactive": {
-        "label": "Solicitacao encerrada",
-        "title": "Acompanhamento indisponivel",
-        "message": "Nao ha mais uma solicitacao ativa vinculada a este QR Code.",
+        "label": "Solicitação encerrada",
+        "title": "Acompanhamento indisponível",
+        "message": "Não há mais uma solicitação ativa vinculada a este QR Code.",
         "appearance": "muted",
         "is_final": True,
     },
     "invalid": {
-        "label": "QR invalido",
-        "title": "Token nao reconhecido",
-        "message": "Nao foi possivel identificar esta solicitacao de passagem.",
+        "label": "QR inválido",
+        "title": "Token não reconhecido",
+        "message": "Não foi possível identificar esta solicitação de passagem.",
         "appearance": "error",
         "is_final": True,
     },
@@ -404,7 +407,7 @@ def format_membership_id(user_id: int) -> str:
 
 def format_birth_date(value: date | None) -> str:
     if not value:
-        return "Nao informada"
+        return "Não informada"
     return value.strftime("%d/%m/%Y")
 
 
@@ -435,8 +438,8 @@ def build_profile_identity(user: Usuario, card: Cartao | None) -> dict:
         "card_number_display": format_card_number(card.numero_cartao) if card else "--",
         "card_number_masked": format_card_number(mask_sensitive(card.numero_cartao, visible_digits=4)) if card else "--",
         "card_model": card.modelo if card else "cartao-verde.png",  # <--- ADICIONE ESTA LINHA!
-        "phone_display": user.telefone or "Nao informado",
-        "phone_masked": mask_sensitive(user.telefone, visible_digits=3) if user.telefone else "Nao informado",
+        "phone_display": user.telefone or "Não informado",
+        "phone_masked": mask_sensitive(user.telefone, visible_digits=3) if user.telefone else "Não informado",
     }
 
 
@@ -573,9 +576,9 @@ def build_dashboard_requests(user: Usuario, recent_movements: list[Movimentacao]
         items.append(
             {
                 "protocol": build_request_protocol(f"card-request-{user.id_usuario}"),
-                "service": "Cartao UrbPay - Solicitacao de emissao",
+                "service": "Cartão UrbPay - Solicitação de emissão",
                 "updated_at_display": requested_at_display,
-                "status_text": "Cartao solicitado",
+                "status_text": "Cartão solicitado",
                 "status_group": "in_progress",
                 "appearance": "pending",
                 "_sort_at": requested_at,
@@ -605,12 +608,12 @@ def build_dashboard_requests(user: Usuario, recent_movements: list[Movimentacao]
                     "updated_at_display": updated_at_display,
                     "status_text": {
                         "created": "Aguardando leitura do QR Code",
-                        "opened": "Aguardando confirmacao do embarque",
+                        "opened": "Aguardando confirmação do embarque",
                         "expired": "QR expirado",
-                        "replaced": "QR substituido",
-                        "inactive": "Solicitacao encerrada",
-                        "invalid": "QR invalido",
-                    }.get(status_code, "Solicitacao em acompanhamento"),
+                        "replaced": "QR substituído",
+                        "inactive": "Solicitação encerrada",
+                        "invalid": "QR inválido",
+                    }.get(status_code, "Solicitação em acompanhamento"),
                     "status_group": "in_progress" if status_code in {"created", "opened"} else "other",
                     "appearance": "pending" if status_code in {"created", "opened"} else "muted",
                     "_sort_at": updated_at,
@@ -621,8 +624,8 @@ def build_dashboard_requests(user: Usuario, recent_movements: list[Movimentacao]
         updated_at, updated_at_display = format_request_timestamp(movement.data_movimentacao)
 
         if movement.tipo_operacao == "RECARGA":
-            service_name = "Bilhete Unico - Compra de Credito"
-            approved_text = "Recarga concluida"
+            service_name = "Bilhete Único - Compra de Crédito"
+            approved_text = "Recarga concluída"
         else:
             service_name = "Passagem digital - Compra de passagem"
             approved_text = "Passagem aprovada"
@@ -803,12 +806,12 @@ def build_common_support_email_body(
     lines = [
         "Novo atendimento do suporte guiado UrbPay.",
         "",
-        "Dados do usuario cadastrado:",
+        "Dados do usuário cadastrado:",
         f"Nome: {user.nome}",
         f"E-mail cadastrado: {user.email}",
         f"CPF: {user.cpf}",
-        f"Telefone: {user.telefone or 'Nao informado'}",
-        f"Endereco: {user.endereco or 'Nao informado'}",
+        f"Telefone: {user.telefone or 'Não informado'}",
+        f"Endereço: {user.endereco or 'Não informado'}",
         "",
         "Dados do atendimento comum:",
         f"Assunto: {support_case['title']}",
@@ -1011,6 +1014,26 @@ def format_gtfs_time(total_seconds: int) -> str:
     return f"{hours:02d}:{minutes:02d}"
 
 
+def gtfs_operation_start_seconds(stop: dict[str, object]) -> int:
+    modes = set(stop.get("modes") or [])
+    if modes and modes.issubset({"subway"}):
+        return GTFS_SUBWAY_SERVICE_START_SECONDS
+    return GTFS_DEFAULT_SERVICE_START_SECONDS
+
+
+def gtfs_operation_notice(stop: dict[str, object], now_seconds: int) -> dict[str, str] | None:
+    start_seconds = gtfs_operation_start_seconds(stop)
+    if start_seconds <= now_seconds < GTFS_SERVICE_END_SECONDS:
+        return None
+
+    resumes_at = format_gtfs_time(start_seconds)
+    return {
+        "title": "Operação encerrada",
+        "description": f"Esta estação volta a operar a partir das {resumes_at}.",
+        "meta": "Não exibimos previsão simulada fora do horário operacional.",
+    }
+
+
 def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
     radius_km = 6371.0
     d_lat = math.radians(lat2 - lat1)
@@ -1043,6 +1066,7 @@ def load_gtfs_index() -> dict[str, object]:
     trips = {}
     stop_routes: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
     stop_times_by_stop: dict[str, list[dict[str, object]]] = defaultdict(list)
+    stop_times_by_trip: dict[str, list[dict[str, object]]] = defaultdict(list)
     trip_first_seconds: dict[str, int] = {}
     frequencies_by_trip: dict[str, list[dict[str, int]]] = defaultdict(list)
 
@@ -1132,6 +1156,12 @@ def load_gtfs_index() -> dict[str, object]:
                 "headsign": trip["headsign"],
             }
         )
+        stop_times_by_trip[trip_id].append(
+            {
+                "stop_id": stop_id,
+                "seconds": seconds,
+            }
+        )
 
     for stop_id, route_map in stop_routes.items():
         modes = {route.get("type", "bus") for route in route_map.values()}
@@ -1152,6 +1182,10 @@ def load_gtfs_index() -> dict[str, object]:
         "trips": trips,
         "stops": stops,
         "stop_times_by_stop": stop_times_by_stop,
+        "stop_times_by_trip": {
+            trip_id: sorted(times, key=lambda item: int(item["seconds"]))
+            for trip_id, times in stop_times_by_trip.items()
+        },
         "frequencies_by_trip": frequencies_by_trip,
     }
 
@@ -1171,22 +1205,24 @@ def gtfs_nearby_points(
 
     for stop in stops:
         name = str(stop.get("name", ""))
-        routes = stop.get("routes", [])
-        route_text = " ".join(
-            f"{route.get('short_name', '')} {route.get('long_name', '')}"
-            for route in routes
-            if isinstance(route, dict)
-        )
-        haystack = f"{name} {stop.get('address', '')} {route_text}".lower()
-        distance_km = haversine_km(lat, lng, float(stop["lat"]), float(stop["lng"]))
         stop_type = str(stop.get("type", "bus"))
-
         if route_type and stop_type != route_type:
             continue
-        if normalized_search and normalized_search not in haystack:
-            continue
+
+        distance_km = haversine_km(lat, lng, float(stop["lat"]), float(stop["lng"]))
+
         if not normalized_search and distance_km > 35:
             continue
+        if normalized_search:
+            routes = stop.get("routes", [])
+            route_text = " ".join(
+                f"{route.get('short_name', '')} {route.get('long_name', '')}"
+                for route in routes
+                if isinstance(route, dict)
+            )
+            haystack = f"{name} {stop.get('address', '')} {route_text}".lower()
+            if normalized_search not in haystack:
+                continue
 
         points.append(
             {
@@ -1201,24 +1237,31 @@ def gtfs_nearby_points(
     return points[:limit]
 
 
-def gtfs_predictions_for_stop(stop_id: str, *, limit: int = 8) -> tuple[dict[str, object] | None, list[dict[str, object]]]:
+def gtfs_predictions_for_stop(stop_id: str, *, limit: int = 8) -> tuple[dict[str, object] | None, list[dict[str, object]], dict[str, str] | None]:
     index = load_gtfs_index()
     stop = index["stops"].get(str(stop_id))
     if not stop:
-        return None, []
+        return None, [], None
 
     now = datetime.now()
     now_seconds = now.hour * 3600 + now.minute * 60 + now.second
+    service_notice = gtfs_operation_notice(stop, now_seconds)
+    if service_notice:
+        return stop, [], service_notice
+
     active_services = active_gtfs_service_ids(now)
     routes = index["routes"]
+    stops = index["stops"]
     frequencies_by_trip = index["frequencies_by_trip"]
+    stop_times_by_trip = index["stop_times_by_trip"]
     predictions = []
 
     for stop_time in index["stop_times_by_stop"].get(str(stop_id), []):
         if active_services and stop_time.get("service_id") not in active_services:
             continue
 
-        raw_seconds = int(stop_time["seconds"])
+        original_seconds = int(stop_time["seconds"])
+        raw_seconds = original_seconds
         adjusted_seconds = raw_seconds
         trip_frequencies = frequencies_by_trip.get(str(stop_time["trip_id"]), [])
 
@@ -1247,21 +1290,52 @@ def gtfs_predictions_for_stop(stop_id: str, *, limit: int = 8) -> tuple[dict[str
             adjusted_seconds += 24 * 3600
 
         wait_minutes = max(0, math.ceil((adjusted_seconds - now_seconds) / 60))
+        is_estimated = False
+        if wait_minutes > 30:
+            minutes_until_close = max(0, (GTFS_SERVICE_END_SECONDS - now_seconds) // 60)
+            if minutes_until_close < 4:
+                continue
+            seed = sum(ord(char) for char in f"{stop_time['trip_id']}{stop_time['route_id']}{now.minute}")
+            wait_window = max(1, min(25, minutes_until_close - 3))
+            wait_minutes = 4 + seed % wait_window
+            adjusted_seconds = now_seconds + wait_minutes * 60
+            is_estimated = True
+
+        destination_name = stop_time.get("headsign") or ""
+        destination_seconds = adjusted_seconds + 35 * 60
+        trip_times = stop_times_by_trip.get(str(stop_time["trip_id"]), [])
+        future_trip_times = [
+            item
+            for item in trip_times
+            if int(item.get("seconds") or 0) > original_seconds
+        ]
+        if future_trip_times:
+            final_stop_time = future_trip_times[-1]
+            destination_stop = stops.get(str(final_stop_time.get("stop_id")), {})
+            destination_name = destination_name or str(destination_stop.get("name") or "")
+            trip_duration = max(5 * 60, int(final_stop_time["seconds"]) - original_seconds)
+            destination_seconds = adjusted_seconds + min(trip_duration, 90 * 60)
+
         route = routes.get(stop_time["route_id"], {})
         predictions.append(
             {
                 "line": route.get("short_name") or stop_time["route_id"],
-                "destination": stop_time.get("headsign") or route.get("long_name") or "Destino nao informado",
+                "destination": destination_name or route.get("long_name") or "Destino não informado",
                 "origin": stop.get("name", ""),
-                "next_arrival": f"{wait_minutes} min" if wait_minutes else "Agora",
-                "scheduled_time": format_gtfs_time(raw_seconds),
+                "next_arrival": f"Em {wait_minutes} min" if wait_minutes else "Agora",
+                "wait_minutes": wait_minutes,
+                "wait_label": "Agora" if wait_minutes == 0 else f"Em {wait_minutes} min",
+                "departure_time": format_gtfs_time(adjusted_seconds),
+                "arrival_time": format_gtfs_time(destination_seconds),
+                "scheduled_time": format_gtfs_time(adjusted_seconds),
                 "type": route.get("type", "bus"),
                 "source": "GTFS",
+                "estimated": is_estimated,
             }
         )
 
-    predictions.sort(key=lambda item: int(item["next_arrival"].split()[0]) if item["next_arrival"][0].isdigit() else 0)
-    return stop, predictions[:limit]
+    predictions.sort(key=lambda item: int(item.get("wait_minutes") or 0))
+    return stop, predictions[:limit], None
 
 
 def apply_card_recharge(
@@ -1279,7 +1353,7 @@ def apply_card_recharge(
         .with_for_update()
     )
     if not card:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado para este usuario.")
+        raise HTTPException(status_code=404, detail="Cartão não encontrado para este usuário.")
 
     current_balance = money_decimal(card.saldo)
     card.saldo = money_decimal(current_balance + amount)
@@ -1459,7 +1533,7 @@ def validate_qr_authorization(payload: dict) -> dict:
     user_id = int(payload["user_id"])
     authorization = ACTIVE_QR_AUTHORIZATIONS.get(user_id) or restore_qr_authorization(payload)
     if not authorization:
-        raise HTTPException(status_code=400, detail="A autorizacao desta passagem nao esta mais ativa.")
+        raise HTTPException(status_code=400, detail="A autorização desta passagem não está mais ativa.")
 
     expires_at = authorization["expires_at"]
     if isinstance(expires_at, datetime) and datetime.utcnow() > expires_at:
@@ -1475,7 +1549,7 @@ def validate_qr_authorization(payload: dict) -> dict:
         or int(authorization.get("card_id") or 0) != int(payload.get("card_id") or 0)
         or str(authorization.get("amount")) != str(payload.get("amount"))
     ):
-        raise HTTPException(status_code=400, detail="A autorizacao desta passagem nao confere com o token atual.")
+        raise HTTPException(status_code=400, detail="A autorização desta passagem não confere com o token atual.")
 
     return authorization
 
@@ -1953,7 +2027,7 @@ async def signup(
     if birth_date > date.today():
         context = build_landing_context(
             request,
-            form_error="A data de nascimento nao pode estar no futuro.",
+            form_error="A data de nascimento não pode estar no futuro.",
             open_signup_modal=True,
         )
         return templates.TemplateResponse("index.html", context, status_code=400)
@@ -2016,7 +2090,7 @@ async def signup(
         db.rollback()
         context = build_landing_context(
             request,
-            form_error="Nao foi possivel salvar o cadastro. Verifique os dados informados e tente novamente.",
+            form_error="Não foi possível salvar o cadastro. Verifique os dados informados e tente novamente.",
             open_signup_modal=True,
         )
         return templates.TemplateResponse("index.html", context, status_code=409)
@@ -2092,7 +2166,7 @@ async def recharge_card_credit(request: Request, db: Session = Depends(get_db)) 
     try:
         card_id = int(payload.get("card_id"))
     except (TypeError, ValueError) as exc:
-        raise HTTPException(status_code=400, detail="Cartao invalido para recarga.") from exc
+        raise HTTPException(status_code=400, detail="Cartão inválido para recarga.") from exc
 
     amount = parse_money_amount(payload.get("amount"), field_name="valor de recarga")
     credit_type = str(payload.get("credit_type") or "Comum").strip()[:40] or "Comum"
@@ -2109,7 +2183,7 @@ async def recharge_card_credit(request: Request, db: Session = Depends(get_db)) 
         db.commit()
     except SQLAlchemyError as exc:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Nao foi possivel salvar a recarga no banco.") from exc
+        raise HTTPException(status_code=500, detail="Não foi possível salvar a recarga no banco.") from exc
 
     db.refresh(card)
     db.refresh(movement)
@@ -2137,6 +2211,7 @@ def dashboard_locate_gtfs_points(
     lng: float = -46.6333,
     q: str = "",
     type: str = "",
+    limit: int = 72,
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
     user = get_user_from_session(request, db)
@@ -2144,13 +2219,19 @@ def dashboard_locate_gtfs_points(
         raise HTTPException(status_code=401, detail="Login required.")
 
     if not GTFS_DIR.exists():
-        raise HTTPException(status_code=503, detail="Base GTFS nao encontrada em data/gtfs.")
+        raise HTTPException(status_code=503, detail="Base GTFS não encontrada em data/gtfs.")
 
     route_type = type.strip().lower()
     if route_type not in {"", "bus", "train"}:
         raise HTTPException(status_code=400, detail="Tipo de ponto invalido.")
 
-    points = gtfs_nearby_points(lat, lng, search=q, route_type=route_type)
+    points = gtfs_nearby_points(
+        lat,
+        lng,
+        search=q,
+        route_type=route_type,
+        limit=max(12, min(limit, 90)),
+    )
     return {
         "items": points,
         "source": "GTFS CittaMobi",
@@ -2169,15 +2250,16 @@ def dashboard_locate_gtfs_prediction(
     if not user:
         raise HTTPException(status_code=401, detail="Login required.")
 
-    stop, predictions = gtfs_predictions_for_stop(stop_id)
+    stop, predictions, service_notice = gtfs_predictions_for_stop(stop_id)
     if not stop:
-        raise HTTPException(status_code=404, detail="Ponto ou estacao nao encontrado no GTFS.")
+        raise HTTPException(status_code=404, detail="Ponto ou estação não encontrado no GTFS.")
 
     return {
         "stop": stop,
         "predictions": predictions,
+        "service_notice": service_notice,
         "source": "GTFS CittaMobi",
-        "note": "Previsao estimada pela grade de horarios do GTFS local.",
+        "note": "Previsão estimada pela grade de horários do GTFS local.",
     }
 
 
@@ -2195,7 +2277,7 @@ async def send_common_support_transcript(request: Request, db: Session = Depends
     case_id = str(payload.get("case_id", "")).strip()
     support_case = get_common_support_case(case_id)
     if not support_case:
-        raise HTTPException(status_code=404, detail="Solicitacao de suporte comum nao encontrada.")
+        raise HTTPException(status_code=404, detail="Solicitação de suporte comum não encontrada.")
 
     transcript = normalize_support_transcript(payload.get("messages"))
     if not transcript:
@@ -2208,7 +2290,7 @@ async def send_common_support_transcript(request: Request, db: Session = Depends
     except smtplib.SMTPException as exc:
         raise HTTPException(
             status_code=502,
-            detail="Nao foi possivel enviar o e-mail do suporte com a configuracao SMTP atual.",
+            detail="Não foi possível enviar o e-mail do suporte com a configuração SMTP atual.",
         ) from exc
 
     return {
@@ -2246,7 +2328,7 @@ def dashboard_qr_image(token: str, request: Request, db: Session = Depends(get_d
     payload = decode_qr_token(token)
     validate_qr_authorization(payload)
     if int(payload["user_id"]) != user.id_usuario:
-        raise HTTPException(status_code=403, detail="QR Code nao pertence a este usuario.")
+        raise HTTPException(status_code=403, detail="QR Code não pertence a este usuário.")
 
     qr = qrcode.QRCode(box_size=8, border=2)
     qr.add_data(str(request.url_for("passage_gateway", token=token)))
@@ -2269,7 +2351,7 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
 
     payload = decode_qr_token_unbounded(token)
     if int(payload["user_id"]) != user.id_usuario:
-        raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
+        raise HTTPException(status_code=403, detail="Este QR Code não pertence a este usuário.")
 
     card_id = int(payload.get("card_id") or 0)
     card = db.scalar(
@@ -2279,7 +2361,7 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
         )
     )
     if not card:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
 
     context = {
         "request": request,
@@ -2304,11 +2386,52 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
         "qr_scan_url": str(request.url_for("dashboard_qr_scan", token=token)),
         "qr_validate_url": str(request.url_for("dashboard_qr_validate", token=token)),
         "qr_complete_url": str(request.url_for("dashboard_qr_complete", token=token)),
+        "qr_retry_url": str(request.url_for("dashboard_qr_retry", token=token)),
         "qr_customer_url": str(request.url_for("passage_gateway", token=token)),
         "qr_image_url": str(request.url_for("dashboard_qr_image")) + f"?token={token}",
         "qr_simulator_mode": "qr" if mode == "qr" else "arm",
     }
     return templates.TemplateResponse("passage_simulator.html", context)
+
+
+@app.post("/dashboard/qr/simulador/{token}/retry", name="dashboard_qr_retry")
+def dashboard_qr_retry(token: str, request: Request, db: Session = Depends(get_db)) -> dict[str, object]:
+    user = get_user_from_session(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Login required.")
+
+    payload = decode_qr_token_unbounded(token)
+    if int(payload["user_id"]) != user.id_usuario:
+        raise HTTPException(status_code=403, detail="Este QR Code não pertence a este usuário.")
+
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == int(payload.get("card_id") or 0),
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
+    if not card:
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
+
+    new_token = build_qr_token(
+        user,
+        amount=money_decimal(payload.get("amount") or DEFAULT_PASSAGE_VALUE),
+        card=card,
+    )
+    snapshot = build_qr_status_snapshot(user, new_token)
+    balance_text = currency(card.saldo)
+    snapshot["balance"] = balance_text
+    snapshot["current_balance"] = balance_text
+    return {
+        "token": new_token,
+        "status": snapshot,
+        "status_url": str(request.url_for("dashboard_qr_status", token=new_token)),
+        "scan_url": str(request.url_for("dashboard_qr_scan", token=new_token)),
+        "validate_url": str(request.url_for("dashboard_qr_validate", token=new_token)),
+        "complete_url": str(request.url_for("dashboard_qr_complete", token=new_token)),
+        "retry_url": str(request.url_for("dashboard_qr_retry", token=new_token)),
+        "image_url": str(request.url_for("dashboard_qr_image")) + f"?token={new_token}",
+    }
 
 
 @app.get("/dashboard/qr/status/{token}", name="dashboard_qr_status")
@@ -2319,7 +2442,7 @@ def dashboard_qr_status(token: str, request: Request, db: Session = Depends(get_
 
     payload = decode_qr_token_unbounded(token)
     if int(payload["user_id"]) != user.id_usuario:
-        raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
+        raise HTTPException(status_code=403, detail="Este QR Code não pertence a este usuário.")
 
     snapshot = build_qr_status_snapshot(user, token)
     card = db.scalar(
@@ -2342,7 +2465,7 @@ def dashboard_qr_scan(token: str, request: Request, db: Session = Depends(get_db
 
     payload = decode_qr_token(token)
     if int(payload["user_id"]) != user.id_usuario:
-        raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
+        raise HTTPException(status_code=403, detail="Este QR Code não pertence a este usuário.")
 
     authorization = validate_qr_authorization(payload)
     current_status = str(authorization.get("status") or "created")
@@ -2378,7 +2501,7 @@ def dashboard_qr_validate(token: str, request: Request, db: Session = Depends(ge
 
     payload = decode_qr_token(token)
     if int(payload["user_id"]) != user.id_usuario:
-        raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
+        raise HTTPException(status_code=403, detail="Este QR Code não pertence a este usuário.")
 
     card = db.scalar(
         select(Cartao).where(
@@ -2387,7 +2510,7 @@ def dashboard_qr_validate(token: str, request: Request, db: Session = Depends(ge
         )
     )
     if not card:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
 
     process_qr_turnstile_validation(db, user=user, card=card, payload=payload)
     snapshot = build_qr_status_snapshot(user, token)
@@ -2404,18 +2527,18 @@ def dashboard_qr_complete(token: str, request: Request, db: Session = Depends(ge
 
     payload = decode_qr_token_unbounded(token)
     if int(payload["user_id"]) != user.id_usuario:
-        raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
+        raise HTTPException(status_code=403, detail="Este QR Code não pertence a este usuário.")
 
     authorization = ACTIVE_QR_AUTHORIZATIONS.get(user.id_usuario)
     if not authorization:
-        raise HTTPException(status_code=400, detail="A autorizacao desta passagem nao esta mais ativa.")
+        raise HTTPException(status_code=400, detail="A autorização desta passagem não está mais ativa.")
 
     if (
         authorization.get("nonce") != payload.get("nonce")
         or int(authorization.get("card_id") or 0) != int(payload.get("card_id") or 0)
         or str(authorization.get("amount")) != str(payload.get("amount"))
     ):
-        raise HTTPException(status_code=400, detail="A autorizacao desta passagem nao confere com o token atual.")
+        raise HTTPException(status_code=400, detail="A autorização desta passagem não confere com o token atual.")
 
     if str(authorization.get("status") or "") == "approved":
         finalize_qr_authorization(user.id_usuario)
@@ -2444,7 +2567,7 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
         .where(Usuario.id_usuario == int(payload["user_id"]))
     )
     if not user or not card_id:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
     card = db.scalar(
         select(Cartao).where(
             Cartao.id_cartao == card_id,
@@ -2452,7 +2575,7 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
         )
     )
     if not card:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
 
     authorization = ACTIVE_QR_AUTHORIZATIONS.get(user.id_usuario)
     if authorization:
@@ -2495,7 +2618,7 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
         .where(Usuario.id_usuario == int(payload["user_id"]))
     )
     if not user or not card_id:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
     card = db.scalar(
         select(Cartao).where(
             Cartao.id_cartao == card_id,
@@ -2503,7 +2626,7 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
         )
     )
     if not card:
-        raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
 
     amount = money_decimal(payload["amount"])
     authorization = process_qr_turnstile_validation(db, user=user, card=card, payload=payload)
@@ -2512,14 +2635,48 @@ def confirm_passage(token: str, request: Request, db: Session = Depends(get_db))
     status_kind, status_message = STATUS_MESSAGES[status]
     context = {
         "request": request,
+        "token": token,
         "status_kind": status_kind,
         "status_message": status_message,
         "current_user": user,
         "profile_image": user.foto_perfil or "imgs/Default.png",
         "amount": currency(amount),
+        "card_number_masked": format_card_number(mask_sensitive(card.numero_cartao, visible_digits=4)),
+        "card_digits": str(card.numero_cartao)[-4:],
+        "card_model": (getattr(card, "modelo", None) or "cartao-verde.png").replace("imgs/", "").replace("/static/", ""),
+        "card_badge": infer_card_badge(user, card)["label"],
+        "card_display_name": card.nome_impresso or user.nome,
         "current_balance": currency(card.saldo),
     }
     return templates.TemplateResponse("passage_result.html", context)
+
+
+@app.post("/passagem/{token}/nova", response_class=HTMLResponse)
+def retry_passage(token: str, request: Request, db: Session = Depends(get_db)) -> RedirectResponse:
+    payload = decode_qr_token_unbounded(token)
+    card_id = int(payload.get("card_id") or 0)
+    user = db.scalar(
+        select(Usuario)
+        .options(joinedload(Usuario.cartao))
+        .where(Usuario.id_usuario == int(payload["user_id"]))
+    )
+    if not user or not card_id:
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == card_id,
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
+    if not card:
+        raise HTTPException(status_code=404, detail="Cartão não encontrado.")
+
+    new_token = build_qr_token(
+        user,
+        amount=money_decimal(payload.get("amount") or DEFAULT_PASSAGE_VALUE),
+        card=card,
+    )
+    return RedirectResponse(url=str(request.url_for("passage_gateway", token=new_token)), status_code=303)
 
 
 @app.post("/logout")

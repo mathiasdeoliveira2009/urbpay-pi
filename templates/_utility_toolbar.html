@@ -18,7 +18,7 @@
   </div>
 
   <div class="utility-item">
-    <button type="button" class="utility-button utility-button--reference" data-toolbar-toggle="notifications" aria-expanded="false" aria-label="Notificacoes">
+    <button type="button" class="utility-button utility-button--reference" data-toolbar-toggle="notifications" aria-expanded="false" aria-label="Notificações">
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 4.5a4 4 0 0 0-4 4v1.4c0 .7-.2 1.4-.6 2l-1.2 1.8a1 1 0 0 0 .8 1.6h10a1 1 0 0 0 .8-1.6l-1.2-1.8c-.4-.6-.6-1.3-.6-2V8.5a4 4 0 0 0-4-4Z"></path>
         <path d="M10 18a2 2 0 0 0 4 0"></path>
@@ -27,12 +27,12 @@
     </button>
 
     <div class="utility-popover utility-popover--wide" data-toolbar-panel="notifications" hidden>
-      <strong data-i18n="toolbar.notificationsTitle">Notificacoes</strong>
-      <p data-i18n="toolbar.notificationsHint">Somente administradores podem enviar notificacoes para os usuarios.</p>
+      <strong data-i18n="toolbar.notificationsTitle">Notificações</strong>
+      <p data-i18n="toolbar.notificationsHint">Somente administradores podem enviar notificações para os usuários.</p>
       <div class="utility-feed">
         <article class="utility-feed__item">
           <strong data-i18n="toolbar.notificationsDemoTitle">Comunicado UrbPay</strong>
-          <p data-i18n="toolbar.notificationsDemoBody">Novas atualizacoes do portal serao exibidas aqui para os usuarios.</p>
+          <p data-i18n="toolbar.notificationsDemoBody">Novas atualizações do portal serão exibidas aqui para os usuários.</p>
         </article>
       </div>
     </div>
@@ -48,11 +48,11 @@
     </button>
 
     <div class="utility-popover utility-popover--wide" data-toolbar-panel="feedback" hidden>
-      <strong data-i18n="toolbar.feedbackTitle">Enviar sugestao</strong>
-      <p data-i18n="toolbar.feedbackHint">Qualquer usuario pode deixar uma sugestao para melhorar a plataforma.</p>
+      <strong data-i18n="toolbar.feedbackTitle">Enviar sugestão</strong>
+      <p data-i18n="toolbar.feedbackHint">Qualquer usuário pode deixar uma sugestão para melhorar a plataforma.</p>
       <form class="utility-feedback" data-feedback-form>
         <textarea name="message" rows="4" maxlength="280" placeholder="Escreva sua ideia aqui" data-i18n-placeholder="toolbar.feedbackPlaceholder"></textarea>
-        <button type="submit" class="utility-submit" data-i18n="toolbar.feedbackSubmit">Enviar sugestao</button>
+        <button type="submit" class="utility-submit" data-i18n="toolbar.feedbackSubmit">Enviar sugestão</button>
       </form>
       <p class="utility-feedback__status" data-feedback-status hidden></p>
     </div>
@@ -71,7 +71,7 @@
         <strong>{{ current_user.nome }}</strong>
         <button type="button" class="utility-option" data-profile-action="account" data-i18n="toolbar.profileAccount">Minha conta</button>
         <button type="button" class="utility-option" data-profile-action="password" data-i18n="toolbar.profilePassword">Mudar senha</button>
-        <button type="button" class="utility-option" data-profile-action="security" data-i18n="toolbar.profileSecurity">Seguranca</button>
+        <button type="button" class="utility-option" data-profile-action="security" data-i18n="toolbar.profileSecurity">Segurança</button>
         <form action="/logout" method="post">
           <button type="submit" class="utility-option utility-option--danger" data-i18n="toolbar.profileLogout">Sair</button>
         </form>

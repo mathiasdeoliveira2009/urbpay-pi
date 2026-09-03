@@ -8,10 +8,10 @@
     {% include "_utility_toolbar.html" %}
   </div>
   <div class="gate-phone-context">
-    <span class="gate-phone-context__kicker">URBPAY / VALIDACAO</span>
-    <h1>Seu embarque<br /><em>esta pronto.</em></h1>
-    <p>Uma simulacao fiel da tela que aparece no celular ao aproximar o QR Code da catraca.</p>
-    <span class="gate-phone-context__terminal">Terminal 04 <i></i> Sao Paulo</span>
+    <span class="gate-phone-context__kicker">URBPAY / VALIDAÇÃO</span>
+    <h1>Seu embarque<br /><em>está pronto.</em></h1>
+    <p>Uma simulação fiel da tela que aparece no celular ao aproximar o QR Code da catraca.</p>
+    <span class="gate-phone-context__terminal">Terminal 04 <i></i> São Paulo</span>
   </div>
 
   <section class="gate-phone" aria-labelledby="gate-reader-title">
@@ -21,23 +21,23 @@
       <div class="gate-phone__content">
         <div class="gate-phone__status"><i></i> Catraca aguardando leitura <span>QR</span></div>
         <div class="gate-phone__heading">
-          <span class="eyebrow">Simulacao de catraca</span>
+          <span class="eyebrow">Simulação de catraca</span>
           <h2 id="gate-reader-title">Validar<br />passagem</h2>
           <p>Confira os dados antes de liberar seu embarque.</p>
         </div>
         <article class="gate-phone-card">
           <div class="gate-phone-card__media">
-            <img src="{{ url_for('static', path='imgs/' ~ card_model) }}" alt="Cartao UrbPay {{ card_display_name }}" onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+            <img src="{{ url_for('static', path='imgs/' ~ card_model) }}" alt="Cartão UrbPay {{ card_display_name }}" onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
             <div class="gate-phone-card__overlay"><strong>UrbPay</strong><span>{{ card_badge }}</span><div><small>{{ card_display_name }}</small><b>{{ card_number_masked }}</b></div></div>
           </div>
-          <div class="gate-phone-card__meta"><span>Cartao ativo</span><strong>Final {{ card_digits }}</strong></div>
+          <div class="gate-phone-card__meta"><span>Cartão ativo</span><strong>Final {{ card_digits }}</strong></div>
         </article>
-        <div class="gate-phone-fare"><span>Tarifa desta viagem</span><strong>R$ {{ amount }}</strong><small>Saldo disponivel: R$ {{ current_balance }}</small></div>
+        <div class="gate-phone-fare"><span>Tarifa desta viagem</span><strong>R$ {{ amount }}</strong><small>Saldo disponível: R$ {{ current_balance }}</small></div>
         <div class="gate-phone-checks"><span><i></i> QR Code reconhecido</span><span><i></i> Saldo suficiente</span></div>
       </div>
       <form action="/passagem/{{ token }}/confirmar" method="post" class="gate-phone__form">
         <button type="submit" class="primary-action gate-confirm">Liberar catraca <b>&gt;</b></button>
-        <small>A liberacao sera registrada no seu historico.</small>
+        <small>A liberação será registrada no seu histórico.</small>
       </form>
       <div class="gate-phone__home"></div>
     </div>

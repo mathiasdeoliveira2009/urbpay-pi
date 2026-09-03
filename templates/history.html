@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}UrbPay | Historico e Extrato{% endblock %}
+{% block title %}UrbPay | Histórico e Extrato{% endblock %}
 
 {% block content %}
 <div class="dashboard-shell dashboard-shell--history">
@@ -34,7 +34,7 @@
           <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil" class="history-profile-card__avatar">
           <div class="history-profile-card__content">
             <strong>{{ current_user.nome }}</strong>
-            <p>Cartao {{ formatted_card_number }}</p>
+            <p>Cartão {{ formatted_card_number }}</p>
             <p>
               Conta {{ card_preview.status }}
               | Validade {{ card_preview.data_validade.strftime('%m/%Y') }}
@@ -209,7 +209,7 @@
             <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil" class="history-profile-card__avatar" />
             <div>
               <strong>{{ current_user.nome }}</strong>
-              <p>Cartao {{ formatted_card_number }}</p>
+              <p>Cartão {{ formatted_card_number }}</p>
               <p>Conta {{ card_preview.status }}  |  Validade {{ card_preview.data_validade.strftime('%m/%Y') }}</p>
             </div>
           </div>
@@ -217,7 +217,7 @@
           <div class="widget-picker">
             <span class="widget-picker__label">Escolha o que aparece na tela</span>
             <label class="widget-toggle"><input type="checkbox" value="monthly" checked data-widget-toggle /> Fluxo mensal</label>
-            <label class="widget-toggle"><input type="checkbox" value="status" checked data-widget-toggle /> Status das operacoes</label>
+            <label class="widget-toggle"><input type="checkbox" value="status" checked data-widget-toggle /> Status das operações</label>
             <label class="widget-toggle"><input type="checkbox" value="locations" checked data-widget-toggle /> Locais recorrentes</label>
             <label class="widget-toggle"><input type="checkbox" value="timeline" checked data-widget-toggle /> Linha recente</label>
             <label class="widget-toggle"><input type="checkbox" value="table" checked data-widget-toggle /> Extrato detalhado</label>
@@ -276,7 +276,7 @@
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
           <h2>Fluxo mensal</h2>
-          <p>Comparativo visual entre debitos e recargas dos ultimos meses.</p>
+          <p>Comparativo visual entre débitos e recargas dos últimos meses.</p>
         </div>
         <div class="chart-area chart-area--bars" data-chart-monthly></div>
       </article> -->
@@ -285,8 +285,8 @@
       <article class="dashboard-card chart-card" data-widget="status">
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
-          <h2>Status das operacoes</h2>
-          <p>Distribuicao de aprovacoes e falhas no uso do cartao.</p>
+          <h2>Status das operações</h2>
+          <p>Distribuição de aprovações e falhas no uso do cartão.</p>
         </div>
         <div class="chart-area chart-area--progress" data-chart-status></div>
       </article>
@@ -296,7 +296,7 @@
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
           <h2>Locais mais frequentes</h2>
-          <p>Leitura de onde o cartao aparece com mais recorrencia.</p>
+          <p>Leitura de onde o cartão aparece com mais recorrência.</p>
         </div>
         <div class="chart-area chart-area--progress" data-chart-locations></div>
       </article>
@@ -306,7 +306,7 @@
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
           <h2>Linha recente</h2>
-          <p>Ultimos eventos do cartao com data, valor e contexto.</p>
+          <p>Últimos eventos do cartão com data, valor e contexto.</p>
         </div>
         <div class="chart-area chart-area--timeline" data-chart-timeline></div>
       </article>
@@ -316,8 +316,8 @@
     <section class="dashboard-card history-table-card history-table-card--separate" data-widget="table">
       <div class="dashboard-card__head">
         <span class="eyebrow">Extrato detalhado</span>
-        <h2>Historico completo do cartao</h2>
-        <p>Registro operacional organizado para conferencia do cliente.</p>
+        <h2>Histórico completo do cartão</h2>
+        <p>Registro operacional organizado para conferência do cliente.</p>
       </div>
 
       <div class="history-table">
@@ -350,7 +350,7 @@
         <div class="dashboard-card__head">
           <span class="eyebrow">Dashboard</span>
           <h2>Fluxo mensal</h2>
-          <p>Comparativo visual entre debitos e recargas dos ultimos meses.</p>
+          <p>Comparativo visual entre débitos e recargas dos últimos meses.</p>
         </div>
         <div class="chart-area chart-area--bars" data-chart-monthly></div>
       </article>
@@ -414,8 +414,8 @@
       <section class="dashboard-card history-table-card">
         <div class="dashboard-card__head">
           <span class="eyebrow">Extrato detalhado</span>
-          <h2>Historico completo do cartao</h2>
-          <p> Registro operacional organizado para conferencia do cliente.</p>
+          <h2>Histórico completo do cartão</h2>
+          <p> Registro operacional organizado para conferência do cliente.</p>
         </div>
         <div class="history-table">
           <div class="history-table__head">

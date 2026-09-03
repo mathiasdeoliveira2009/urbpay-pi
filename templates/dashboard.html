@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}UrbPay | Painel do Cliente{% endblock %}
 
@@ -26,19 +26,7 @@
               <path d="M6.5 9.5V20h11V9.5"></path>
             </svg>
           </span>
-          <span>Inicio</span>
-        </button>
-
-        <button type="button" class="urb-nav-link" data-dashboard-view="cards">
-          <span class="urb-nav-link__icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="5" width="18" height="14" rx="2.5"></rect>
-              <path d="M3 10h18"></path>
-              <path d="M7 15h4"></path>
-            </svg>
-          </span>
-          <span>Meu cartao</span>
+          <span>Início</span>
         </button>
 
         <button type="button" class="urb-nav-link" data-qr-modal-open>
@@ -81,7 +69,7 @@
           <span>Adicionar saldo</span>
         </button>
 
-        <a href="/dashboard/extrato" class="urb-nav-link">
+        <button type="button" class="urb-nav-link" data-dashboard-view="statement">
           <span class="urb-nav-link__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round">
@@ -92,7 +80,7 @@
             </svg>
           </span>
           <span>Extrato</span>
-        </a>
+        </button>
 
         <button type="button" class="urb-nav-link" data-dashboard-view="requests">
           <span class="urb-nav-link__icon">
@@ -106,7 +94,7 @@
               <path d="M8 16h5"></path>
             </svg>
           </span>
-          <span>Solicitacoes</span>
+          <span>Solicitações</span>
         </button>
 
         <button type="button" class="urb-nav-link" onclick="openUrbModal()">
@@ -163,8 +151,8 @@
 
 
         <div class="urb-header__copy">
-          <h1>Ola, {{ current_user.nome.split(' ')[0] }}</h1>
-          <p>Aqui esta o resumo da sua conta UrbPay.</p>
+          <h1>Olá, {{ current_user.nome.split(' ')[0] }}</h1>
+          <p>Aqui está o resumo da sua conta UrbPay.</p>
         </div>
 
         <div class="urb-header__actions">
@@ -285,8 +273,8 @@
   <article class="urb-card urb-month-summary">
     <div class="urb-panel__head urb-panel__head--inline">
       <div>
-        <h2>Resumo do mes</h2>
-        <p>Movimentacoes do seu cartao</p>
+        <h2>Resumo do mês</h2>
+        <p>Movimentações do seu cartão</p>
       </div>
       <span class="urb-month-summary__icon" aria-hidden="true">R$</span>
     </div>
@@ -336,7 +324,7 @@
             <span>Gerar passagem</span>
           </button>
 
-          <a href="/dashboard/extrato" class="urb-quick-action">
+          <button type="button" class="urb-quick-action" data-dashboard-view="statement">
             <span class="urb-quick-action__icon">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -347,7 +335,7 @@
               </svg>
             </span>
             <span>Extrato</span>
-          </a>
+          </button>
 
           <button type="button" class="urb-quick-action" data-dashboard-shortcut="billing">
             <span class="urb-quick-action__icon">
@@ -382,78 +370,99 @@
                 </path>
               </svg>
             </span>
-            <span>Configuracoes</span>
+            <span>Configurações</span>
           </button>
         </div>
       </section>
 
-      <section class="urb-panel" id="transacoes" hidden>
-        <div class="urb-panel__head urb-panel__head--inline">
-          <div>
-            <h2>Transacoes recentes</h2>
-            <p>Seus ultimos movimentos entram aqui automaticamente.</p>
-          </div>
-          <a href="/dashboard/extrato" class="urb-inline-link">Ver todas</a>
-        </div>
-
-        <div class="urb-transactions" data-recent-transactions>
-          {% for item in recent_movements[:4] %}
-          <article class="urb-transaction-row">
-            <span
-              class="urb-transaction-row__icon urb-transaction-row__icon--{{ 'debit' if item.tipo_operacao == 'DEBITO' else 'topup' }}">
-              {% if item.tipo_operacao == "DEBITO" %}
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 11.5h12"></path>
-                <path
-                  d="M7.5 6.5h9A2.5 2.5 0 0 1 19 9v6a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 15V9a2.5 2.5 0 0 1 2.5-2.5Z">
-                </path>
-                <path d="M7 14.5h10"></path>
-              </svg>
-              {% else %}
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="m7 12 5-5 5 5"></path>
-                <path d="m7 17 5-5 5 5"></path>
-              </svg>
-              {% endif %}
-            </span>
-            <div class="urb-transaction-row__content">
-              <strong>
-                {% if item.tipo_operacao == "DEBITO" %}
-                Passagem de onibus
-                {% else %}
-                Recarga via Pix
-                {% endif %}
-              </strong>
-              <p>{{ item.localizacao_operacao or "Rede UrbPay" }}</p>
-            </div>
-            <span class="urb-transaction-row__time">{{ item.data_movimentacao.strftime("%d/%m/%Y, %H:%M") }}</span>
-            <strong
-              class="urb-transaction-row__amount urb-transaction-row__amount--{{ 'negative' if item.tipo_operacao == 'DEBITO' else 'positive' }}">
-              {% if item.tipo_operacao == "DEBITO" %}-{% else %}+{% endif %} {{ "R$
-              %.2f"|format(item.valor)|replace(".", ",") }}
-            </strong>
-          </article>
-          {% else %}
-          <div class="urb-empty-state urb-empty-state--rows">
-            <strong>Nenhuma transacao recente</strong>
-            <p>Suas compras de passagem e recargas aparecerao aqui.</p>
-          </div>
-          {% endfor %}
-        </div>
-
-        <p class="urb-panel__footer" data-recent-transactions-footer data-movement-count="{{ movement_count }}">Mostrando {{ recent_movements[:4] | length }} de {{ movement_count }} transacoes.
-        </p>
-      </section>
-
       <section class="urb-workspace">
+
+        <section class="urb-panel urb-workspace__panel" data-dashboard-panel="statement" hidden>
+          <div class="urb-panel__head urb-panel__head--inline">
+            <div>
+              <h2>Extrato</h2>
+              <p>Movimentações recentes do seu cartão no mesmo painel.</p>
+            </div>
+            <span class="urb-pill-muted">{{ movement_count }} lançamentos</span>
+          </div>
+
+          <div style="display: grid; gap: 16px;">
+            <article class="urb-month-summary">
+              <div class="urb-panel__head urb-panel__head--inline">
+                <div>
+                  <h2>Resumo do mês</h2>
+                  <p>Entradas e saídas registradas nesta conta</p>
+                </div>
+                <span class="urb-month-summary__icon" aria-hidden="true">R$</span>
+              </div>
+              <div class="urb-month-summary__grid">
+                <div>
+                  <span>Recargas</span>
+                  <strong>{{ topup_total }}</strong>
+                </div>
+                <div>
+                  <span>Passagens</span>
+                  <strong>{{ debit_total }}</strong>
+                </div>
+              </div>
+            </article>
+
+            <div class="urb-transactions" data-recent-transactions>
+              {% for item in recent_movements[:6] %}
+              <article class="urb-transaction-row">
+                <span
+                  class="urb-transaction-row__icon urb-transaction-row__icon--{{ 'debit' if item.tipo_operacao == 'DEBITO' else 'topup' }}">
+                  {% if item.tipo_operacao == "DEBITO" %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 11.5h12"></path>
+                    <path
+                      d="M7.5 6.5h9A2.5 2.5 0 0 1 19 9v6a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 15V9a2.5 2.5 0 0 1 2.5-2.5Z">
+                    </path>
+                    <path d="M7 14.5h10"></path>
+                  </svg>
+                  {% else %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m7 12 5-5 5 5"></path>
+                    <path d="m7 17 5-5 5 5"></path>
+                  </svg>
+                  {% endif %}
+                </span>
+                <div class="urb-transaction-row__content">
+                  <strong>
+                    {% if item.tipo_operacao == "DEBITO" %}
+                    Passagem de ônibus
+                    {% else %}
+                    Recarga via Pix
+                    {% endif %}
+                  </strong>
+                  <p>{{ item.localizacao_operacao or "Rede UrbPay" }}</p>
+                </div>
+                <span class="urb-transaction-row__time">{{ item.data_movimentacao.strftime("%d/%m/%Y, %H:%M") }}</span>
+                <strong
+                  class="urb-transaction-row__amount urb-transaction-row__amount--{{ 'negative' if item.tipo_operacao == 'DEBITO' else 'positive' }}">
+                  {% if item.tipo_operacao == "DEBITO" %}-{% else %}+{% endif %} {{ "R$
+                  %.2f"|format(item.valor)|replace(".", ",") }}
+                </strong>
+              </article>
+              {% else %}
+              <div class="urb-empty-state urb-empty-state--rows">
+                <strong>Nenhuma transacao recente</strong>
+                <p>Suas compras de passagem e recargas aparecerão aqui.</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <p class="urb-panel__footer" data-recent-transactions-footer data-movement-count="{{ movement_count }}">Mostrando {{ recent_movements[:6] | length }} de {{ movement_count }} transações.</p>
+        </section>
 
         <section class="urb-panel urb-workspace__panel" data-dashboard-panel="cards" hidden>
           <div class="urb-panel__head urb-panel__head--inline">
             <div>
-              <h2>Meu cartao</h2>
-              <p>Carteira digital com saldo, tipo e dados essenciais do cartao.</p>
+              <h2>Meu cartão</h2>
+              <p>Carteira digital com saldo, tipo e dados essenciais do cartão.</p>
             </div>
             {% if primary_card %}
             <span class="urb-pill-muted">{{ primary_card.badge }}</span>
@@ -468,7 +477,7 @@
             <div class="urb-card-vertical-wrapper">
               <div class="urb-card-display">
                 <img src="{{ url_for('static', path='imgs/' ~ (item.modelo or 'cartao-verde.png')) }}"
-                  alt="Cartao UrbPay {{ item.display_name }}" class="urb-card-vertical-img" />
+                  alt="Cartão UrbPay {{ item.display_name }}" class="urb-card-vertical-img" />
 
                 <div class="urb-card-overlay">
                   <div class="urb-card-overlay__top">
@@ -506,33 +515,49 @@
             </article>
             {% else %}
             <article class="my-card-empty">
-              <strong>Nenhum cartao vinculado</strong>
-              <p>Quando houver mais de um cartao associado ao usuario, eles serao exibidos aqui automaticamente.</p>
+              <strong>Nenhum cartão vinculado</strong>
+              <p>Quando houver mais de um cartão associado ao usuário, eles serão exibidos aqui automaticamente.</p>
             </article>
             {% endfor %}
         </div>
       </section>
 
       <section class="urb-panel urb-workspace__panel urb-locate-panel" data-dashboard-panel="locate" hidden>
-        <div class="urb-panel__head urb-panel__head--inline">
+        <div class="urb-locate-hero">
           <div>
-            <h2>Localizar</h2>
-            <p>Mapa ao vivo com sua posicao e estacoes de trem e metro proximas.</p>
+            <span class="urb-locate-hero__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 4.5h12a2 2 0 0 1 2 2V15a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V6.5a2 2 0 0 1 2-2Z"></path>
+                <path d="M8 8h8"></path>
+                <path d="M8 13h.01"></path>
+                <path d="M16 13h.01"></path>
+                <path d="M8 18l-2 2.5"></path>
+                <path d="M16 18l2 2.5"></path>
+              </svg>
+            </span>
+            <div>
+              <h2>Localizar</h2>
+              <p>Veja as estações próximas e priorize a próxima chegada do trem.</p>
+            </div>
           </div>
-          <span class="urb-pill-muted" data-locate-status>Carregando mapa</span>
+          <div class="urb-locate-live">
+            <span><i></i> Dados atualizados</span>
+            <strong data-locate-status>Carregando mapa</strong>
+          </div>
         </div>
 
         <div class="urb-locate-shell">
           <div class="urb-locate-toolbar">
             <div class="urb-locate-search">
-              <input type="text" placeholder="Busque estacao, linha ou destino"
+              <input type="text" placeholder="Busque estação, linha ou destino"
                 data-locate-search />
-              <button type="button" class="urb-btn urb-btn--fill" data-locate-search-button>Buscar estacoes</button>
-              <button type="button" class="urb-btn urb-btn--outline" data-locate-center-user>Minha localizacao</button>
+              <button type="button" class="urb-btn urb-btn--fill" data-locate-search-button>Buscar estações</button>
+              <button type="button" class="urb-btn urb-btn--outline" data-locate-center-user>Minha localização</button>
             </div>
 
             <div class="urb-locate-legend" aria-label="Legenda do mapa">
-              <span><i class="urb-locate-dot urb-locate-dot--user"></i>Voce</span>
+              <span><i class="urb-locate-dot urb-locate-dot--user"></i>Você</span>
               <span><i class="urb-locate-dot urb-locate-dot--train"></i>Trem</span>
             </div>
           </div>
@@ -542,19 +567,18 @@
 
             <aside class="urb-locate-side">
               <div>
-                <span class="urb-label">Detalhes</span>
-                <h3 data-locate-title>Selecione uma estacao no mapa</h3>
-                <p data-locate-description>Permita a localizacao para iniciar no seu ponto atual e use a busca para
-                  carregar estacoes proximas do GTFS local.</p>
+                <span class="urb-label">Próximas chegadas</span>
+                <h3 data-locate-title>Horários em destaque</h3>
+                <p data-locate-description>Abra o mapa ou use sua localização para ver quando o próximo trem chega.</p>
               </div>
               <div class="urb-locate-results" data-locate-results>
                 <article class="urb-locate-result">
-                  <strong>Metro e CPTM</strong>
-                  <p>Dados carregados do GTFS local com estacoes proximas.</p>
+                  <strong>Carregando estações</strong>
+                  <p>Os horários aparecem aqui assim que o mapa for atualizado.</p>
                 </article>
                 <article class="urb-locate-result">
-                  <strong>Proximas chegadas</strong>
-                  <p>Previsao estimada pela grade de horarios do GTFS.</p>
+                  <strong>Busca otimizada</strong>
+                  <p>Menos marcadores são carregados para deixar a tela mais rápida.</p>
                 </article>
               </div>
             </aside>
@@ -564,8 +588,8 @@
 
       <section class="urb-panel urb-workspace__panel" data-dashboard-panel="services" hidden>
         <div class="urb-panel__head">
-          <h2>Central de servicos</h2>
-          <p>Abra um fluxo por vez para recarga, suporte e operacoes do cartao.</p>
+          <h2>Central de serviços</h2>
+          <p>Abra um fluxo por vez para recarga, suporte e operações do cartão.</p>
         </div>
 
         <div class="service-menu service-menu--embedded">
@@ -584,7 +608,7 @@
                   <path d="M16.5 11.5v1"></path>
                 </svg>
               </div>
-              <strong>Compra de credito</strong>
+              <strong>Compra de crédito</strong>
             </button>
 
             <button type="button" class="service-item service-item--action" data-service-trigger="common"
@@ -636,7 +660,7 @@
 
             <section class="service-flow__panel service-flow__panel--common" data-service-panel="common" hidden>
               <div class="service-flow__crumbs">
-                <span>Inicio</span>
+                <span>Início</span>
                 <span>Comum</span>
                 <span>Central de suporte</span>
               </div>
@@ -644,7 +668,7 @@
               <div class="service-flow__head service-flow__head--common">
                 <div>
                   <h4>Atendimento do bilhete comum</h4>
-                  <p>Escolha um assunto abaixo para abrir um atendimento visual, todo em verde, no mesmo padrao da sua
+                  <p>Escolha um assunto abaixo para abrir um atendimento visual, todo em verde, no mesmo padrão da sua
                     referencia.</p>
                 </div>
 
@@ -652,7 +676,7 @@
                   <span class="common-support-online__dot"></span>
                   <div>
                     <strong>Suporte simulado online</strong>
-                    <p>Um analista acompanha o protocolo assim que voce escolhe a solicitacao.</p>
+                    <p>Um analista acompanha o protocolo assim que você escolhe a solicitação.</p>
                   </div>
                 </div>
               </div>
@@ -682,8 +706,8 @@
               </div>
 
               <div class="common-support-placeholder" data-common-support-placeholder>
-                <strong>Selecione uma opcao acima</strong>
-                <p data-common-support-placeholder-text>O suporte guiado aparece somente quando voce clicar em um dos
+                <strong>Selecione uma opção acima</strong>
+                <p data-common-support-placeholder-text>O suporte guiado aparece somente quando você clicar em um dos
                   cards de atendimento.</p>
               </div>
 
@@ -758,7 +782,7 @@
                       {% if initial_common_case %}
                       {% for message in initial_common_case.messages %}
                       <article class="common-support-message common-support-message--{{ message.role }}">
-                        <span>{{ initial_common_case.agent_name if message.role == "agent" else "Voce" }}</span>
+                        <span>{{ initial_common_case.agent_name if message.role == "agent" else "Você" }}</span>
                         <p>{{ message.text }}</p>
                       </article>
                       {% endfor %}
@@ -783,12 +807,12 @@
 
             <section class="service-flow__panel" data-service-panel="credit-home" hidden>
               <div class="service-flow__crumbs">
-                <span>Inicio</span>
-                <span>Servicos</span>
+                <span>Início</span>
+                <span>Serviços</span>
               </div>
               <div class="service-flow__head">
-                <h4>Compra de credito</h4>
-                <p>Gerencie suas solicitacoes e servicos relacionados ao compra de credito.</p>
+                <h4>Compra de crédito</h4>
+                <p>Gerencie suas solicitações e serviços relacionados ao compra de crédito.</p>
               </div>
               <button type="button" class="service-option-card" data-service-trigger="credit-choose">
                 <div class="service-option-card__icon">
@@ -803,19 +827,19 @@
                     <path d="M16.5 11.5v1"></path>
                   </svg>
                 </div>
-                <strong>Bilhete unico - compra de credito</strong>
+                <strong>Bilhete único - compra de crédito</strong>
               </button>
             </section>
 
             <section class="service-flow__panel" data-service-panel="credit-choose" hidden>
               <div class="service-flow__crumbs">
-                <span>Inicio</span>
+                <span>Início</span>
                 <span>Escolher bilhete</span>
               </div>
               <div class="service-flow__chooser">
                 <div class="service-flow__head">
-                  <h4>Escolher cartao</h4>
-                  <p>Selecione um dos cartoes ja vinculados ao seu perfil para comprar creditos.</p>
+                  <h4>Escolher cartão</h4>
+                  <p>Selecione um dos cartoes ja vinculados ao seu perfil para comprar créditos.</p>
                 </div>
 
                 <div class="service-card-grid">
@@ -831,8 +855,8 @@
                   </button>
                   {% else %}
                   <article class="service-mini-card service-mini-card--empty">
-                    <span>Nenhum cartao</span>
-                    <strong>Cadastre um cartao para recarga</strong>
+                    <span>Nenhum cartão</span>
+                    <strong>Cadastre um cartão para recarga</strong>
                   </article>
                   {% endfor %}
                 </div>
@@ -845,18 +869,18 @@
 
             <section class="service-flow__panel" data-service-panel="credit-type" hidden>
               <div class="service-flow__crumbs">
-                <span>Inicio</span>
+                <span>Início</span>
                 <span>Escolher bilhete</span>
-                <span>Tipo de credito</span>
+                <span>Tipo de crédito</span>
               </div>
               <div class="service-flow__head">
-                <h4>Selecione o tipo de credito</h4>
-                <p>Escolha a modalidade da recarga para o cartao selecionado.</p>
+                <h4>Selecione o tipo de crédito</h4>
+                <p>Escolha a modalidade da recarga para o cartão selecionado.</p>
               </div>
 
               <div class="recharge-overview">
                 <article class="recharge-overview__item">
-                  <span>Cartao selecionado</span>
+                  <span>Cartão selecionado</span>
                   <strong data-credit-selected-card-name>--</strong>
                   <p data-credit-selected-card-number>--</p>
                 </article>
@@ -876,7 +900,7 @@
                   </div>
                   <div class="service-choice-card__copy">
                     <strong>Comum</strong>
-                    <p>Recarga de credito tradicional com escolha livre de valor e pagamento via Pix.</p>
+                    <p>Recarga de crédito tradicional com escolha livre de valor e pagamento via Pix.</p>
                   </div>
                 </button>
 
@@ -891,7 +915,7 @@
                   </div>
                   <div class="service-choice-card__copy">
                     <strong>Estudante</strong>
-                    <p>Segue a mesma mecanica de recarga, com os mesmos valores e confirmacao em Pix.</p>
+                    <p>Segue a mesma mecânica de recarga, com os mesmos valores e confirmação em Pix.</p>
                   </div>
                 </button>
               </div>
@@ -903,19 +927,19 @@
 
             <section class="service-flow__panel" data-service-panel="credit-amount" hidden>
               <div class="service-flow__crumbs">
-                <span>Inicio</span>
+                <span>Início</span>
                 <span>Escolher bilhete</span>
-                <span>Tipo de credito</span>
+                <span>Tipo de crédito</span>
                 <span>Valor</span>
               </div>
               <div class="service-flow__head">
                 <h4>Escolha o valor da recarga</h4>
-                <p>Selecione um valor rapido ou informe outro valor para seguir com o Pix.</p>
+                <p>Selecione um valor rápido ou informe outro valor para seguir com o Pix.</p>
               </div>
 
               <div class="recharge-overview recharge-overview--double">
                 <article class="recharge-overview__item">
-                  <span>Cartao</span>
+                  <span>Cartão</span>
                   <strong data-credit-selected-card-name>--</strong>
                   <p data-credit-selected-card-number>--</p>
                 </article>
@@ -945,7 +969,7 @@
                     data-credit-custom-input />
                   <button type="button" class="secondary-action" data-credit-custom-confirm>Usar este valor</button>
                 </div>
-                <p>Depois da selecao, a proxima etapa abre a confirmacao via Pix.</p>
+                <p>Depois da seleção, a próxima etapa abre a confirmação via Pix.</p>
               </div>
 
               <div class="service-flow__actions">
@@ -956,19 +980,19 @@
 
             <section class="service-flow__panel" data-service-panel="credit-pix" hidden>
               <div class="service-flow__crumbs">
-                <span>Inicio</span>
+                <span>Início</span>
                 <span>Escolher bilhete</span>
-                <span>Tipo de credito</span>
+                <span>Tipo de crédito</span>
                 <span>Pix</span>
               </div>
               <div class="service-flow__head">
                 <h4>Pague com Pix</h4>
-                <p>Revise os dados da recarga e avance para a confirmacao visual do pagamento.</p>
+                <p>Revise os dados da recarga e avance para a confirmação visual do pagamento.</p>
               </div>
 
               <div class="payment-alert">
-                <strong>Atencao</strong>
-                <p>Ao confirmar, a recarga aprovada e salva no banco e o saldo do cartao e atualizado.</p>
+                <strong>Atenção</strong>
+                <p>Ao confirmar, a recarga aprovada e salva no banco e o saldo do cartão é atualizado.</p>
               </div>
 
               <div class="payment-layout">
@@ -986,18 +1010,18 @@
                   <div class="payment-method-card__copy">
                     <span>Forma de pagamento</span>
                     <strong>Pix</strong>
-                    <p>Pagamento instantaneo para a recarga escolhida neste cartao.</p>
+                    <p>Pagamento instantâneo para a recarga escolhida neste cartão.</p>
                   </div>
                 </article>
 
                 <article class="payment-summary-card">
                   <span class="payment-summary-card__eyebrow">Resumo da recarga</span>
                   <div class="payment-summary-card__row">
-                    <span>Cartao</span>
+                    <span>Cartão</span>
                     <strong data-credit-selected-card-name>--</strong>
                   </div>
                   <div class="payment-summary-card__row">
-                    <span>Numero</span>
+                    <span>Número</span>
                     <strong data-credit-selected-card-number>--</strong>
                   </div>
                   <div class="payment-summary-card__row">
@@ -1034,11 +1058,11 @@
             <div class="urb-settings-shell" data-settings-root>
               <div class="urb-settings-surface">
                 <div class="urb-panel__head urb-settings-surface__head">
-                  <h2>Configuracoes</h2>
-                  <p>Aqui estao as configuracoes da sua conta UrbPay.</p>
+                  <h2>Configurações</h2>
+                  <p>Aqui estão as configurações da sua conta UrbPay.</p>
                 </div>
 
-                <div class="urb-settings-tabs" role="tablist" aria-label="Categorias de configuracoes">
+                <div class="urb-settings-tabs" role="tablist" aria-label="Categorias de configurações">
                   <button type="button" class="urb-settings-tab is-active" data-settings-tab="account"
                     id="settings-tab-account" role="tab" aria-selected="true" aria-controls="settings-panel-account">
                     <span class="urb-settings-tab__icon" aria-hidden="true">
@@ -1060,7 +1084,7 @@
                         <path d="M7 15h4"></path>
                       </svg>
                     </span>
-                    <span>Cartao de passagem</span>
+                    <span>Cartão de passagem</span>
                   </button>
                   <button type="button" class="urb-settings-tab" data-settings-tab="notifications"
                     id="settings-tab-notifications" role="tab" aria-selected="false"
@@ -1073,7 +1097,7 @@
                         <path d="M10 17a2 2 0 0 0 4 0"></path>
                       </svg>
                     </span>
-                    <span>Notificacoes</span>
+                    <span>Notificações</span>
                   </button>
                   <button type="button" class="urb-settings-tab" data-settings-tab="security" id="settings-tab-security"
                     role="tab" aria-selected="false" aria-controls="settings-panel-security">
@@ -1084,7 +1108,7 @@
                         <path d="m9.5 12 1.7 1.7 3.3-3.4"></path>
                       </svg>
                     </span>
-                    <span>Seguranca</span>
+                    <span>Segurança</span>
                   </button>
                   <button type="button" class="urb-settings-tab" data-settings-tab="privacy" id="settings-tab-privacy"
                     role="tab" aria-selected="false" aria-controls="settings-panel-privacy">
@@ -1114,7 +1138,7 @@
                         <path d="m17.3 6.7 1.8-1.8"></path>
                       </svg>
                     </span>
-                    <span>Aparencia</span>
+                    <span>Aparência</span>
                   </button>
                   <button type="button" class="urb-settings-tab" data-settings-tab="about" id="settings-tab-about"
                     role="tab" aria-selected="false" aria-controls="settings-panel-about">
@@ -1139,12 +1163,12 @@
                           <div class="urb-settings-card__head urb-settings-card__head--avatar">
                             <div>
                               <h3>Dados da conta</h3>
-                              <p>Gerencie suas informacoes pessoais.</p>
+                              <p>Gerencie suas informações pessoais.</p>
                             </div>
                             <div class="urb-settings-avatar-badge" aria-label="Identificacao do perfil">
                               <span>{{ initials }}</span>
                               <button type="button" class="urb-settings-avatar-badge__action"
-                                data-settings-feedback="A edicao da foto de perfil entra na proxima etapa de backend."
+                                data-settings-feedback="A edição da foto de perfil entra na próxima etapa de backend."
                                 aria-label="Editar foto do perfil">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                                   stroke-linecap="round" stroke-linejoin="round">
@@ -1166,7 +1190,7 @@
                                 <strong>{{ profile_identity.email_display }}</strong>
                               </div>
                               <button type="button" class="urb-settings-inline-button"
-                                data-settings-feedback="A alteracao de e-mail entra na proxima etapa de backend.">Alterar
+                                data-settings-feedback="A alteração de e-mail entra na próxima etapa de backend.">Alterar
                                 e-mail</button>
                             </div>
                             <div
@@ -1176,7 +1200,7 @@
                                 <strong>{{ profile_identity.phone_display }}</strong>
                               </div>
                               <button type="button" class="urb-settings-inline-button"
-                                data-settings-feedback="A alteracao de telefone entra na proxima etapa de backend.">Alterar
+                                data-settings-feedback="A alteração de telefone entra na próxima etapa de backend.">Alterar
                                 telefone</button>
                             </div>
                           </div>
@@ -1185,39 +1209,39 @@
                         <section class="urb-settings-block urb-settings-block--separated">
                           <div class="urb-settings-card__head">
                             <div>
-                              <h3>Preferencias do cartao</h3>
-                              <p>Defina preferencias para seu cartao de passagem virtual.</p>
+                              <h3>Preferências do cartão</h3>
+                              <p>Defina preferências para seu cartão de passagem virtual.</p>
                             </div>
                           </div>
 
                           <div class="urb-settings-form-grid">
                             <label class="urb-settings-form-field">
-                              <span>Cartao ativo para uso</span>
+                              <span>Cartão ativo para uso</span>
                               <select class="urb-settings-select" data-setting-select="defaultCard">
-                                <option value="active">Cartao ativo</option>
-                                <option value="backup">Cartao reserva</option>
+                                <option value="active">Cartão ativo</option>
+                                <option value="backup">Cartão reserva</option>
                               </select>
-                              <small>Este cartao sera usado por padrao nas validacoes.</small>
+                              <small>Este cartão será usado por padrão nas validações.</small>
                             </label>
 
                             <label class="urb-settings-form-field">
-                              <span>Saldo minimo para alerta</span>
+                              <span>Saldo mínimo para alerta</span>
                               <select class="urb-settings-select" data-setting-select="lowBalanceLimit">
                                 <option value="10">R$ 10,00</option>
                                 <option value="20">R$ 20,00</option>
                                 <option value="30">R$ 30,00</option>
                                 <option value="50">R$ 50,00</option>
                               </select>
-                              <small>Voce sera avisado quando o saldo estiver abaixo deste valor.</small>
+                              <small>Você será avisado quando o saldo estiver abaixo deste valor.</small>
                             </label>
                           </div>
 
                           <div class="urb-settings-row urb-settings-row--inline">
                             <div class="urb-settings-row__copy">
-                              <h4>Validacao automatica ao abrir o app</h4>
+                              <h4>Validação automática ao abrir o app</h4>
                               <p>Exibir o QR Code automaticamente ao abrir o aplicativo.</p>
                             </div>
-                            <label class="urb-switch" aria-label="Validacao automatica ao abrir o app">
+                            <label class="urb-switch" aria-label="Validação automática ao abrir o app">
                               <input type="checkbox" data-setting-toggle="autoOpenQr" checked />
                               <span class="urb-switch__track"></span>
                             </label>
@@ -1225,8 +1249,8 @@
 
                           <div class="urb-settings-row urb-settings-row--inline">
                             <div class="urb-settings-row__copy">
-                              <h4>Tempo de expiracao do QR Code</h4>
-                              <p>Defina por quanto tempo o QR Code gerado sera valido.</p>
+                              <h4>Tempo de expiração do QR Code</h4>
+                              <p>Defina por quanto tempo o QR Code gerado será valido.</p>
                             </div>
                             <select class="urb-settings-select" data-setting-select="qrValidity">
                               <option value="45">45 segundos</option>
@@ -1241,14 +1265,14 @@
                       <article class="urb-settings-card urb-settings-card--reference">
                         <div class="urb-settings-card__head">
                           <div>
-                            <h3>Configuracoes de recarga</h3>
-                            <p>Gerencie suas preferencias de recarga.</p>
+                            <h3>Configurações de recarga</h3>
+                            <p>Gerencie suas preferências de recarga.</p>
                           </div>
                         </div>
 
                         <div class="urb-settings-row urb-settings-row--stacked">
                           <div class="urb-settings-row__copy">
-                            <h4>Valor sugerido para recarga rapida</h4>
+                            <h4>Valor sugerido para recarga rápida</h4>
                           </div>
                           <div class="urb-settings-chip-grid">
                             <button type="button" class="urb-settings-choice" data-setting-choice="quickRecharge"
@@ -1260,16 +1284,16 @@
                             <button type="button" class="urb-settings-choice" data-setting-choice="quickRecharge"
                               data-setting-value="50">R$ 50,00</button>
                             <button type="button" class="urb-settings-choice"
-                              data-settings-feedback="O valor customizado entra na proxima etapa de backend.">Outro</button>
+                              data-settings-feedback="O valor customizado entra na próxima etapa de backend.">Outro</button>
                           </div>
                         </div>
 
                         <div class="urb-settings-row urb-settings-row--inline">
                           <div class="urb-settings-row__copy">
-                            <h4>Permitir recarga automatica</h4>
-                            <p>Ativar recarga automatica quando o saldo estiver baixo.</p>
+                            <h4>Permitir recarga automática</h4>
+                            <p>Ativar recarga automática quando o saldo estiver baixo.</p>
                           </div>
-                          <label class="urb-switch" aria-label="Permitir recarga automatica">
+                          <label class="urb-switch" aria-label="Permitir recarga automática">
                             <input type="checkbox" data-setting-toggle="autoReload" />
                             <span class="urb-switch__track"></span>
                           </label>
@@ -1282,8 +1306,8 @@
                         <article class="urb-settings-card">
                           <div class="urb-settings-card__head">
                             <div>
-                              <h3>Preferencias do cartao de passagem</h3>
-                              <p>Configure o cartao principal, o comportamento do QR e os valores mais usados de
+                              <h3>Preferências do cartão de passagem</h3>
+                              <p>Configure o cartão principal, o comportamento do QR e os valores mais usados de
                                 recarga.
                               </p>
                             </div>
@@ -1292,19 +1316,19 @@
                           <div class="urb-settings-list">
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Cartao padrao para uso</h4>
-                                <p>Esse cartao sera destacado para validacao, recarga e exibicao de dados sensiveis.
+                                <h4>Cartão padrão para uso</h4>
+                                <p>Esse cartão será destacado para validação, recarga e exibição de dados sensíveis.
                                 </p>
                               </div>
                               <select class="urb-settings-select" data-setting-select="defaultCard">
-                                <option value="active">Cartao ativo</option>
-                                <option value="backup">Cartao reserva</option>
+                                <option value="active">Cartão ativo</option>
+                                <option value="backup">Cartão reserva</option>
                               </select>
                             </div>
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Saldo minimo para alerta</h4>
+                                <h4>Saldo mínimo para alerta</h4>
                                 <p>Defina um limite para receber lembretes antes de ficar sem saldo para embarque.</p>
                               </div>
                               <select class="urb-settings-select" data-setting-select="lowBalanceLimit">
@@ -1317,12 +1341,12 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Validacao automatica ao abrir o app</h4>
-                                <p>Exibe o QR Code mais rapido para pessoas que usam o cartao em deslocamentos
+                                <h4>Validação automática ao abrir o app</h4>
+                                <p>Exibe o QR Code mais rápido para pessoas que usam o cartão em deslocamentos
                                   frequentes.
                                 </p>
                               </div>
-                              <label class="urb-switch" aria-label="Validacao automatica ao abrir o app">
+                              <label class="urb-switch" aria-label="Validação automática ao abrir o app">
                                 <input type="checkbox" data-setting-toggle="autoOpenQr" checked />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1330,8 +1354,8 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Tempo de expiracao do QR Code</h4>
-                                <p>Ajuste o intervalo mais confortavel para leitura sem deixar o codigo exposto por
+                                <h4>Tempo de expiração do QR Code</h4>
+                                <p>Ajuste o intervalo mais confortável para leitura sem deixar o codigo exposto por
                                   muito
                                   tempo.</p>
                               </div>
@@ -1345,7 +1369,7 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Valor sugerido para recarga rapida</h4>
+                                <h4>Valor sugerido para recarga rápida</h4>
                                 <p>Escolha o valor que deve aparecer como destaque no fluxo de recarga.</p>
                               </div>
                               <div class="urb-settings-choice-group">
@@ -1362,11 +1386,11 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Permitir recarga automatica</h4>
+                                <h4>Permitir recarga automática</h4>
                                 <p>Ideal para quem usa o app todos os dias e quer reduzir o risco de saldo
                                   insuficiente.</p>
                               </div>
-                              <label class="urb-switch" aria-label="Permitir recarga automatica">
+                              <label class="urb-switch" aria-label="Permitir recarga automática">
                                 <input type="checkbox" data-setting-toggle="autoReload" />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1381,7 +1405,7 @@
                         <article class="urb-settings-card">
                           <div class="urb-settings-card__head">
                             <div>
-                              <h3>Central de notificacoes</h3>
+                              <h3>Central de notificações</h3>
                               <p>Combine canais e tipos de aviso para reduzir ruido e priorizar o que realmente
                                 importa.</p>
                             </div>
@@ -1390,11 +1414,11 @@
                           <div class="urb-settings-list">
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Notificacoes no aplicativo</h4>
-                                <p>Mostra alertas de embarque, atualizacao de recarga e novidades dentro do painel.
+                                <h4>Notificações no aplicativo</h4>
+                                <p>Mostra alertas de embarque, atualização de recarga e novidades dentro do painel.
                                 </p>
                               </div>
-                              <label class="urb-switch" aria-label="Notificacoes no aplicativo">
+                              <label class="urb-switch" aria-label="Notificações no aplicativo">
                                 <input type="checkbox" data-setting-toggle="pushAlerts" checked />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1403,7 +1427,7 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Comprovantes por e-mail</h4>
-                                <p>Envia recibos de recarga, mudancas cadastrais e respostas do suporte para o e-mail
+                                <p>Envia recibos de recarga, mudanças cadastrais e respostas do suporte para o e-mail
                                   principal.</p>
                               </div>
                               <label class="urb-switch" aria-label="Comprovantes por e-mail">
@@ -1414,12 +1438,12 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>SMS para eventos criticos</h4>
+                                <h4>SMS para eventos críticos</h4>
                                 <p>Dispara um aviso curto quando houver bloqueio, saldo muito baixo ou falha de
-                                  validacao.
+                                  validação.
                                 </p>
                               </div>
-                              <label class="urb-switch" aria-label="SMS para eventos criticos">
+                              <label class="urb-switch" aria-label="SMS para eventos críticos">
                                 <input type="checkbox" data-setting-toggle="smsAlerts" />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1428,7 +1452,7 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Alertas de recarga e saldo</h4>
-                                <p>Recomendado para quem acompanha o uso do cartao com mais frequencia.</p>
+                                <p>Recomendado para quem acompanha o uso do cartão com mais frequência.</p>
                               </div>
                               <label class="urb-switch" aria-label="Alertas de recarga e saldo">
                                 <input type="checkbox" data-setting-toggle="rechargeAlerts" checked />
@@ -1439,7 +1463,7 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Atualizacoes operacionais do transporte</h4>
-                                <p>Receba mensagens sobre mudancas de fluxo, leitura e disponibilidade do servico
+                                <p>Receba mensagens sobre mudanças de fluxo, leitura e disponibilidade do serviço
                                   digital.
                                 </p>
                               </div>
@@ -1451,8 +1475,8 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Horario silencioso</h4>
-                                <p>Define um periodo com menos interrupcoes, mantendo apenas avisos de seguranca e
+                                <h4>Horário silencioso</h4>
+                                <p>Define um período com menos interrupções, mantendo apenas avisos de seguranca e
                                   emergencias.</p>
                               </div>
                               <select class="urb-settings-select" data-setting-select="quietHours">
@@ -1470,8 +1494,8 @@
                         <article class="urb-settings-card">
                           <div class="urb-settings-card__head">
                             <div>
-                              <h3>Seguranca da conta</h3>
-                              <p>Camadas de protecao para acesso, sessao e exibicao de dados sensiveis.</p>
+                              <h3>Segurança da conta</h3>
+                              <p>Camadas de proteção para acesso, sessão e exibição de dados sensíveis.</p>
                             </div>
                           </div>
 
@@ -1490,8 +1514,8 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Biometria ou bloqueio por aparelho</h4>
-                                <p>Melhora a protecao para uso rapido em celulares compartilhados ou em ambiente
-                                  publico.
+                                <p>Melhora a proteção para uso rápido em celulares compartilhados ou em ambiente
+                                  público.
                                 </p>
                               </div>
                               <label class="urb-switch" aria-label="Biometria ou bloqueio por aparelho">
@@ -1502,10 +1526,10 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Alertas de novas sessoes</h4>
+                                <h4>Alertas de novas sessões</h4>
                                 <p>Informa quando o seu perfil for acessado em um navegador ou aparelho diferente.</p>
                               </div>
-                              <label class="urb-switch" aria-label="Alertas de novas sessoes">
+                              <label class="urb-switch" aria-label="Alertas de novas sessões">
                                 <input type="checkbox" data-setting-toggle="sessionAlerts" checked />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1513,11 +1537,11 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Manter dados do cartao ocultos por padrao</h4>
-                                <p>Ajuda a evitar exposicao acidental de numero do cartao e saldo em ambientes
+                                <h4>Manter dados do cartão ocultos por padrão</h4>
+                                <p>Ajuda a evitar exposição acidental de número do cartão e saldo em ambientes
                                   externos.</p>
                               </div>
-                              <label class="urb-switch" aria-label="Manter dados do cartao ocultos por padrao">
+                              <label class="urb-switch" aria-label="Manter dados do cartão ocultos por padrão">
                                 <input type="checkbox" data-setting-toggle="maskCardDetails" checked />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1525,7 +1549,7 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Tempo maximo de sessao sem atividade</h4>
+                                <h4>Tempo máximo de sessão sem atividade</h4>
                                 <p>Escolha um intervalo adequado ao seu contexto de uso sem sacrificar seguranca.</p>
                               </div>
                               <select class="urb-settings-select" data-setting-select="sessionTimeout">
@@ -1545,8 +1569,8 @@
                           <div class="urb-settings-card__head">
                             <div>
                               <h3>Privacidade e dados</h3>
-                              <p>Ajustes inspirados em praticas de minimizacao de dados, transparencia e conforto do
-                                usuario.</p>
+                              <p>Ajustes inspirados em práticas de minimização de dados, transparência e conforto do
+                                usuário.</p>
                             </div>
                           </div>
 
@@ -1554,8 +1578,8 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Compartilhar dados anonimizados de uso</h4>
-                                <p>Ajuda a melhorar o fluxo de recarga e validacao sem usar identificacao publica do
-                                  usuario.</p>
+                                <p>Ajuda a melhorar o fluxo de recarga e validação sem usar identificação publica do
+                                  usuário.</p>
                               </div>
                               <label class="urb-switch" aria-label="Compartilhar dados anonimizados de uso">
                                 <input type="checkbox" data-setting-toggle="anonymousAnalytics" />
@@ -1565,12 +1589,12 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Compartilhar diagnosticos com o suporte</h4>
-                                <p>Permite anexar contexto tecnico de erros para reduzir tempo de atendimento em
+                                <h4>Compartilhar diagnósticos com o suporte</h4>
+                                <p>Permite anexar contexto técnico de erros para reduzir tempo de atendimento em
                                   chamados.
                                 </p>
                               </div>
-                              <label class="urb-switch" aria-label="Compartilhar diagnosticos com o suporte">
+                              <label class="urb-switch" aria-label="Compartilhar diagnósticos com o suporte">
                                 <input type="checkbox" data-setting-toggle="supportDiagnostics" checked />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1578,12 +1602,12 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Ocultar detalhes pessoais em areas compartilhadas</h4>
-                                <p>Diminui a exibicao de e-mail e identificadores quando a tela estiver aberta em
+                                <h4>Ocultar detalhes pessoais em áreas compartilhadas</h4>
+                                <p>Diminui a exibição de e-mail e identificadores quando a tela estiver aberta em
                                   local
-                                  publico.</p>
+                                  público.</p>
                               </div>
-                              <label class="urb-switch" aria-label="Ocultar detalhes pessoais em areas compartilhadas">
+                              <label class="urb-switch" aria-label="Ocultar detalhes pessoais em áreas compartilhadas">
                                 <input type="checkbox" data-setting-toggle="publicScreenMode" checked />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1606,20 +1630,20 @@
                           <div class="urb-settings-card__head">
                             <div>
                               <h3>Controle de dados</h3>
-                              <p>Atalhos rapidos para operacoes sensiveis ou administrativas.</p>
+                              <p>Atalhos rápidos para operações sensíveis ou administrativas.</p>
                             </div>
                           </div>
 
                           <div class="urb-settings-inline-actions">
                             <button type="button" class="secondary-action"
-                              data-settings-feedback="O fluxo de exportacao entra na proxima etapa de backend.">Exportar
+                              data-settings-feedback="O fluxo de exportação entra na próxima etapa de backend.">Exportar
                               meus dados</button>
                             <button type="button" class="secondary-action"
-                              data-settings-feedback="O download detalhado do historico entra na proxima etapa de backend.">Baixar
-                              historico de uso</button>
+                              data-settings-feedback="O download detalhado do histórico entra na próxima etapa de backend.">Baixar
+                              histórico de uso</button>
                             <button type="button" class="secondary-action"
-                              data-settings-feedback="A revisao de permissoes entra na proxima etapa de backend.">Revisar
-                              permissoes</button>
+                              data-settings-feedback="A revisão de permissões entra na próxima etapa de backend.">Revisar
+                              permissões</button>
                           </div>
                         </article>
                       </section>
@@ -1629,9 +1653,9 @@
                         <article class="urb-settings-card">
                           <div class="urb-settings-card__head">
                             <div>
-                              <h3>Aparencia e acessibilidade</h3>
-                              <p>Opcoes pensadas para baixa visao, sensibilidade a movimento, leitura prolongada e
-                                diferentes preferencias cognitivas.</p>
+                              <h3>Aparência e acessibilidade</h3>
+                              <p>Opções pensadas para baixa visão, sensibilidade a movimento, leitura prolongada e
+                                diferentes preferências cognitivas.</p>
                             </div>
                           </div>
 
@@ -1639,7 +1663,7 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Tema visual</h4>
-                                <p>Escolha entre claro, escuro ou acompanhamento automatico do sistema.</p>
+                                <p>Escolha entre claro, escuro ou acompanhamento automático do sistema.</p>
                               </div>
                               <div class="urb-settings-choice-group">
                                 <button type="button" class="urb-settings-choice" data-setting-choice="theme"
@@ -1654,11 +1678,11 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Idioma da interface</h4>
-                                <p>Permite alternar rapidamente o idioma principal da navegacao e dos atalhos.</p>
+                                <p>Permite alternar rápidamente o idioma principal da navegação e dos atalhos.</p>
                               </div>
                               <div class="urb-settings-choice-group">
                                 <button type="button" class="urb-settings-choice"
-                                  data-language-option="pt-BR">Portugues</button>
+                                  data-language-option="pt-BR">Português</button>
                                 <button type="button" class="urb-settings-choice"
                                   data-language-option="en-US">English</button>
                               </div>
@@ -1671,23 +1695,23 @@
                               </div>
                               <div class="urb-settings-choice-group">
                                 <button type="button" class="urb-settings-choice" data-setting-choice="textSize"
-                                  data-setting-value="default">Padrao</button>
+                                  data-setting-value="default">Padrão</button>
                                 <button type="button" class="urb-settings-choice" data-setting-choice="textSize"
                                   data-setting-value="large">Ampliado</button>
                                 <button type="button" class="urb-settings-choice" data-setting-choice="textSize"
-                                  data-setting-value="xlarge">Maximo</button>
+                                  data-setting-value="xlarge">Máximo</button>
                               </div>
                             </div>
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Densidade da interface</h4>
-                                <p>A versao confortavel aumenta respiro. A compacta concentra mais informacao na tela.
+                                <p>A versão confortável aumenta respiro. A compacta concentra mais informação na tela.
                                 </p>
                               </div>
                               <div class="urb-settings-choice-group">
                                 <button type="button" class="urb-settings-choice" data-setting-choice="density"
-                                  data-setting-value="comfortable">Confortavel</button>
+                                  data-setting-value="comfortable">Confortável</button>
                                 <button type="button" class="urb-settings-choice" data-setting-choice="density"
                                   data-setting-value="compact">Compacta</button>
                               </div>
@@ -1696,7 +1720,7 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Contraste elevado</h4>
-                                <p>Reforca bordas, textos e estados visuais para facilitar leitura em diferentes
+                                <p>Reforça bordas, textos e estados visuais para facilitar leitura em diferentes
                                   ambientes.
                                 </p>
                               </div>
@@ -1708,11 +1732,11 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Reduzir animacoes</h4>
-                                <p>Minimiza transicoes e movimentos para pessoas com vestibulopatia, fadiga visual ou
-                                  preferencia por interfaces estaveis.</p>
+                                <h4>Reduzir animações</h4>
+                                <p>Minimiza transições e movimentos para pessoas com vestibulopatia, fadiga visual ou
+                                  preferência por interfaces estáveis.</p>
                               </div>
-                              <label class="urb-switch" aria-label="Reduzir animacoes">
+                              <label class="urb-switch" aria-label="Reduzir animações">
                                 <input type="checkbox" data-setting-toggle="reducedMotion" />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1721,8 +1745,8 @@
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Realce forte de foco</h4>
-                                <p>Destaca botoes, links e campos durante uso por teclado ou leitor de tela com
-                                  navegacao
+                                <p>Destaca botões, links e campos durante uso por teclado ou leitor de tela com
+                                  navegação
                                   visual.</p>
                               </div>
                               <label class="urb-switch" aria-label="Realce forte de foco">
@@ -1733,11 +1757,11 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
-                                <h4>Modo de leitura confortavel</h4>
-                                <p>Aumenta espacamento e melhora a cadencia visual para textos longos e consultas
+                                <h4>Modo de leitura confortável</h4>
+                                <p>Aumenta espaçamento e melhora a cadência visual para textos longos e consultas
                                   detalhadas.</p>
                               </div>
-                              <label class="urb-switch" aria-label="Modo de leitura confortavel">
+                              <label class="urb-switch" aria-label="Modo de leitura confortável">
                                 <input type="checkbox" data-setting-toggle="readableMode" />
                                 <span class="urb-switch__track"></span>
                               </label>
@@ -1753,13 +1777,13 @@
                           <div class="urb-settings-card__head">
                             <div>
                               <h3>Sobre o aplicativo</h3>
-                              <p>Informacoes gerais da plataforma, recursos em destaque e canais de apoio.</p>
+                              <p>Informações gerais da plataforma, recursos em destaque e canais de apoio.</p>
                             </div>
                           </div>
 
                           <div class="urb-settings-field-grid">
                             <div class="urb-settings-field">
-                              <span>Versao da interface</span>
+                              <span>Versão da interface</span>
                               <strong>1.3.2</strong>
                             </div>
                             <div class="urb-settings-field">
@@ -1780,8 +1804,8 @@
                         <article class="urb-settings-card">
                           <div class="urb-settings-card__head">
                             <div>
-                              <h3>Boas praticas adotadas</h3>
-                              <p>Itens incluidos para melhorar clareza, confianca e autonomia no uso.</p>
+                              <h3>Boas práticas adotadas</h3>
+                              <p>Itens incluídos para melhorar clareza, confiança e autonomia no uso.</p>
                             </div>
                           </div>
 
@@ -1794,13 +1818,13 @@
                             </div>
                             <div class="urb-settings-checklist__item">
                               <strong>Acessibilidade visual</strong>
-                              <p>Contraste elevado, foco destacado, escala de texto e reducao de movimento com
-                                aplicacao
+                              <p>Contraste elevado, foco destacado, escala de texto e redução de movimento com
+                                aplicação
                                 real na interface.</p>
                             </div>
                             <div class="urb-settings-checklist__item">
                               <strong>Privacidade por contexto</strong>
-                              <p>Controles pensados para consulta em local publico, suporte e tratamento de dados mais
+                              <p>Controles pensados para consulta em local público, suporte e tratamento de dados mais
                                 transparente.</p>
                             </div>
                           </div>
@@ -1811,8 +1835,8 @@
                     <article class="urb-settings-sidecard">
                       <div class="urb-settings-card__head">
                         <div>
-                          <h3>Informacoes do cartao ativo</h3>
-                          <p>Resumo rapido para consulta durante recargas e validacoes.</p>
+                          <h3>Informações do cartão ativo</h3>
+                          <p>Resumo rápido para consulta durante recargas e validações.</p>
                         </div>
                       </div>
 
@@ -1822,7 +1846,7 @@
                           <div class="urb-virtual-card__media">
                             <img
                               src="{{ url_for('static', path='imgs/' ~ (primary_card.card_model or primary_card.modelo or 'cartao-verde.png')) }}"
-                              alt="Cartao UrbPay" class="urb-virtual-card__image" />
+                              alt="Cartão UrbPay" class="urb-virtual-card__image" />
                             <span class="urb-virtual-card__badge">{{ primary_card.badge }}</span>
                           </div>
                         </div>
@@ -1837,7 +1861,7 @@
                             <strong>{{ card_preview.cvv if card_preview else "---" }}</strong>
                           </div>
                           <div>
-                            <span>Valido ate</span>
+                            <span>Válido até</span>
                             <strong>{{ card_preview.data_validade.strftime("%m/%Y") if card_preview and
                               card_preview.data_validade else "--" }}</strong>
                           </div>
@@ -1845,8 +1869,8 @@
                       </div>
                       {% else %}
                       <div class="urb-empty-state urb-empty-state--rows">
-                        <strong>Nenhum cartao disponivel</strong>
-                        <p>Cadastre ou vincule um cartao para ver o resumo aqui.</p>
+                        <strong>Nenhum cartão disponível</strong>
+                        <p>Cadastre ou vincule um cartão para ver o resumo aqui.</p>
                       </div>
                       {% endif %}
                     </article>
@@ -1855,23 +1879,23 @@
                       <div class="urb-settings-card__head">
                         <div>
                           <h3>Sobre o aplicativo</h3>
-                          <p>Informacoes da versao e atualizacao mais recente.</p>
+                          <p>Informações da versão e atualização mais recente.</p>
                         </div>
                       </div>
 
                       <div class="urb-settings-app-meta">
                         <div class="urb-settings-app-meta__item">
-                          <span>Versao atual</span>
+                          <span>Versão atual</span>
                           <strong>1.3.2</strong>
                         </div>
                         <div class="urb-settings-app-meta__item">
-                          <span>Ultima atualizacao</span>
+                          <span>Última atualização</span>
                           <strong>06/08/2026</strong>
                         </div>
                       </div>
 
                       <button type="button" class="urb-settings-app-button"
-                        data-settings-feedback="A central de novidades entra na proxima etapa de backend.">Ver
+                        data-settings-feedback="A central de novidades entra na próxima etapa de backend.">Ver
                         novidades</button>
                     </article>
                     </aside>
@@ -1885,15 +1909,15 @@
 
 <section class="urb-panel urb-workspace__panel" data-dashboard-panel="requests" hidden>
   <div class="urb-panel__head">
-    <h2>Solicitacoes e acompanhamento</h2>
-    <p>Historico operacional, fila de servicos e suporte guiado no mesmo painel.</p>
+    <h2>Solicitações e acompanhamento</h2>
+    <p>Histórico operacional, fila de serviços e suporte guiado no mesmo painel.</p>
   </div>
 
   <div class="request-board" data-request-board data-request-endpoint="/dashboard/requests">
     <div class="request-board__filters">
       <label class="request-board__search">
-        <span class="sr-only">Buscar por protocolo ou servico</span>
-        <input type="search" placeholder="Buscar por protocolo ou servico" data-request-search />
+        <span class="sr-only">Buscar por protocolo ou serviço</span>
+        <input type="search" placeholder="Buscar por protocolo ou serviço" data-request-search />
       </label>
 
       <label class="request-board__status">
@@ -1905,7 +1929,7 @@
         </select>
       </label>
 
-      <button type="button" class="request-board__action" aria-label="Atualizar solicitacoes" data-request-refresh>
+      <button type="button" class="request-board__action" aria-label="Atualizar solicitações" data-request-refresh>
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
           stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 12a8 8 0 1 1-2.34-5.66"></path>
@@ -1917,7 +1941,7 @@
     <div class="request-board__table">
       <div class="request-board__head">
         <span>Protocolo</span>
-        <span>Servico</span>
+        <span>Serviço</span>
         <span>Status</span>
       </div>
 
@@ -1936,11 +1960,11 @@
           </div>
         </article>
         {% else %}
-        <div class="request-board__empty">Nenhuma solicitacao encontrada com esse filtro.</div>
+        <div class="request-board__empty">Nenhuma solicitação encontrada com esse filtro.</div>
         {% endfor %}
       </div>
     </div>
-    <p class="request-board__feedback" data-request-feedback>Mostrando solicitacoes em andamento.</p>
+    <p class="request-board__feedback" data-request-feedback>Mostrando solicitações em andamento.</p>
     <script type="application/json" data-request-items>{{ request_items | tojson }}</script>
   </div>
 </section>

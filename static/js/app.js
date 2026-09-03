@@ -1,4 +1,4 @@
-﻿const body = document.body;
+const body = document.body;
 const root = document.documentElement;
 const revealItems = document.querySelectorAll("[data-reveal]");
 const magneticItems = document.querySelectorAll("[data-magnetic]");
@@ -141,6 +141,10 @@ const dashboardPanels = document.querySelectorAll("[data-dashboard-panel]");
 const dashboardHomeSections = document.querySelectorAll("[data-dashboard-home-section]");
 const dashboardPlaceholder = document.querySelector("[data-dashboard-placeholder]");
 const dashboardWorkspace = document.querySelector(".urb-workspace");
+const requestsPanel = document.querySelector('[data-dashboard-panel="requests"]');
+if (dashboardWorkspace && requestsPanel && !dashboardWorkspace.contains(requestsPanel)) {
+  dashboardWorkspace.appendChild(requestsPanel);
+}
 const locateMapElement = document.querySelector("[data-locate-map]");
 const locateStatus = document.querySelector("[data-locate-status]");
 const locateSearchInput = document.querySelector("[data-locate-search]");
@@ -204,34 +208,34 @@ const defaultUiSettings = {
 const i18n = {
   "pt-BR": {
     "toolbar.languageTitle": "Idioma",
-    "toolbar.themeTitle": "Aparencia",
+    "toolbar.themeTitle": "Aparência",
     "toolbar.themeLight": "Modo claro",
     "toolbar.themeDark": "Modo escuro",
-    "toolbar.notificationsTitle": "Notificacoes",
-    "toolbar.notificationsHint": "Somente administradores podem enviar notificacoes para os usuarios.",
+    "toolbar.notificationsTitle": "Notificações",
+    "toolbar.notificationsHint": "Somente administradores podem enviar notificações para os usuários.",
     "toolbar.notificationsDemoTitle": "Comunicado UrbPay",
-    "toolbar.notificationsDemoBody": "Novas atualizacoes do portal serao exibidas aqui para os usuarios.",
-    "toolbar.feedbackTitle": "Enviar sugestao",
-    "toolbar.feedbackHint": "Qualquer usuario pode deixar uma sugestao para melhorar a plataforma.",
+    "toolbar.notificationsDemoBody": "Novas atualizações do portal serão exibidas aqui para os usuários.",
+    "toolbar.feedbackTitle": "Enviar sugestão",
+    "toolbar.feedbackHint": "Qualquer usuário pode deixar uma sugestão para melhorar a plataforma.",
     "toolbar.feedbackPlaceholder": "Escreva sua ideia aqui",
-    "toolbar.feedbackSubmit": "Enviar sugestao",
+    "toolbar.feedbackSubmit": "Enviar sugestão",
     "toolbar.profileAccount": "Minha conta",
     "toolbar.profilePassword": "Mudar senha",
-    "toolbar.profileSecurity": "Seguranca",
+    "toolbar.profileSecurity": "Segurança",
     "toolbar.profileLogout": "Sair",
-    "toolbar.feedbackSuccess": "Sugestao enviada com sucesso.",
-    "toolbar.profilePending": "Esta area ainda esta em preparacao.",
+    "toolbar.feedbackSuccess": "Sugestão enviada com sucesso.",
+    "toolbar.profilePending": "Esta área ainda está em preparação.",
     "dashboard.headerTitle": "Painel do Cliente",
-    "dashboard.headerSubtitle": "Passagem QR segura, cartao digital e leitura rapida do seu historico.",
-    "dashboard.historyLink": "Historico e extrato",
-    "history.headerTitle": "Historico e Extrato",
-    "history.headerSubtitle": "Painel configuravel para acompanhar o comportamento do seu cartao.",
+    "dashboard.headerSubtitle": "Passagem QR segura, cartão digital e leitura rápida do seu histórico.",
+    "dashboard.historyLink": "Histórico e extrato",
+    "history.headerTitle": "Histórico e Extrato",
+    "history.headerSubtitle": "Painel configurável para acompanhar o comportamento do seu cartão.",
     "history.backLink": "Voltar ao painel",
     "landing.brandSubtitle": "Portal de mobilidade urbana",
-    "landing.navHome": "Inicio",
+    "landing.navHome": "Início",
     "landing.navLogin": "Login",
     "landing.navHowItWorks": "Como funciona",
-    "landing.navServices": "Servicos",
+    "landing.navServices": "Serviços",
     "landing.navProfile": "Meu perfil",
     "landing.signupButton": "Cadastrar",
   },
@@ -351,25 +355,25 @@ const updateSettingsSummary = (settings = uiSettingsState) => {
     system: "Sistema",
   };
   const languageLabels = {
-    "pt-BR": "Portugues",
+    "pt-BR": "Português",
     "en-US": "English",
   };
   const textSizeLabels = {
-    default: "Padrao",
+    default: "Padrão",
     large: "Ampliado",
-    xlarge: "Maximo",
+    xlarge: "Máximo",
   };
   const densityLabels = {
-    comfortable: "Confortavel",
+    comfortable: "Confortável",
     compact: "Compacta",
   };
 
   setSettingsSummaryValue("theme", themeLabels[getStoredTheme()] || "Claro");
-  setSettingsSummaryValue("language", languageLabels[getStoredLanguage()] || "Portugues");
-  setSettingsSummaryValue("textSize", textSizeLabels[settings.textSize] || "Padrao");
-  setSettingsSummaryValue("density", densityLabels[settings.density] || "Confortavel");
+  setSettingsSummaryValue("language", languageLabels[getStoredLanguage()] || "Português");
+  setSettingsSummaryValue("textSize", textSizeLabels[settings.textSize] || "Padrão");
+  setSettingsSummaryValue("density", densityLabels[settings.density] || "Confortável");
   setSettingsSummaryValue("motion", settings.reducedMotion ? "Reduzido" : "Completo");
-  setSettingsSummaryValue("contrast", settings.highContrast ? "Elevado" : "Padrao");
+  setSettingsSummaryValue("contrast", settings.highContrast ? "Elevado" : "Padrão");
   setSettingsSummaryValue("focus", settings.focusHighlight ? "Ativo" : "Suave");
 };
 
@@ -501,7 +505,7 @@ const normalizeSearchText = (value) => String(value ?? "")
 
 const getRequestFilterLabel = (filterValue) => {
   if (filterValue === "completed") {
-    return "concluidas";
+    return "concluídas";
   }
 
   if (filterValue === "all") {
@@ -561,16 +565,16 @@ const renderRequestBoard = () => {
 
   const filteredItems = getFilteredRequestItems();
   if (!filteredItems.length) {
-    requestBoardBody.innerHTML = '<div class="request-board__empty">Nenhuma solicitacao encontrada com esse filtro.</div>';
+    requestBoardBody.innerHTML = '<div class="request-board__empty">Nenhuma solicitação encontrada com esse filtro.</div>';
   } else {
     requestBoardBody.innerHTML = filteredItems.map(renderRequestRow).join("");
   }
 
   const filterLabel = getRequestFilterLabel(requestBoardStatusSelect?.value || "in_progress");
-  const countLabel = filteredItems.length === 1 ? "solicitacao" : "solicitacoes";
+  const countLabel = filteredItems.length === 1 ? "solicitação" : "solicitações";
   let message = filteredItems.length
     ? `Mostrando ${filteredItems.length} ${countLabel} ${filterLabel}.`
-    : "Nenhuma solicitacao encontrada com esse filtro.";
+    : "Nenhuma solicitação encontrada com esse filtro.";
 
   if (requestBoardState.lastSyncedAt instanceof Date && !Number.isNaN(requestBoardState.lastSyncedAt.valueOf())) {
     message += ` Atualizado em ${dateTimeFormatter.format(requestBoardState.lastSyncedAt)}.`;
@@ -607,7 +611,7 @@ const refreshRequestBoard = async () => {
     });
 
     if (!response.ok) {
-      throw new Error(`Nao foi possivel atualizar as solicitacoes (${response.status}).`);
+      throw new Error(`Não foi possível atualizar as solicitações (${response.status}).`);
     }
 
     const payload = await response.json();
@@ -616,8 +620,8 @@ const refreshRequestBoard = async () => {
     renderRequestBoard();
   } catch (error) {
     console.error(error);
-    setRequestBoardFeedback("Nao foi possivel atualizar as solicitacoes agora.", true);
-    showToolbarToast("Nao foi possivel atualizar as solicitacoes.");
+    setRequestBoardFeedback("Não foi possível atualizar as solicitações agora.", true);
+    showToolbarToast("Não foi possível atualizar as solicitações.");
   } finally {
     setRequestBoardLoading(false);
   }
@@ -705,6 +709,8 @@ const locateState = {
   watchId: null,
   moveTimeoutId: null,
   refreshIntervalId: null,
+  requestId: 0,
+  selectedStopId: "",
 };
 
 const setLocateStatus = (message, isError = false) => {
@@ -731,13 +737,42 @@ const setLocateDetails = (title, description, rows = []) => {
 
   locateResults.innerHTML = rows.length
     ? rows.map((row) => `
-        <article class="urb-locate-result">
-          <strong>${escapeHtml(row.title)}</strong>
-          <p>${escapeHtml(row.description)}</p>
+        <article class="urb-locate-result ${row.featured ? "urb-locate-result--featured" : ""}">
+          ${row.time ? `<div class="urb-locate-result__countdown"><span>${escapeHtml(row.timeLabel || "Chega em")}</span><strong>${escapeHtml(row.time)}</strong></div>` : ""}
+          <div class="urb-locate-result__body">
+            ${row.kicker ? `<span class="urb-locate-result__kicker">${escapeHtml(row.kicker)}</span>` : ""}
+            <strong>${escapeHtml(row.title)}</strong>
+            <p>${escapeHtml(row.description)}</p>
+            ${row.departure || row.arrival ? `
+              <dl class="urb-locate-result__times">
+                ${row.departure ? `<div><dt>Sai desta estação</dt><dd>${escapeHtml(row.departure)}</dd></div>` : ""}
+                ${row.arrival ? `<div><dt>Chega no destino</dt><dd>${escapeHtml(row.arrival)}</dd></div>` : ""}
+              </dl>
+            ` : ""}
+          </div>
           ${row.meta ? `<small>${escapeHtml(row.meta)}</small>` : ""}
+          ${row.actionId ? `<button type="button" data-locate-prediction="${escapeHtml(row.actionId)}" data-locate-stop-name="${escapeHtml(row.actionName || row.title)}">${escapeHtml(row.actionLabel || "Ver horários")}</button>` : ""}
         </article>
       `).join("")
-    : '<article class="urb-locate-result"><strong>Sem dados</strong><p>Nenhuma estacao encontrada nesta area.</p></article>';
+    : '<article class="urb-locate-result"><strong>Sem dados</strong><p>Nenhuma estação encontrada nesta área.</p></article>';
+};
+
+const renderLocateStationPreview = (stations) => {
+  setLocateDetails(
+    "Próximas chegadas",
+    stations.length
+      ? "Selecione uma estação ou aguarde o carregamento automático dos horários mais próximos."
+      : "Nenhuma estação de trem ou metrô foi encontrada para esta busca.",
+    stations.slice(0, 5).map((station, index) => ({
+      title: station.name,
+      description: station.mode_label || "Trem / Metrô",
+      meta: index === 0 ? "Consultando próximos horários..." : "Toque para consultar os horários",
+      actionId: station.id,
+      actionName: station.name,
+      actionLabel: "Ver chegadas",
+      featured: index === 0,
+    }))
+  );
 };
 
 const createLocateIcon = (type) => {
@@ -773,7 +808,7 @@ const locateFetchJson = async (url) => {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(payload.detail || "Nao foi possivel consultar a localizacao agora.");
+    throw new Error(payload.detail || "Não foi possível consultar a localização agora.");
   }
 
   return payload;
@@ -793,15 +828,21 @@ const renderLocateStations = async (searchTerm = "") => {
     return;
   }
 
+  const requestId = ++locateState.requestId;
   const [lat, lng] = getLocateCenter();
-  setLocateStatus("Buscando estacoes");
+  setLocateStatus("Buscando estações");
   const params = new URLSearchParams({
     lat: String(lat),
     lng: String(lng),
     q: searchTerm || "",
     type: "train",
+    limit: searchTerm ? "90" : "72",
   });
   const payload = await locateFetchJson(`/dashboard/localizar/gtfs/pontos?${params.toString()}`);
+  if (requestId !== locateState.requestId) {
+    return;
+  }
+
   const stations = Array.isArray(payload.items) ? payload.items : [];
   locateState.trainLayer.clearLayers();
 
@@ -816,39 +857,72 @@ const renderLocateStations = async (searchTerm = "") => {
       .bindPopup(`
         <div class="urb-locate-popup">
           <strong>${escapeHtml(station.name)}</strong>
-          <span>${escapeHtml(station.mode_label || "Trem")}<br>${escapeHtml(station.distance_km)} km de distancia</span>
-          <button type="button" data-locate-prediction="${escapeHtml(station.id)}" data-locate-stop-name="${escapeHtml(station.name)}">Ver proximas chegadas</button>
+          <span>${escapeHtml(station.mode_label || "Trem / Metrô")}</span>
+          <button type="button" data-locate-prediction="${escapeHtml(station.id)}" data-locate-stop-name="${escapeHtml(station.name)}">Ver chegadas</button>
         </div>
       `)
       .addTo(locateState.trainLayer);
   });
 
-  setLocateDetails(
-    `${stations.length} estacoes encontradas`,
-    searchTerm ? `Busca "${searchTerm}" no GTFS local.` : "Estacoes de trem e metro mais proximas da area do mapa.",
-    stations.slice(0, 5).map((station) => ({
-      title: station.name,
-      description: station.mode_label || "Trem",
-      meta: `${station.distance_km} km`,
-    }))
-  );
-  setLocateStatus("Mapa atualizado");
+  renderLocateStationPreview(stations);
+  setLocateStatus(`${stations.length} estações carregadas`);
+
+  if (stations[0]) {
+    loadLocatePrediction(stations[0].id, stations[0].name, { auto: true, requestId }).catch((error) => {
+      console.error(error);
+      setLocateStatus(error.message, true);
+    });
+  }
 };
 
-const loadLocatePrediction = async (stopCode, stopName) => {
-  setLocateStatus("Consultando horarios");
+const loadLocatePrediction = async (stopCode, stopName, options = {}) => {
+  const requestId = options.requestId || ++locateState.requestId;
+  locateState.selectedStopId = String(stopCode || "");
+  setLocateStatus("Consultando horários");
   const payload = await locateFetchJson(`/dashboard/localizar/gtfs/previsao/${encodeURIComponent(stopCode)}`);
+  if (requestId !== locateState.requestId && options.auto) {
+    return;
+  }
+
   const predictions = Array.isArray(payload.predictions) ? payload.predictions : [];
-  setLocateDetails(
-    stopName || payload.stop?.name || "Estacao selecionada",
-    payload.note || "Previsao estimada pela grade GTFS.",
-    predictions.map((item) => ({
-      title: `${item.line} - ${item.destination}`,
-      description: "Trem / metro",
-      meta: `Proxima chegada: ${item.next_arrival} (${item.scheduled_time})`,
+  const serviceNotice = payload.service_notice;
+  const rows = predictions.length
+    ? predictions.slice(0, 5).map((item, index) => ({
+      time: item.wait_label || item.next_arrival || "--",
+      timeLabel: "Trem chega",
+      kicker: item.estimated ? "Previsão estimada" : "Grade oficial",
+      title: item.line ? `Linha ${item.line}` : "Próximo trem",
+      description: item.destination ? `Sentido ${item.destination}` : "Destino não informado",
+      departure: item.departure_time || item.scheduled_time || "",
+      arrival: item.arrival_time || "",
+      meta: item.estimated
+        ? ""
+        : "Horário oficial da operação.",
+      featured: index === 0,
     }))
+    : serviceNotice
+      ? [{
+        kicker: "Horário de operação",
+        title: serviceNotice.title || "Operação encerrada",
+        description: serviceNotice.description || "Esta estação está fora do horário operacional.",
+        meta: serviceNotice.meta || "Consulte novamente durante a operação.",
+        featured: true,
+      }]
+    : [{
+      title: "Sem horários próximos",
+      description: "Não há previsões disponíveis para esta estação no momento.",
+      meta: "Tente outra estação próxima.",
+      featured: true,
+    }];
+
+  setLocateDetails(
+    stopName || payload.stop?.name || "Estação selecionada",
+    serviceNotice
+      ? "Horários respeitando a janela de operação da estação."
+      : "Próximos trens com saída e chegada estimadas.",
+    rows
   );
-  setLocateStatus("Horarios atualizados");
+  setLocateStatus("Horários atualizados");
 };
 
 const upsertLocateUserMarker = (latLng, shouldCenter = false) => {
@@ -860,7 +934,7 @@ const upsertLocateUserMarker = (latLng, shouldCenter = false) => {
     locateState.userMarker.setLatLng(latLng);
   } else {
     locateState.userMarker = L.marker(latLng, { icon: createLocateIcon("user") })
-      .bindPopup("Sua localizacao")
+      .bindPopup("Sua localização")
       .addTo(locateState.map);
   }
 
@@ -877,12 +951,12 @@ const requestLocateUserPosition = ({ recenter = false, refreshStops = false } = 
   }
 
   if (!navigator.geolocation) {
-    setLocateStatus("GPS indisponivel", true);
+    setLocateStatus("GPS indisponível", true);
     return;
   }
 
   locateState.locationRequested = true;
-  setLocateStatus("Localizando voce");
+  setLocateStatus("Localizando você");
   navigator.geolocation.getCurrentPosition(
     (position) => {
       const latLng = [position.coords.latitude, position.coords.longitude];
@@ -900,7 +974,7 @@ const requestLocateUserPosition = ({ recenter = false, refreshStops = false } = 
       });
     },
     () => {
-      setLocateStatus("Permita a localizacao", true);
+      setLocateStatus("Permita a localização", true);
     },
     {
       enableHighAccuracy: true,
@@ -932,7 +1006,7 @@ const refreshLocateStationsSoon = () => {
       console.error(error);
       setLocateStatus(error.message, true);
     });
-  }, 250);
+  }, 700);
 };
 
 const startLocateWatch = () => {
@@ -952,7 +1026,7 @@ const startLocateWatch = () => {
       }
     },
     () => {
-      setLocateStatus("Permita a localizacao", true);
+      setLocateStatus("Permita a localização", true);
     },
     {
       enableHighAccuracy: true,
@@ -1000,8 +1074,16 @@ const initializeLocateMap = () => {
   });
 
   startLocateWatch();
-  refreshLocateStationsSoon();
-  locateState.refreshIntervalId = window.setInterval(refreshLocateStationsSoon, 15000);
+  if (locateState.userLatLng) {
+    refreshLocateStationsSoon();
+  } else {
+    window.setTimeout(() => {
+      if (!locateState.userLatLng) {
+        refreshLocateStationsSoon();
+      }
+    }, 900);
+  }
+  locateState.refreshIntervalId = window.setInterval(refreshLocateStationsSoon, 30000);
 
   window.setTimeout(() => locateState.map?.invalidateSize(), 150);
 };
@@ -1037,7 +1119,7 @@ const renderCommonSupportMessages = (item) => {
   const thread = commonSupportState.threads.get(item.id) || [];
   commonSupportMessages.innerHTML = thread.map((message) => {
     const role = message.role === "user" ? "user" : "agent";
-    const author = role === "agent" ? item.agent_name || "Suporte UrbPay" : "Voce";
+    const author = role === "agent" ? item.agent_name || "Suporte UrbPay" : "Você";
 
     return `
       <article class="common-support-message common-support-message--${role}">
@@ -1145,7 +1227,7 @@ const setCommonSupportSendingState = (isSending) => {
 const sendCommonSupportEmail = async (item) => {
   const endpoint = commonSupportRoot?.dataset.commonSupportEndpoint;
   if (!endpoint) {
-    throw new Error("Endpoint do suporte nao configurado.");
+    throw new Error("Endpoint do suporte não configurado.");
   }
 
   const transcript = (commonSupportState.threads.get(item.id) || []).map((message) => ({
@@ -1169,7 +1251,7 @@ const sendCommonSupportEmail = async (item) => {
     return response.json();
   }
 
-  let errorMessage = "Nao foi possivel enviar o e-mail do suporte.";
+  let errorMessage = "Não foi possível enviar o e-mail do suporte.";
 
   try {
     const payload = await response.json();
@@ -1448,7 +1530,7 @@ if (commonSupportRoot) {
       showToolbarToast(`Suporte enviado por e-mail para mathiasdeoliveira2009@gmail.com.`);
     } catch (error) {
       console.error(error);
-      showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel enviar o e-mail do suporte.");
+      showToolbarToast(error instanceof Error ? error.message : "Não foi possível enviar o e-mail do suporte.");
     } finally {
       setCommonSupportSendingState(false);
     }
@@ -1636,7 +1718,7 @@ const prependRecentRechargeTransaction = (payload) => {
     const currentTotal = Number.parseInt(recentTransactionsFooter.dataset.movementCount || "0", 10) || 0;
     const nextTotal = currentTotal + 1;
     recentTransactionsFooter.dataset.movementCount = String(nextTotal);
-    recentTransactionsFooter.textContent = `Mostrando ${visibleCount} de ${nextTotal} transacoes.`;
+    recentTransactionsFooter.textContent = `Mostrando ${visibleCount} de ${nextTotal} transações.`;
   }
 };
 
@@ -1742,7 +1824,7 @@ creditGoPixButton?.addEventListener("click", () => {
 
 creditConfirmButton?.addEventListener("click", async () => {
   if (!creditState.cardId || !creditState.amount) {
-    showToolbarToast("Escolha um cartao e um valor antes de confirmar.");
+    showToolbarToast("Escolha um cartão e um valor antes de confirmar.");
     return;
   }
 
@@ -1766,12 +1848,12 @@ creditConfirmButton?.addEventListener("click", async () => {
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(payload.detail || "Nao foi possivel salvar a recarga.");
+      throw new Error(payload.detail || "Não foi possível salvar a recarga.");
     }
 
     const nextBalance = Number.parseFloat(payload.balance_value || "");
     if (!Number.isFinite(nextBalance)) {
-      throw new Error("A recarga foi salva, mas o saldo retornado esta invalido.");
+      throw new Error("A recarga foi salva, mas o saldo retornado está inválido.");
     }
 
     creditState.currentBalance = nextBalance;
@@ -1784,7 +1866,7 @@ creditConfirmButton?.addEventListener("click", async () => {
     scrollServiceFlowIntoView();
     refreshRequestBoard();
   } catch (error) {
-    showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel salvar a recarga.");
+    showToolbarToast(error instanceof Error ? error.message : "Não foi possível salvar a recarga.");
   } finally {
     creditConfirmButton.disabled = false;
     creditConfirmButton.textContent = "Confirmar";
@@ -1817,7 +1899,7 @@ serviceTriggers.forEach((button) => {
     }
 
     if (panelName === "student" || panelName === "teacher") {
-      showToolbarToast("Este servico entra na proxima etapa.");
+      showToolbarToast("Este serviço entra na próxima etapa.");
       return;
     }
 
@@ -1839,11 +1921,11 @@ dashboardShortcutButtons.forEach((button) => {
     const shortcut = button.dataset.dashboardShortcut;
 
     if (shortcut === "billing") {
-      showToolbarToast("A cobranca compartilhada entrou no novo layout e segue para a proxima etapa de backend.");
+      showToolbarToast("A cobranca compartilhada entrou no novo layout e segue para a próxima etapa de backend.");
       return;
     }
 
-    showToolbarToast("Este atalho entra na proxima etapa.");
+    showToolbarToast("Este atalho entra na próxima etapa.");
   });
 });
 
@@ -1961,7 +2043,7 @@ settingsSelectInputs.forEach((input) => {
 
 settingsFeedbackButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    showToolbarToast(button.dataset.settingsFeedback || "Este ajuste entra na proxima etapa.");
+    showToolbarToast(button.dataset.settingsFeedback || "Este ajuste entra na próxima etapa.");
   });
 });
 
@@ -2093,24 +2175,24 @@ const getQrSimulatorCopy = (snapshot) => {
   if (snapshot.code === "created") {
     return {
       heroTitle: "Aproxime o QR Code do leitor",
-      heroMessage: "Posicione o QR digital no leitor da catraca para iniciar a validacao da passagem.",
+      heroMessage: "Posicione o QR digital no leitor da catraca para iniciar a validação da passagem.",
       statusLabel: "QR pronto para leitura",
-      summaryTitle: "Leitor aguardando aproximacao",
+      summaryTitle: "Leitor aguardando aproximação",
       summaryCopy: "Simule a leitura do QR para iniciar o fluxo operacional da catraca.",
       consoleTitle: "Leitor pronto",
-      consoleCopy: "Clique em simular leitura para reproduzir a aproximacao do QR na catraca, como no uso em estacoes da CPTM e do Metro.",
+      consoleCopy: "Clique em simular leitura para reproduzir a aproximação do QR na catraca, como no uso em estações da CPTM e do Metrô.",
     };
   }
 
   if (snapshot.code === "opened") {
     return {
       heroTitle: "Leitura identificada",
-      heroMessage: "O leitor reconheceu o QR Code e o backend esta conferindo autorizacao e saldo.",
+      heroMessage: "O leitor reconheceu o QR Code e o backend está conferindo autorização e saldo.",
       statusLabel: "Validando bilhete",
-      summaryTitle: "Validacao em andamento",
-      summaryCopy: "A leitura foi detectada e o sistema esta processando a autorizacao da passagem.",
+      summaryTitle: "Validação em andamento",
+      summaryCopy: "A leitura foi detectada e o sistema está processando a autorização da passagem.",
       consoleTitle: "Validando bilhete",
-      consoleCopy: "O QR foi lido. A simulacao agora executa a mesma etapa de conferÃªncia que antecede a liberacao do bloqueio.",
+      consoleCopy: "O QR foi lido. A simulação agora executa a mesma etapa de conferência que antecede a liberação do bloqueio.",
     };
   }
 
@@ -2122,31 +2204,31 @@ const getQrSimulatorCopy = (snapshot) => {
       summaryTitle: snapshot.title,
       summaryCopy: snapshot.message,
       consoleTitle: "Bloqueio liberado",
-      consoleCopy: "A autorizacao foi aprovada. Na operacao real, o passageiro tem uma janela curta para ultrapassar a catraca.",
+      consoleCopy: "A autorização foi aprovada. Na operação real, o passageiro tem uma janela curta para ultrapassar a catraca.",
     };
   }
 
   if (snapshot.code === "completed") {
     return {
-      heroTitle: "Passagem concluida",
+      heroTitle: "Passagem concluída",
       heroMessage: snapshot.message,
       statusLabel: snapshot.label,
       summaryTitle: snapshot.title,
       summaryCopy: snapshot.message,
       consoleTitle: "Leitura encerrada",
-      consoleCopy: "A travessia foi concluida e esta simulacao foi encerrada. Gere um novo QR para reiniciar o fluxo.",
+      consoleCopy: "A travessia foi concluída e esta simulação foi encerrada. Gere um novo QR para reiniciar o fluxo.",
     };
   }
 
   if (snapshot.code === "failed") {
     return {
-      heroTitle: "Validacao nao autorizada",
+      heroTitle: "Validação não autorizada",
       heroMessage: snapshot.message,
       statusLabel: snapshot.label,
       summaryTitle: snapshot.title,
       summaryCopy: snapshot.message,
       consoleTitle: "Acesso negado",
-      consoleCopy: "O bloqueio nao foi liberado. Com este token, a simulacao foi encerrada e um novo QR deve ser gerado apos ajuste de saldo.",
+      consoleCopy: "O bloqueio não foi liberado. Com este token, a simulação foi encerrada e um novo QR deve ser gerado após ajuste de saldo.",
     };
   }
 
@@ -2164,37 +2246,37 @@ const getQrSimulatorCopy = (snapshot) => {
 
   if (snapshot.code === "replaced") {
     return {
-      heroTitle: "QR substituido",
+      heroTitle: "QR substituído",
       heroMessage: snapshot.message,
       statusLabel: snapshot.label,
       summaryTitle: snapshot.title,
       summaryCopy: snapshot.message,
-      consoleTitle: "QR substituido",
+      consoleTitle: "QR substituído",
       consoleCopy: "Outro QR ja assumiu o lugar deste token. Reabra o simulador usando a passagem mais recente.",
     };
   }
 
   if (snapshot.code === "inactive") {
     return {
-      heroTitle: "Acompanhamento indisponivel",
+      heroTitle: "Acompanhamento indisponível",
       heroMessage: snapshot.message,
       statusLabel: snapshot.label,
       summaryTitle: snapshot.title,
       summaryCopy: snapshot.message,
-      consoleTitle: "Sem solicitacao ativa",
-      consoleCopy: "Nao existe mais uma passagem ativa associada a este token.",
+      consoleTitle: "Sem solicitação ativa",
+      consoleCopy: "Não existe mais uma passagem ativa associada a este token.",
     };
   }
 
   if (snapshot.code === "invalid") {
     return {
-      heroTitle: "Token nao reconhecido",
+      heroTitle: "Token não reconhecido",
       heroMessage: snapshot.message,
       statusLabel: snapshot.label,
       summaryTitle: snapshot.title,
       summaryCopy: snapshot.message,
-      consoleTitle: "QR nao reconhecido",
-      consoleCopy: "Este token nao corresponde a uma passagem valida da simulacao atual.",
+      consoleTitle: "QR não reconhecido",
+      consoleCopy: "Este token não corresponde a uma passagem válida da simulação atual.",
     };
   }
 
@@ -2284,6 +2366,26 @@ const updateQrSimulatorControls = (snapshot) => {
   }
 };
 
+const updateQrSimulatorUrls = (payload) => {
+  if (!qrSimulatorRoot || !payload) {
+    return;
+  }
+
+  const urlMap = {
+    token: "qrToken",
+    status_url: "statusUrl",
+    scan_url: "scanUrl",
+    validate_url: "validateUrl",
+    complete_url: "completeUrl",
+    retry_url: "retryUrl",
+  };
+  Object.entries(urlMap).forEach(([key, datasetKey]) => {
+    if (payload[key]) {
+      qrSimulatorRoot.dataset[datasetKey] = payload[key];
+    }
+  });
+};
+
 const postQrSimulatorAction = async (url) => {
   const response = await window.fetch(url, {
     method: "POST",
@@ -2294,7 +2396,7 @@ const postQrSimulatorAction = async (url) => {
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload.detail || `Nao foi possivel concluir a operacao (${response.status}).`);
+    throw new Error(payload.detail || `Não foi possível concluir a operação (${response.status}).`);
   }
 
   return payload;
@@ -2318,7 +2420,7 @@ const runQrSimulatorValidation = async () => {
     renderQrSimulatorStatus(snapshot);
   } catch (error) {
     console.error(error);
-    showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel validar o bilhete.");
+    showToolbarToast(error instanceof Error ? error.message : "Não foi possível validar o bilhete.");
   } finally {
     qrSimulatorState.isBusy = false;
     updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
@@ -2494,12 +2596,12 @@ const renderQrSimulatorStatus = (snapshot) => {
       created: [waitingTurnstileImage, "Catraca aguardando leitura"],
       opened: [waitingTurnstileImage, "Catraca lendo o QR Code"],
       approved: ["UrbPay_Customizada_Passagem_Liberada.png", "Catraca liberada para passagem"],
-      completed: ["UrbPay_Customizada_Passagem_Liberada.png", "Passagem liberada e concluida"],
+      completed: ["UrbPay_Customizada_Passagem_Liberada.png", "Passagem liberada e concluída"],
       failed: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada"],
-      expired: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por expiracao"],
-      replaced: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR substituido"],
+      expired: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por expiração"],
+      replaced: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR substituído"],
       inactive: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada"],
-      invalid: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR invalido"],
+      invalid: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR inválido"],
     }[snapshot.code] || [waitingTurnstileImage, "Catraca aguardando leitura"];
 
     const nextImageUrl = `/static/imgs/${imageState[0]}`;
@@ -2543,7 +2645,7 @@ const stopQrCamera = () => {
 
 const startQrCamera = async () => {
   if (!qrSimulatorRoot || !window.BarcodeDetector || !navigator.mediaDevices?.getUserMedia) {
-    showToolbarToast("A leitura pela camera nao e suportada neste navegador. Use a simulacao.");
+    showToolbarToast("A leitura pela câmera não é suportada neste navegador. Use a simulação.");
     return;
   }
 
@@ -2561,7 +2663,7 @@ const startQrCamera = async () => {
     });
     camera.srcObject = qrSimulatorState.cameraStream;
     camera.classList.add("is-visible");
-    cameraButton.textContent = "Camera ativa";
+    cameraButton.textContent = "Câmera ativa";
 
     const scanFrame = async () => {
       if (!qrSimulatorState.cameraStream || camera.readyState < 2) {
@@ -2580,7 +2682,7 @@ const startQrCamera = async () => {
           return;
         }
       } catch (error) {
-        console.debug("Nao foi possivel ler o QR pela camera.", error);
+        console.debug("Não foi possível ler o QR pela câmera.", error);
       }
 
       qrSimulatorState.cameraFrameId = window.requestAnimationFrame(scanFrame);
@@ -2589,7 +2691,7 @@ const startQrCamera = async () => {
     scanFrame();
   } catch (error) {
     stopQrCamera();
-    showToolbarToast("Nao foi possivel acessar a camera. Verifique a permissao do navegador.");
+    showToolbarToast("Não foi possível acessar a câmera. Verifique a permissão do navegador.");
   }
 };
 
@@ -2757,12 +2859,15 @@ const setupArmDragInteraction = () => {
 };
 
 if (qrSimulatorRoot) {
-  const simulatorStatusUrl = qrSimulatorRoot.dataset.statusUrl;
+  let simulatorStatusUrl = qrSimulatorRoot.dataset.statusUrl;
   const scanButton = qrSimulatorRoot.querySelector("[data-qr-scan-action]");
   const completeButton = qrSimulatorRoot.querySelector("[data-qr-complete-action]");
   const cameraButton = qrSimulatorRoot.querySelector("[data-qr-camera-action]");
-  const scanUrl = qrSimulatorRoot.dataset.scanUrl;
-  const completeUrl = qrSimulatorRoot.dataset.completeUrl;
+  let scanUrl = qrSimulatorRoot.dataset.scanUrl;
+  let validateUrl = qrSimulatorRoot.dataset.validateUrl;
+  let completeUrl = qrSimulatorRoot.dataset.completeUrl;
+  let retryUrl = qrSimulatorRoot.dataset.retryUrl;
+  const retryButton = qrSimulatorRoot.querySelector("[data-qr-retry-action]");
   const layoutToggle = qrSimulatorRoot.querySelector("[data-layout-toggle]");
   const qrFocusToggle = qrSimulatorRoot.querySelector("[data-qr-focus-toggle]");
   const qrDisplay = qrSimulatorRoot.querySelector("[data-qr-display]");
@@ -2779,6 +2884,35 @@ if (qrSimulatorRoot) {
     qrFocusToggle.setAttribute("aria-pressed", String(isFocused));
     if (qrDisplay) {
       qrDisplay.hidden = !isFocused || qrSimulatorRoot.dataset.qrCode !== "created";
+    }
+  });
+
+  retryButton?.addEventListener("click", async () => {
+    if (!retryUrl || qrSimulatorState.isBusy) {
+      return;
+    }
+
+    qrSimulatorState.isBusy = true;
+    retryButton.disabled = true;
+    try {
+      const payload = await postQrSimulatorAction(retryUrl);
+      updateQrSimulatorUrls(payload);
+      simulatorStatusUrl = payload.status_url;
+      scanUrl = payload.scan_url;
+      validateUrl = payload.validate_url;
+      completeUrl = payload.complete_url;
+      retryUrl = payload.retry_url;
+      const qrDisplay = qrSimulatorRoot.querySelector("[data-qr-display]");
+      if (qrDisplay && payload.image_url) {
+        qrDisplay.src = payload.image_url;
+      }
+      renderQrSimulatorStatus(payload.status);
+    } catch (error) {
+      console.error(error);
+      showToolbarToast(error instanceof Error ? error.message : "Não foi possível gerar uma nova tentativa.");
+    } finally {
+      qrSimulatorState.isBusy = false;
+      retryButton.disabled = false;
     }
   });
 
@@ -2801,7 +2935,7 @@ if (qrSimulatorRoot) {
       renderQrSimulatorStatus(snapshot);
     } catch (error) {
       console.error(error);
-      showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel simular a leitura do QR.");
+      showToolbarToast(error instanceof Error ? error.message : "Não foi possível simular a leitura do QR.");
     } finally {
       qrSimulatorState.isBusy = false;
       updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
@@ -2824,7 +2958,7 @@ if (qrSimulatorRoot) {
       renderQrSimulatorStatus(snapshot);
     } catch (error) {
       console.error(error);
-      showToolbarToast(error instanceof Error ? error.message : "Nao foi possivel concluir a passagem.");
+      showToolbarToast(error instanceof Error ? error.message : "Não foi possível concluir a passagem.");
     } finally {
       qrSimulatorState.isBusy = false;
       updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
@@ -2845,7 +2979,7 @@ if (qrSimulatorRoot) {
         });
 
         if (!response.ok) {
-          throw new Error(`Nao foi possivel consultar o status (${response.status}).`);
+          throw new Error(`Não foi possível consultar o status (${response.status}).`);
         }
 
         const snapshot = await response.json();
@@ -2877,7 +3011,7 @@ const renderEmptyState = (container, message) => {
 
 const renderMonthlyChart = (container, items) => {
   if (!items?.length) {
-    renderEmptyState(container, "Ainda nao ha dados suficientes para o fluxo mensal.");
+    renderEmptyState(container, "Ainda não há dados suficientes para o fluxo mensal.");
     return;
   }
 
@@ -2899,7 +3033,7 @@ const renderMonthlyChart = (container, items) => {
 
 const renderProgressChart = (container, items) => {
   if (!items?.length || items.every((item) => !item.value)) {
-    renderEmptyState(container, "Sem informacoes suficientes para este painel no momento.");
+    renderEmptyState(container, "Sem informações suficientes para este painel no momento.");
     return;
   }
 
@@ -3062,9 +3196,9 @@ setupModal(
 );
 
 
-// FunÃ§Ã£o para abrir o modal
+// Função para abrir o modal
 // ==========================================
-// 1. GERENCIAMENTO DE MODAL (ConfiguraÃ§Ãµes)
+// 1. GERENCIAMENTO DE MODAL (Configurações)
 // ==========================================
 function openUrbModal() {
   const modal = document.getElementById('settings-modal');
@@ -3145,7 +3279,7 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmTerms.addEventListener("click", () => {
 
       if (!acceptTerms.checked) {
-        alert("VocÃª precisa aceitar os Termos de Uso.");
+        alert("Você precisa aceitar os Termos de Uso.");
         return;
       }
 
@@ -3196,7 +3330,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 document.addEventListener("click", function (e) {
-  // Procura se o elemento clicado Ã© o botÃ£o ou estÃ¡ dentro dele
+  // Procura se o elemento clicado é o botão ou está dentro dele
   const toggleBtn = e.target.closest("#toggle-card-data");
   
   if (toggleBtn) {
@@ -3208,11 +3342,11 @@ document.addEventListener("click", function (e) {
     const valElem = document.getElementById("card-validity");
 
     if (!numElem || !cvvElem || !valElem) {
-      console.error("Elementos com ID card-number, card-cvv ou card-validity nÃ£o foram encontrados.");
+      console.error("Elementos com ID card-number, card-cvv ou card-validity não foram encontrados.");
       return;
     }
 
-    const isHidden = numElem.textContent.includes("â€¢â€¢â€¢â€¢");
+    const isHidden = numElem.textContent.includes("••••");
 
     numElem.textContent = isHidden ? numElem.dataset.full : numElem.dataset.masked;
     cvvElem.textContent = isHidden ? cvvElem.dataset.full : cvvElem.dataset.masked;
@@ -3257,24 +3391,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Estado: Bloqueado
                 lockLabel.innerText = "Desbloquear";
                 if (cardStatus) {
-                    cardStatus.innerText = "â— Bloqueado";
+                    cardStatus.innerText = "● Bloqueado";
                     cardStatus.style.color = "#e53e3e"; // Cor vermelha
                 }
                 if (cardImg) {
                     cardImg.style.filter = "grayscale(100%) opacity(0.6)"; // Efeito visual de bloqueado
                 }
-                alert("CartÃ£o UrbPay bloqueado temporariamente com sucesso!");
+                alert("Cartão UrbPay bloqueado temporariamente com sucesso!");
             } else {
                 // Estado: Ativo
                 lockLabel.innerText = "Bloquear";
                 if (cardStatus) {
-                    cardStatus.innerText = "â— Ativo";
+                    cardStatus.innerText = "● Ativo";
                     cardStatus.style.color = "#38a169"; // Cor verde
                 }
                 if (cardImg) {
                     cardImg.style.filter = "none";
                 }
-                alert("CartÃ£o UrbPay reativado com sucesso!");
+                alert("Cartão UrbPay reativado com sucesso!");
             }
         });
     }
@@ -3282,7 +3416,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // 1. NAVEGAÃ‡ÃƒO ENTRE PAINÃ‰IS / TELAS (SIDEBAR E NAVEGAÃ‡ÃƒO)
+  // 1. NAVEGAÇÃO ENTRE PAINÉIS / TELAS (SIDEBAR E NAVEGAÇÃO)
   const navLinks = document.querySelectorAll('[data-dashboard-view]');
   const panels = document.querySelectorAll('[data-dashboard-panel]');
 
@@ -3291,17 +3425,17 @@ document.addEventListener('DOMContentLoaded', function () {
       link.addEventListener('click', function (e) {
         const viewTarget = link.getAttribute('data-dashboard-view');
 
-        // Se nÃ£o for o botÃ£o de abrir a modal de cartÃ£o
+        // Se não for o botão de abrir a modal de cartão
         if (viewTarget && viewTarget !== 'new-card') {
           e.preventDefault();
 
-          // Atualiza estado ativo nos botÃµes do menu
+          // Atualiza estado ativo nos botões do menu
           navLinks.forEach(function (l) {
             l.classList.remove('is-active');
           });
           link.classList.add('is-active');
 
-          // Alterna exibiÃ§Ã£o dos painÃ©is
+          // Alterna exibição dos painéis
           panels.forEach(function (panel) {
             if (panel.getAttribute('data-dashboard-panel') === viewTarget) {
               panel.removeAttribute('hidden');
@@ -3314,7 +3448,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 2. MODAL DE SOLICITAR NOVO CARTÃƒO
+  // 2. MODAL DE SOLICITAR NOVO CARTÃO
   const cardModal = document.getElementById('modalNewCard');
   const triggerBtns = document.querySelectorAll('[data-open-card-modal], [data-dashboard-view="new-card"]');
   const closeBtns = cardModal ? cardModal.querySelectorAll('[data-modal-close]') : [];
@@ -3341,15 +3475,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Envio do FormulÃ¡rio (Permite o submit real para o Python/FastAPI)
+  // Envio do Formulário (Permite o submit real para o Python/FastAPI)
   if (formNewCard) {
     formNewCard.addEventListener('submit', function () {
-      // Removemos o preventDefault() e o alert() fictÃ­cio.
-      // O formulÃ¡rio agora envia a requisiÃ§Ã£o normalmente para o banco de dados.
+      // Removemos o preventDefault() e o alert() fictício.
+      // O formulário agora envia a requisição normalmente para o banco de dados.
     });
   }
 
-  // 3. NAVEGAÃ‡ÃƒO DO CARROSSEL DE CARTÃ•ES
+  // 3. NAVEGAÇÃO DO CARROSSEL DE CARTÕES
   const track = document.getElementById('cardsCarouselTrack');
   const prevBtn = document.getElementById('cardsCarouselPrev');
   const nextBtn = document.getElementById('cardsCarouselNext');
@@ -3384,7 +3518,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (!num || !cvv || !val) return;
 
-  const isMasked = num.textContent.trim().includes("â€¢");
+  const isMasked = num.textContent.trim().includes("•");
 
   num.textContent = isMasked ? num.dataset.full : num.dataset.masked;
   cvv.textContent = isMasked ? cvv.dataset.full : cvv.dataset.masked;

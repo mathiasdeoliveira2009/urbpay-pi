@@ -3,28 +3,41 @@
 {% block title %}UrbPay | Resultado da Passagem{% endblock %}
 
 {% block content %}
-  <main class="gate-shell">
-    <section class="gate-card gate-card--result">
-      <div class="status-card status-card--{{ status_kind }}">
-        {{ status_message }}
-      </div>
+  <main class="gate-phone-page gate-phone-page--result gate-phone-page--{{ status_kind }}">
+    <div class="gate-phone-toolbar">
+      {% include "_utility_toolbar.html" %}
+    </div>
 
-      <div class="gate-user">
-        <img src="{{ url_for('static', path=profile_image) }}" alt="Foto do usuario" class="gate-user__avatar" />
-        <div>
-          <strong>{{ current_user.nome }}</strong>
-          <p>Valor debitado R$ {{ amount }}</p>
-          <p>Saldo restante R$ {{ current_balance }}</p>
+    <section class="gate-phone" aria-labelledby="gate-result-title">
+      <div class="gate-phone__speaker"></div>
+      <div class="gate-phone__screen">
+        <header class="gate-phone__topbar"><span>09:41</span><strong>urbpay</strong><span>●●●</span></header>
+        <div class="gate-phone__content">
+          <div class="gate-phone__status gate-phone__status--{{ status_kind }}"><i></i> {{ "Passagem liberada" if status_kind == "success" else "Passagem não autorizada" }} <span>QR</span></div>
+          <div class="gate-phone__heading">
+            <span class="eyebrow">Resultado da validação</span>
+            <h2 id="gate-result-title">{% if status_kind == 'success' %}Pagamento<br /><em>efetuado.</em>{% else %}Pagamento<br /><em>não autorizado.</em>{% endif %}</h2>
+            <p>{{ status_message }}</p>
+          </div>
+          <article class="gate-phone-card">
+            <div class="gate-phone-card__media">
+              <img src="{{ url_for('static', path='imgs/' ~ card_model) }}" alt="Cartão UrbPay {{ card_display_name }}" onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+              <div class="gate-phone-card__overlay"><strong>UrbPay</strong><span>{{ card_badge }}</span><div><small>{{ card_display_name }}</small><b>{{ card_number_masked }}</b></div></div>
+            </div>
+            <div class="gate-phone-card__meta"><span>Cartão utilizado</span><strong>Final {{ card_digits }}</strong></div>
+          </article>
+          <div class="gate-phone-fare"><span>Tarifa desta viagem</span><strong>R$ {{ amount }}</strong><small>Saldo restante: R$ {{ current_balance }}</small></div>
+          <div class="gate-phone-checks gate-phone-checks--{{ status_kind }}"><span><i></i> QR Code reconhecido</span><span><i></i> {% if status_kind == 'success' %}Passagem registrada{% else %}Saldo insuficiente ou validação recusada{% endif %}</span></div>
         </div>
+        <div class="gate-phone__form">
+          <form action="/passagem/{{ token }}/nova" method="post">
+            <button type="submit" class="primary-action gate-confirm">Nova tentativa <b>&gt;</b></button>
+          </form>
+          <a href="/dashboard" class="secondary-action gate-phone__back">Voltar ao painel</a>
+          <small>Uma nova tentativa vai gerar outro QR Code com os dados atuais.</small>
+        </div>
+        <div class="gate-phone__home"></div>
       </div>
-
-      <h1 class="gate-result-title">
-        {% if status_kind == 'success' %}
-          PAGAMENTO EFETUADO, PASSAGEM LIBERADA!
-        {% else %}
-          PASSAGEM NAO AUTORIZADA
-        {% endif %}
-      </h1>
     </section>
   </main>
 {% endblock %}

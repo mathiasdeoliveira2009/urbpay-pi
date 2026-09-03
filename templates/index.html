@@ -156,7 +156,7 @@
         <span class="eyebrow">Portal URBPAY</span>
         <h1>Cadastro, login e cartão digital conectados ao seu banco.</h1>
         <p class="hero-text">
-          Agora o portal pode registrar usuarios de verdade, salvar acesso por CPF e gerar um cartao visual
+          Agora o portal pode registrar usuários de verdade, salvar acesso por CPF e gerar um cartão visual
           com a foto de perfil enviada no cadastro.
         </p>
 
@@ -175,7 +175,7 @@
         <div class="hero-points">
           <span>Cadastro salvo no MySQL</span>
           <span>Foto de perfil</span>
-          <span>Cartao simulado por usuario</span>
+          <span>Cartão simulado por usuário</span>
         </div>
       </div>
 
@@ -228,13 +228,13 @@
       <article class="feature-card">
         <span class="eyebrow small">Recarga</span>
         <strong>Pagamento agil</strong>
-        <p>Fluxos mais curtos, acesso autenticado e base pronta para registrar operacoes reais.</p>
+        <p>Fluxos mais curtos, acesso autenticado e base pronta para registrar operações reais.</p>
       </article>
 
       <article class="feature-card">
         <span class="eyebrow small">Atendimento</span>
         <strong>Conta personalizada</strong>
-        <p>O usuario entra com CPF, visualiza o proprio perfil e ja encontra o cartao vinculado.</p>
+        <p>O usuário entra com CPF, visualiza o próprio perfil e já encontra o cartão vinculado.</p>
       </article>
 
       <article class="feature-card qr-feature">
@@ -253,8 +253,8 @@
     {% if current_user %}
     <section class="profile-section reveal" id="perfil" data-reveal>
       <div class="section-head">
-        <span class="eyebrow">Perfil do usuario</span>
-        <h2>Seu cadastro e seu cartao digital agora ficam salvos no banco.</h2>
+        <span class="eyebrow">Perfil do usuário</span>
+        <h2>Seu cadastro e seu cartão digital agora ficam salvos no banco.</h2>
       </div>
 
       <div class="profile-grid">
@@ -275,11 +275,11 @@
             </div>
             <div>
               <dt>Telefone</dt>
-              <dd>{{ current_user.telefone or 'Nao informado' }}</dd>
+              <dd>{{ current_user.telefone or 'Não informado' }}</dd>
             </div>
             <div>
-              <dt>Endereco</dt>
-              <dd>{{ current_user.endereco or 'Nao informado' }}</dd>
+              <dt>Endereço</dt>
+              <dd>{{ current_user.endereco or 'Não informado' }}</dd>
             </div>
             <div>
               <dt>Status</dt>
@@ -292,11 +292,11 @@
           <span class="user-card-preview__brand">URBPAY PASS</span>
           <div class="user-card-preview__body">
             <div>
-              <p class="user-card-preview__label">Cartao virtual</p>
+              <p class="user-card-preview__label">Cartão virtual</p>
               <strong>{{ current_user.nome }}</strong>
               <p class="user-card-preview__number">{{ formatted_card_number }}</p>
             </div>
-            <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil no cartao"
+            <img src="{{ url_for('static', path=profile_image) }}" alt="Foto de perfil no cartão"
               class="user-card-preview__photo" />
           </div>
           <div class="user-card-preview__footer">
