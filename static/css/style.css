@@ -8713,6 +8713,102 @@ html[data-theme="dark"] .common-support-message--agent {
     linear-gradient(180deg, #f7faf6 0%, #f3f7f1 40%, #eff5ee 100%);
 }
 
+.yellow-september-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 48px;
+  height: 44px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid rgba(190, 145, 22, 0.35);
+  border-radius: 14px;
+  background: linear-gradient(100deg, #fff8d9, #fffdf0 72%);
+  color: #5d4b16;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(159, 124, 20, 0.08);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.urb-header__greeting { display: flex; align-items: center; gap: 12px; }
+.urb-header__greeting h1 { margin: 0; }
+
+.yellow-september-banner:hover,
+.yellow-september-banner:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(159, 124, 20, 0.15);
+}
+
+.yellow-september-banner__mark {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: #f3c928;
+  color: #554100;
+}
+
+.yellow-september-banner__mark svg { width: 22px; height: 22px; }
+
+.yellow-september-modal {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+.yellow-september-modal.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+.yellow-september-modal__backdrop { position: absolute; inset: 0; background: rgba(29, 38, 24, 0.48); backdrop-filter: blur(3px); }
+.yellow-september-modal__surface {
+  position: relative;
+  width: min(500px, 100%);
+  padding: 34px;
+  border: 1px solid rgba(190, 145, 22, 0.3);
+  border-radius: 24px;
+  background: #fffdf5;
+  color: #354334;
+  box-shadow: 0 28px 70px rgba(34, 45, 29, 0.24);
+}
+
+.yellow-september-modal__close { position: absolute; top: 14px; right: 16px; border: 0; background: none; color: #68705f; font-size: 1.7rem; cursor: pointer; }
+.yellow-september-modal__eyebrow { color: #9a7910; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.yellow-september-modal h2 { max-width: 360px; margin: 10px 0 12px; color: #354334; font: 700 clamp(1.6rem, 4vw, 2.15rem)/1.1 "Sora", sans-serif; }
+.yellow-september-modal p { margin: 0; line-height: 1.65; }
+.yellow-september-modal__help { display: grid; gap: 10px; margin: 24px 0; padding: 18px; border-radius: 16px; background: #fff5bd; }
+.yellow-september-modal__help strong { font-family: "Sora", sans-serif; }
+.yellow-september-modal__help a { color: #5d4b16; font-weight: 700; }
+.yellow-september-modal__help > a { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; text-decoration: none; }
+.yellow-september-modal__help > a b { font-size: 1.5rem; }
+.yellow-september-modal__help > a small { flex-basis: 100%; color: #776628; font-size: 0.78rem; }
+.yellow-september-modal__help p { color: #625827; font-size: 0.82rem; }
+.yellow-september-modal__action { padding: 11px 16px; border: 0; border-radius: 10px; background: #354334; color: #fffdf5; font-weight: 700; cursor: pointer; }
+
+html[data-theme="dark"] .yellow-september-banner { background: linear-gradient(100deg, #443b18, #292a1b 72%); color: #fff0a5; }
+html[data-theme="dark"] .yellow-september-banner__copy span { color: #d9ca72; }
+html[data-theme="dark"] .yellow-september-modal__surface { background: #202a21; color: #eef4e9; }
+html[data-theme="dark"] .yellow-september-modal h2 { color: #fffdf5; }
+html[data-theme="dark"] .yellow-september-modal__help { background: #443b18; }
+html[data-theme="dark"] .yellow-september-modal__help p,
+html[data-theme="dark"] .yellow-september-modal__help > a small { color: #e5d68a; }
+html[data-theme="dark"] .yellow-september-modal__help a { color: #fff0a5; }
+
+@media (max-width: 700px) {
+  .urb-header__greeting { gap: 8px; }
+  .yellow-september-banner { flex-basis: 40px; width: 40px; height: 40px; }
+  .yellow-september-banner__mark { width: 36px; height: 36px; }
+  .yellow-september-modal { padding: 14px; }
+  .yellow-september-modal__surface { padding: 30px 22px 22px; }
+}
+
 html[data-theme="dark"] .dashboard-shell--reference {
   background:
     radial-gradient(circle at top left, rgba(94, 149, 98, 0.12), transparent 18%),

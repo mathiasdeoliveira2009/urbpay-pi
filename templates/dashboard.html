@@ -169,7 +169,18 @@
 
 
         <div class="urb-header__copy">
-          <h1>Olá, {{ current_user.nome.split(' ')[0] }}</h1>
+          <div class="urb-header__greeting">
+            <h1>Olá, {{ current_user.nome.split(' ')[0] }}</h1>
+            <button type="button" class="yellow-september-banner" data-yellow-september-open
+              aria-label="Abrir mensagem do Setembro Amarelo" title="Setembro Amarelo"
+              aria-controls="yellowSeptemberModal" aria-haspopup="dialog">
+              <span class="yellow-september-banner__mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.8 8.7c0 5.5-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"></path>
+                </svg>
+              </span>
+            </button>
+          </div>
           <p>Aqui está o resumo da sua conta UrbPay.</p>
         </div>
 
@@ -177,6 +188,25 @@
           {% include "_utility_toolbar.html" %}
         </div>
       </header>
+
+      <div class="yellow-september-modal" id="yellowSeptemberModal" data-yellow-september-modal
+        aria-hidden="true" hidden>
+        <div class="yellow-september-modal__backdrop" data-yellow-september-close></div>
+        <section class="yellow-september-modal__surface" role="dialog" aria-modal="true"
+          aria-labelledby="yellowSeptemberTitle">
+          <button type="button" class="yellow-september-modal__close" data-yellow-september-close
+            aria-label="Fechar mensagem">&times;</button>
+          <span class="yellow-september-modal__eyebrow">Setembro Amarelo</span>
+          <h2 id="yellowSeptemberTitle">Você não está sozinho.</h2>
+          <p>Sinta-se amado e cuidado pela UrbPay. Sua vida importa, e pedir ajuda é um gesto de coragem.</p>
+          <div class="yellow-september-modal__help">
+            <strong>Precisa conversar agora?</strong>
+            <a href="tel:188"><span>CVV</span><b>188</b><small>apoio emocional gratuito, 24 horas</small></a>
+            <p>Em uma situação de risco imediato, ligue para o <a href="tel:192">SAMU (192)</a> ou para a <a href="tel:190">Polícia (190)</a>.</p>
+          </div>
+          <button type="button" class="yellow-september-modal__action" data-yellow-september-close>Fechar mensagem</button>
+        </section>
+      </div>
 
       <!-- 1. Estilo do Leaflet (Coloque no topo do bloco) -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />

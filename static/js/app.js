@@ -11,6 +11,9 @@ const qrModalOpeners = document.querySelectorAll("[data-qr-modal-open]");
 const qrModalClosers = document.querySelectorAll("[data-qr-modal-close]");
 const statusModal = document.querySelector("[data-status-modal]");
 const statusModalClosers = document.querySelectorAll("[data-status-close]");
+const yellowSeptemberModal = document.querySelector("[data-yellow-september-modal]");
+const yellowSeptemberOpeners = document.querySelectorAll("[data-yellow-september-open]");
+const yellowSeptemberClosers = document.querySelectorAll("[data-yellow-september-close]");
 const toolbar = document.querySelector("[data-utility-toolbar]");
 const toolbarToggleButtons = document.querySelectorAll("[data-toolbar-toggle]");
 const themeToggleButtons = document.querySelectorAll("[data-theme-toggle]");
@@ -1312,6 +1315,17 @@ const setStatusModalState = (open) => {
   statusModal.setAttribute("aria-hidden", String(!open));
 };
 
+const setYellowSeptemberModalState = (open) => {
+  if (!yellowSeptemberModal) {
+    return;
+  }
+
+  yellowSeptemberModal.classList.toggle("is-open", open);
+  yellowSeptemberModal.hidden = !open;
+  yellowSeptemberModal.setAttribute("aria-hidden", String(!open));
+  syncBodyModalState();
+};
+
 if (signupModal?.classList.contains("is-open")) {
   syncBodyModalState();
 }
@@ -1347,11 +1361,20 @@ statusModalClosers.forEach((button) => {
   button.addEventListener("click", () => setStatusModalState(false));
 });
 
+yellowSeptemberOpeners.forEach((button) => {
+  button.addEventListener("click", () => setYellowSeptemberModalState(true));
+});
+
+yellowSeptemberClosers.forEach((button) => {
+  button.addEventListener("click", () => setYellowSeptemberModalState(false));
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     setSignupState(false);
     setQrModalState(false);
     setStatusModalState(false);
+    setYellowSeptemberModalState(false);
     closeToolbarPanels();
   }
 });
