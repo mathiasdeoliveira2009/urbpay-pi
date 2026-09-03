@@ -3,103 +3,44 @@
 {% block title %}UrbPay | Catraca Digital{% endblock %}
 
 {% block content %}
-<main class="gate-shell gate-shell--reader">
-  <section class="gate-reader-card" aria-labelledby="gate-reader-title">
-    <div class="gate-reader-card__header">
-      <span class="gate-reader-status">
-        <i></i>
-        Catraca aguardando leitura
-      </span>
-      <span class="gate-reader-code">Terminal UrbPay • QR</span>
-    </div>
+<main class="gate-phone-page">
+  <div class="gate-phone-toolbar">
+    {% include "_utility_toolbar.html" %}
+  </div>
+  <div class="gate-phone-context">
+    <span class="gate-phone-context__kicker">URBPAY / VALIDACAO</span>
+    <h1>Seu embarque<br /><em>esta pronto.</em></h1>
+    <p>Uma simulacao fiel da tela que aparece no celular ao aproximar o QR Code da catraca.</p>
+    <span class="gate-phone-context__terminal">Terminal 04 <i></i> Sao Paulo</span>
+  </div>
 
-    <div class="gate-reader-hero">
-      <div class="gate-reader-copy">
-        <span class="eyebrow">Simulacao de catraca</span>
-        <h1 id="gate-reader-title">Validar passagem</h1>
-        <p>A catraca confere o QR Code, valida o cartao ativo e libera a passagem quando houver saldo suficiente.</p>
-      </div>
-
-      <div class="gate-turnstile-visual" aria-label="Leitor da catraca">
-        <div class="gate-turnstile-visual__scan">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 7V5a1 1 0 0 1 1-1h2"></path>
-            <path d="M17 4h2a1 1 0 0 1 1 1v2"></path>
-            <path d="M20 17v2a1 1 0 0 1-1 1h-2"></path>
-            <path d="M7 20H5a1 1 0 0 1-1-1v-2"></path>
-            <path d="M8 8h3v3H8z"></path>
-            <path d="M13 8h3"></path>
-            <path d="M13 11h3"></path>
-            <path d="M8 13h3"></path>
-            <path d="M13 13h1"></path>
-            <path d="M16 13h1"></path>
-            <path d="M8 16h1"></path>
-            <path d="M11 16h5"></path>
-          </svg>
+  <section class="gate-phone" aria-labelledby="gate-reader-title">
+    <div class="gate-phone__speaker"></div>
+    <div class="gate-phone__screen">
+      <header class="gate-phone__topbar"><span>09:41</span><strong>urbpay</strong><span>●●●</span></header>
+      <div class="gate-phone__content">
+        <div class="gate-phone__status"><i></i> Catraca aguardando leitura <span>QR</span></div>
+        <div class="gate-phone__heading">
+          <span class="eyebrow">Simulacao de catraca</span>
+          <h2 id="gate-reader-title">Validar<br />passagem</h2>
+          <p>Confira os dados antes de liberar seu embarque.</p>
         </div>
-        <div class="gate-turnstile-visual__arms">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <strong>Leitor da catraca</strong>
-        <small>Aguardando confirmacao</small>
-      </div>
-    </div>
-
-    <div class="gate-reader-layout">
-      <article class="gate-active-card">
-        <div class="gate-active-card__media">
-          <img src="{{ url_for('static', path='imgs/' ~ card_model) }}" alt="Cartao UrbPay {{ card_display_name }}"
-            onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
-          <div class="gate-active-card__overlay">
-            <span class="gate-active-card__brand">UrbPay</span>
-            <span class="gate-active-card__badge">{{ card_badge }}</span>
-            <div class="gate-active-card__data">
-              <span>NOME</span>
-              <strong>{{ card_display_name }}</strong>
-              <span>NUMERO</span>
-              <strong>{{ card_number_masked }}</strong>
-              <div>
-                <p>
-                  <span>DATA</span>
-                  <strong>{{ card_validity }}</strong>
-                </p>
-                <p>
-                  <span>CVV</span>
-                  <strong>{{ card_cvv }}</strong>
-                </p>
-              </div>
-            </div>
+        <article class="gate-phone-card">
+          <div class="gate-phone-card__media">
+            <img src="{{ url_for('static', path='imgs/' ~ card_model) }}" alt="Cartao UrbPay {{ card_display_name }}" onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+            <div class="gate-phone-card__overlay"><strong>UrbPay</strong><span>{{ card_badge }}</span><div><small>{{ card_display_name }}</small><b>{{ card_number_masked }}</b></div></div>
           </div>
-        </div>
-      </article>
-
-      <aside class="gate-reader-summary">
-        <div class="gate-reader-summary__row">
-          <span>Cartao ativo</span>
-          <strong>Final {{ card_digits }}</strong>
-        </div>
-        <div class="gate-reader-summary__row">
-          <span>Saldo atual</span>
-          <strong>R$ {{ current_balance }}</strong>
-        </div>
-        <div class="gate-reader-summary__amount">
-          <span>Tarifa da passagem</span>
-          <strong>R$ {{ amount }}</strong>
-        </div>
-        <div class="gate-reader-legend">
-          <span><i class="is-waiting"></i> QR lido pela catraca</span>
-          <span><i class="is-processing"></i> Saldo conferido no cartao ativo</span>
-          <span><i class="is-approved"></i> Liberacao registrada no historico</span>
-        </div>
-      </aside>
+          <div class="gate-phone-card__meta"><span>Cartao ativo</span><strong>Final {{ card_digits }}</strong></div>
+        </article>
+        <div class="gate-phone-fare"><span>Tarifa desta viagem</span><strong>R$ {{ amount }}</strong><small>Saldo disponivel: R$ {{ current_balance }}</small></div>
+        <div class="gate-phone-checks"><span><i></i> QR Code reconhecido</span><span><i></i> Saldo suficiente</span></div>
+      </div>
+      <form action="/passagem/{{ token }}/confirmar" method="post" class="gate-phone__form">
+        <button type="submit" class="primary-action gate-confirm">Liberar catraca <b>&gt;</b></button>
+        <small>A liberacao sera registrada no seu historico.</small>
+      </form>
+      <div class="gate-phone__home"></div>
     </div>
-
-    <form action="/passagem/{{ token }}/confirmar" method="post" class="gate-form gate-reader-form">
-      <button type="submit" class="primary-action gate-confirm">Liberar catraca</button>
-    </form>
   </section>
 </main>
 {% endblock %}

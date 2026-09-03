@@ -2,7 +2,35 @@
 
 {% block title %}UrbPay | Simulacao de Catraca{% endblock %}
 
+{% block head %}
+  <style>
+    html, body, .device-mode-shell, .device-mode-screen { width: 100%; height: 100%; min-height: 100%; margin: 0; overflow: hidden; background: #000 !important; }
+    .gate-only-screen { position: fixed; inset: 0; width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: #000; }
+    .gate-only-screen__image { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .gate-only-screen__arm { position: absolute; z-index: 2; top: 0; right: 0; width: auto; height: 100%; max-width: none; cursor: grab; touch-action: none; user-select: none; }
+    .gate-only-screen__arm.is-dragging { cursor: grabbing; }
+    .gate-only-screen__reader-target { position: absolute; left: 5%; top: 12%; width: 38%; height: 76%; pointer-events: none; }
+  </style>
+{% endblock %}
+
 {% block content %}
+  <main class="gate-only-screen" data-qr-simulator-root
+    data-status-url="{{ qr_status_url }}"
+    data-scan-url="{{ qr_scan_url }}"
+    data-validate-url="{{ qr_validate_url }}"
+    data-complete-url="{{ qr_complete_url }}"
+    data-customer-url="{{ qr_customer_url }}"
+    data-qr-token="{{ token }}"
+    data-qr-appearance="{{ qr_status.appearance }}"
+    data-qr-code="{{ qr_status.code }}">
+    <img class="gate-only-screen__image" data-qr-turnstile-image
+      src="{{ url_for('static', path='imgs/UrbPay_Customizada_Aproxime_QR_Code.png') }}" alt="Catraca" />
+    <img class="gate-only-screen__arm" data-qr-drag-arm
+      src="{{ url_for('static', path='imgs/mão_e_celular.png') }}" alt="" draggable="false" />
+    <span class="gate-only-screen__reader-target" data-qr-reader-target aria-hidden="true"></span>
+  </main>
+{% endblock %}
+{#
   {% set name_parts = current_user.nome.split(' ') %}
   {% set operator_initials = (name_parts[0][:1] ~ name_parts[-1][:1]) | upper %}
   {% set current_card_digits = card_number | replace(' ', '') %}
@@ -28,6 +56,9 @@
             <span>Validacao em tempo real</span>
             <h1>Simulador de catraca</h1>
           </div>
+          <strong class="gate-top-expiry" data-qr-top-expiry>
+            {{ "%02d:%02d"|format(qr_status.remaining_seconds // 60, qr_status.remaining_seconds % 60) }}
+          </strong>
         </div>
 
         <div class="gate-ops-header__operator">
@@ -51,12 +82,17 @@
       data-validate-url="{{ qr_validate_url }}"
       data-complete-url="{{ qr_complete_url }}"
       data-customer-url="{{ qr_customer_url }}"
+      data-qr-token="{{ token }}"
       data-qr-appearance="{{ qr_status.appearance }}"
       data-qr-code="{{ qr_status.code }}"
     >
       <div class="gate-ops-grid">
         <article class="gate-ops-hero gate-turnstile gate-turnstile--{{ qr_status.appearance }}" data-qr-turnstile>
-          <div class="gate-ops-hero__visual" aria-hidden="true">
+          <div class="gate-ops-hero__visual">
+            <img class="gate-turnstile-image" data-qr-turnstile-image
+              src="{{ url_for('static', path='imgs/catraca-aproxime.png') }}"
+              alt="Catraca aguardando aproximacao do QR Code" />
+            <video class="gate-qr-camera" data-qr-camera autoplay muted playsinline></video>
             <div class="gate-ops-hero__scan">
               <span class="gate-ops-hero__corner gate-ops-hero__corner--tl"></span>
               <span class="gate-ops-hero__corner gate-ops-hero__corner--tr"></span>
@@ -73,11 +109,17 @@
                 <path d="M70 58h8"></path>
               </svg>
             </div>
+            <button type="button" class="gate-camera-button" data-qr-camera-action>Usar camera para ler</button>
+            <img class="gate-hand-drag" data-qr-drag-hand
+              src="{{ url_for('static', path='imgs/mão_e_celular.png') }}"
+              alt="Arraste a mao com o celular ate o leitor" draggable="false" />
           </div>
 
           <div class="gate-ops-hero__copy">
-            <h2 data-qr-status-title>{{ qr_status.title }}</h2>
+            <span class="gate-reader-live"><i></i><span data-qr-status-label>{{ qr_status.label }}</span></span>
+            <h2 data-qr-status-title>Aproxime o cartao/QR na catraca</h2>
             <p data-qr-status-message>{{ qr_status.message }}</p>
+            <p class="gate-drag-instruction">Segure e arraste a mao ate o leitor para iniciar a leitura.</p>
           </div>
 
           <div class="gate-ops-hero__status">
@@ -157,6 +199,32 @@
         </aside>
       </div>
 
+      <section class="gate-reader-card-preview">
+        <div class="gate-reader-card-preview__heading">
+          <strong>Cartao ativo</strong>
+          <span>Final {{ card_digits }}</span>
+        </div>
+        <div class="gate-active-card__media">
+          <img src="{{ url_for('static', path='imgs/' ~ card_model) }}" alt="Cartao UrbPay {{ card_display_name }}"
+            onerror="this.onerror=null; this.src='/static/imgs/cartao-verde.png';" />
+          <div class="gate-active-card__overlay">
+            <span class="gate-active-card__brand">UrbPay</span>
+            <span class="gate-active-card__badge">{{ card_badge }}</span>
+            <div class="gate-active-card__data">
+              <span>NOME</span><strong>{{ card_display_name }}</strong>
+              <span>NUMERO</span><strong>{{ card_number_masked }}</strong>
+              <div><p><span>DATA</span><strong>{{ card_validity }}</strong></p><p><span>CVV</span><strong>{{ card_cvv }}</strong></p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="gate-reader-stats">
+        <article><span>Saldo atual</span><strong data-qr-status-balance>R$ {{ qr_status.balance }}</strong></article>
+        <article><span>Tarifa</span><strong>R$ {{ amount }}</strong></article>
+        <article><span data-qr-expiry-label>Validade do QR</span><strong data-qr-status-expiry>{{ "%02d:%02d"|format(qr_status.remaining_seconds // 60, qr_status.remaining_seconds % 60) }}</strong></article>
+      </section>
+
       <section class="gate-ops-progress">
         <div class="gate-ops-progress__track">
           <article class="gate-step-card" data-qr-stage-card="created">
@@ -205,10 +273,17 @@
         </div>
       </section>
 
-      <div class="gate-simulator__actions gate-simulator__actions--operator">
-        <a href="{{ qr_customer_url }}" class="secondary-action" target="_blank" rel="noopener">Abrir visual do QR</a>
-        <a href="/dashboard" class="secondary-action">Voltar ao painel</a>
-      </div>
+      <section class="gate-api-response">
+        <strong>Resposta da API (simulada)</strong>
+        <pre data-qr-api-response>{
+      "success": false,
+      "message": "Aguardando leitura",
+      "status": "created",
+      "balance": "R$ {{ qr_status.balance }}"
+    }</pre>
+      </section>
+
     </section>
   </main>
 {% endblock %}
+#}

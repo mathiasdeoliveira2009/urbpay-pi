@@ -21,12 +21,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" href="{{ url_for('static', path='imgs/logo_urbpay.png') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=20260902-6" />
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=20260902-13" />
   {% block head %}{% endblock %}
 </head>
 <body>
-  {% block content %}{% endblock %}
-  <script src="{{ url_for('static', path='js/app.js') }}?v=20260902-5" defer></script>
+  <div class="device-mode-shell" data-device-mode-shell>
+    <aside class="device-mode-context" aria-hidden="true">
+      <span>URBPAY / EXPERIENCIA MOBILE</span>
+      <h1>Seu transporte,<br /><em>na palma da mao.</em></h1>
+      <p>Explore o portal UrbPay em uma simulacao de celular, diretamente no computador.</p>
+      <small>Modo celular ativo <i></i></small>
+    </aside>
+    <div class="device-mode-screen">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+  <script src="{{ url_for('static', path='js/app.js') }}?v=20260903-2" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

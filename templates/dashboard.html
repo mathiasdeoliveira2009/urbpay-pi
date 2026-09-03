@@ -11,7 +11,7 @@
   <div class="urb-layout">
     <div class="urb-sidebar-overlay" id="urbSidebarOverlay">
     </div>
-    <aside class="urb-sidebar">
+    <aside class="urb-sidebar" id="urbSidebar">
       <button type="button" class="urb-sidebar__brand" data-dashboard-view="home"
         aria-label="Voltar ao inicio do painel">
         <img src="{{ url_for('static', path='imgs/logo_urbpay.png') }}" alt="Logo UrbPay" class="brand-logo" />
@@ -153,6 +153,13 @@
 
     <main class="urb-main">
       <header class="urb-header">
+        <button type="button" class="urb-mobile-menu" id="urbHamburger" aria-label="Abrir menu" aria-controls="urbSidebar" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 7h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 17h16"></path>
+          </svg>
+        </button>
 
 
         <div class="urb-header__copy">
@@ -168,12 +175,12 @@
       <!-- 1. Estilo do Leaflet (Coloque no topo do bloco) -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-     <section class="urb-main-grid" data-dashboard-home-section style="display: flex !important; justify-content: flex-start !important; align-items: stretch !important; gap: 0.75rem !important; width: 100% !important;">
+    <section class="urb-main-grid" data-dashboard-home-section>
 
   <!-- COLUNA ESQUERDA: Envolto em div flexível para forçar altura total de 100% -->
-  <div style="flex: 0 0 500px !important; max-width: 500px !important; width: 500px !important; display: flex !important; flex-direction: column !important;">
+  <div class="urb-main-grid__card-column">
     
-    <article class="card-display-box" style="width: 100% !important; height: 100% !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; padding: 1.5rem !important;">
+    <article class="card-display-box">
       
       <!-- Cabeçalho -->
       <div class="card-display-box__header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -250,7 +257,7 @@
 
   <!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS (Estruturada para esticar e igualar a altura) -->
 <!-- COLUNA DIREITA: SALDO + LINHAS PRÓXIMAS -->
-<div class="urb-right-column" style="flex: 1 !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; gap: 0.75rem !important;">
+<div class="urb-right-column">
   
   <!-- BLOCO 1: SALDO -->
   <article class="urb-card urb-card--compact-balance" data-sensitive style="flex: 0 0 auto !important;">
@@ -380,7 +387,7 @@
         </div>
       </section>
 
-      <section class="urb-panel" id="transacoes" data-dashboard-home-section>
+      <section class="urb-panel" id="transacoes" hidden>
         <div class="urb-panel__head urb-panel__head--inline">
           <div>
             <h2>Transacoes recentes</h2>

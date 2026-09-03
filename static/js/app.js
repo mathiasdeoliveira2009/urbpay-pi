@@ -14,6 +14,78 @@ const statusModalClosers = document.querySelectorAll("[data-status-close]");
 const toolbar = document.querySelector("[data-utility-toolbar]");
 const toolbarToggleButtons = document.querySelectorAll("[data-toolbar-toggle]");
 const themeToggleButtons = document.querySelectorAll("[data-theme-toggle]");
+const phoneModeButtons = document.querySelectorAll("[data-phone-mode-toggle]");
+const phonePage = document.querySelector(".gate-phone-page");
+
+let phoneModeEnabled = false;
+try {
+  phoneModeEnabled = window.localStorage.getItem("urbpay-phone-mode") === "true";
+} catch (error) {
+  phoneModeEnabled = false;
+}
+
+body.classList.toggle("is-phone-mode", phoneModeEnabled);
+phonePage?.classList.toggle("is-phone-mode", phoneModeEnabled);
+phoneModeButtons.forEach((button) => {
+  button.setAttribute("aria-pressed", String(phoneModeEnabled));
+  button.setAttribute("aria-label", phoneModeEnabled ? "Desativar modo celular" : "Ativar modo celular");
+  button.classList.toggle("is-open", phoneModeEnabled);
+});
+
+const phoneScrollViewport = document.querySelector(".device-mode-screen .urb-main");
+let phoneDragState = null;
+
+phoneScrollViewport?.addEventListener("pointerdown", (event) => {
+  if (!body.classList.contains("is-phone-mode") || event.button !== 0) {
+    return;
+  }
+
+  if (event.target.closest("button, a, input, select, textarea, label")) {
+    return;
+  }
+
+  phoneDragState = {
+    pointerId: event.pointerId,
+    startY: event.clientY,
+    startScrollTop: phoneScrollViewport.scrollTop,
+    moved: false,
+  };
+  phoneScrollViewport.classList.add("is-dragging");
+});
+
+phoneScrollViewport?.addEventListener("pointermove", (event) => {
+  if (!phoneDragState || event.pointerId !== phoneDragState.pointerId) {
+    return;
+  }
+
+  const deltaY = event.clientY - phoneDragState.startY;
+  if (!phoneDragState.moved && Math.abs(deltaY) <= 4) {
+    return;
+  }
+
+  if (!phoneDragState.moved) {
+    phoneDragState.moved = true;
+    phoneScrollViewport.setPointerCapture(event.pointerId);
+  }
+
+  phoneScrollViewport.scrollTop = phoneDragState.startScrollTop - deltaY;
+  event.preventDefault();
+});
+
+const stopPhoneDrag = (event) => {
+  if (!phoneDragState || event.pointerId !== phoneDragState.pointerId) {
+    return;
+  }
+
+  if (phoneScrollViewport.hasPointerCapture(event.pointerId)) {
+    phoneScrollViewport.releasePointerCapture(event.pointerId);
+  }
+  phoneScrollViewport.classList.remove("is-dragging");
+  phoneDragState = null;
+};
+
+phoneScrollViewport?.addEventListener("pointerup", stopPhoneDrag);
+phoneScrollViewport?.addEventListener("pointercancel", stopPhoneDrag);
 const feedbackForms = document.querySelectorAll("[data-feedback-form]");
 const profileActionButtons = document.querySelectorAll("[data-profile-action]");
 const serviceTriggers = document.querySelectorAll("[data-service-trigger]");
@@ -604,7 +676,15 @@ const setDashboardView = (viewName, { scrollIntoView = true } = {}) => {
   syncDashboardViewButtons(normalizedView);
 
   if (scrollIntoView && normalizedView !== "home" && dashboardWorkspace) {
-    dashboardWorkspace.scrollIntoView({ behavior: "smooth", block: "start" });
+    const phoneViewport = body.classList.contains("is-phone-mode")
+      ? dashboardWorkspace.closest(".urb-main")
+      : null;
+
+    if (phoneViewport) {
+      phoneViewport.scrollTo({ top: dashboardWorkspace.offsetTop, behavior: "smooth" });
+    } else {
+      dashboardWorkspace.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   if (normalizedView === "locate") {
@@ -1223,6 +1303,26 @@ themeToggleButtons.forEach((button) => {
     const nextTheme = resolveTheme(getStoredTheme()) === "dark" ? "light" : "dark";
     applyTheme(nextTheme);
     syncSettingsControls();
+    closeToolbarPanels();
+  });
+});
+
+phoneModeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const isPhoneMode = document.body.classList.toggle("is-phone-mode");
+    phonePage?.classList.toggle("is-phone-mode", isPhoneMode);
+    try {
+      window.localStorage.setItem("urbpay-phone-mode", String(isPhoneMode));
+    } catch (error) {
+    }
+    phoneModeButtons.forEach((modeButton) => {
+      modeButton.setAttribute("aria-pressed", String(isPhoneMode));
+      modeButton.setAttribute("aria-label", isPhoneMode ? "Desativar modo celular" : "Ativar modo celular");
+      modeButton.classList.toggle("is-open", isPhoneMode);
+    });
+    document.querySelectorAll(".urb-sidebar.is-open, .urb-sidebar-overlay.is-open").forEach((element) => {
+      element.classList.remove("is-open");
+    });
     closeToolbarPanels();
   });
 });
@@ -1985,6 +2085,8 @@ const setQrStageState = (node, state) => {
 const qrSimulatorState = {
   isBusy: false,
   validationTimerId: null,
+  cameraStream: null,
+  cameraFrameId: null,
 };
 
 const getQrSimulatorCopy = (snapshot) => {
@@ -2128,6 +2230,17 @@ const updateQrSimulatorConsole = (snapshot, copy) => {
 
   if (consoleCopy) {
     consoleCopy.textContent = copy.consoleCopy;
+  }
+
+  const apiResponse = qrSimulatorRoot.querySelector("[data-qr-api-response]");
+  if (apiResponse) {
+    const isApproved = snapshot.code === "approved" || snapshot.code === "completed";
+    apiResponse.textContent = JSON.stringify({
+      success: isApproved,
+      message: copy.heroTitle,
+      status: snapshot.code,
+      balance: snapshot.current_balance || snapshot.balance || "0,00",
+    }, null, 2);
   }
 };
 
@@ -2293,8 +2406,11 @@ const renderQrSimulatorStatus = (snapshot) => {
   const messageNode = qrSimulatorRoot.querySelector("[data-qr-status-message]");
   const balanceNode = qrSimulatorRoot.querySelector("[data-qr-status-balance]");
   const expiryNode = qrSimulatorRoot.querySelector("[data-qr-status-expiry]");
+  const topExpiryNode = qrSimulatorRoot.querySelector("[data-qr-top-expiry]");
   const expiryLabelNode = qrSimulatorRoot.querySelector("[data-qr-expiry-label]");
   const turnstileNode = qrSimulatorRoot.querySelector("[data-qr-turnstile]");
+  const turnstileImage = qrSimulatorRoot.querySelector("[data-qr-turnstile-image]");
+  const turnstileForeground = qrSimulatorRoot.querySelector("[data-qr-turnstile-foreground]");
   const appearances = ["pending", "active", "success", "error", "warning", "muted"];
   const copy = getQrSimulatorCopy(snapshot);
 
@@ -2329,6 +2445,16 @@ const renderQrSimulatorStatus = (snapshot) => {
     }
   }
 
+  if (topExpiryNode) {
+    if (snapshot.code === "approved") {
+      topExpiryNode.textContent = formatCountdown(Number(snapshot.gate_remaining_seconds || 0));
+    } else if (snapshot.code === "created" || snapshot.code === "opened") {
+      topExpiryNode.textContent = formatCountdown(Number(snapshot.remaining_seconds || 0));
+    } else {
+      topExpiryNode.textContent = snapshot.label;
+    }
+  }
+
   if (expiryLabelNode) {
     if (snapshot.code === "approved") {
       expiryLabelNode.textContent = "Janela da catraca";
@@ -2346,25 +2472,285 @@ const renderQrSimulatorStatus = (snapshot) => {
     turnstileNode.classList.add(`gate-turnstile--${snapshot.appearance || "muted"}`);
   }
 
+  if (turnstileImage) {
+    const imageState = {
+      created: ["UrbPay_Customizada_Aproxime_QR_Code.png", "Catraca aguardando aproximacao do QR Code"],
+      opened: ["UrbPay_Customizada_Aproxime_QR_Code.png", "Catraca lendo o QR Code"],
+      approved: ["UrbPay_Customizada_Passagem_Liberada.png", "Catraca liberada para passagem"],
+      completed: ["UrbPay_Customizada_Passagem_Liberada.png", "Passagem liberada e concluida"],
+      failed: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada"],
+      expired: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por expiracao"],
+      replaced: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR substituido"],
+      inactive: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada"],
+      invalid: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR invalido"],
+    }[snapshot.code] || ["UrbPay_Customizada_Aproxime_QR_Code.png", "Catraca aguardando aproximacao do QR Code"];
+
+    const nextImageUrl = `/static/imgs/${imageState[0]}`;
+    if (turnstileImage.getAttribute("src") !== nextImageUrl) {
+      turnstileImage.classList.remove("is-changing");
+      void turnstileImage.offsetWidth;
+      turnstileImage.src = nextImageUrl;
+      turnstileImage.classList.add("is-changing");
+    }
+    if (turnstileForeground && turnstileForeground.getAttribute("src") !== nextImageUrl) {
+      turnstileForeground.src = nextImageUrl;
+    }
+    turnstileImage.alt = imageState[1];
+    turnstileNode?.setAttribute("data-turnstile-state", snapshot.code || "created");
+  }
+
   qrSimulatorRoot.dataset.qrAppearance = snapshot.appearance || "muted";
   qrSimulatorRoot.dataset.qrCode = snapshot.code || "inactive";
   updateQrSimulatorConsole(snapshot, copy);
   applyQrTimelineState(snapshot);
   updateQrSimulatorControls(snapshot);
 
-  if (snapshot.code === "opened") {
-    scheduleQrSimulatorValidation();
+  if (snapshot.code === "opened" && snapshot.opened_source === "simulator") {
+    scheduleQrSimulatorValidation(150);
   } else {
     clearQrValidationTimer();
   }
+};
+
+const stopQrCamera = () => {
+  if (qrSimulatorState.cameraFrameId) {
+    window.cancelAnimationFrame(qrSimulatorState.cameraFrameId);
+    qrSimulatorState.cameraFrameId = null;
+  }
+
+  if (qrSimulatorState.cameraStream) {
+    qrSimulatorState.cameraStream.getTracks().forEach((track) => track.stop());
+    qrSimulatorState.cameraStream = null;
+  }
+};
+
+const startQrCamera = async () => {
+  if (!qrSimulatorRoot || !window.BarcodeDetector || !navigator.mediaDevices?.getUserMedia) {
+    showToolbarToast("A leitura pela camera nao e suportada neste navegador. Use a simulacao.");
+    return;
+  }
+
+  const camera = qrSimulatorRoot.querySelector("[data-qr-camera]");
+  const cameraButton = qrSimulatorRoot.querySelector("[data-qr-camera-action]");
+  if (!camera || !cameraButton) {
+    return;
+  }
+
+  try {
+    const detector = new BarcodeDetector({ formats: ["qr_code"] });
+    qrSimulatorState.cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } },
+      audio: false,
+    });
+    camera.srcObject = qrSimulatorState.cameraStream;
+    camera.classList.add("is-visible");
+    cameraButton.textContent = "Camera ativa";
+
+    const scanFrame = async () => {
+      if (!qrSimulatorState.cameraStream || camera.readyState < 2) {
+        qrSimulatorState.cameraFrameId = window.requestAnimationFrame(scanFrame);
+        return;
+      }
+
+      try {
+        const detected = await detector.detect(camera);
+        const token = qrSimulatorRoot.dataset.qrToken || "";
+        if (detected.some((item) => item.rawValue && (!token || item.rawValue.includes(token)))) {
+          stopQrCamera();
+          camera.classList.remove("is-visible");
+          cameraButton.textContent = "QR identificado";
+          qrSimulatorRoot.querySelector("[data-qr-scan-action]")?.click();
+          return;
+        }
+      } catch (error) {
+        console.debug("Nao foi possivel ler o QR pela camera.", error);
+      }
+
+      qrSimulatorState.cameraFrameId = window.requestAnimationFrame(scanFrame);
+    };
+
+    scanFrame();
+  } catch (error) {
+    stopQrCamera();
+    showToolbarToast("Nao foi possivel acessar a camera. Verifique a permissao do navegador.");
+  }
+};
+
+const setupQrDragInteraction = () => {
+  if (!qrSimulatorRoot) {
+    return;
+  }
+
+  const hand = qrSimulatorRoot.querySelector("[data-qr-drag-hand]");
+  const visual = qrSimulatorRoot.querySelector(".gate-ops-hero__visual");
+  const scanTarget = qrSimulatorRoot.querySelector(".gate-ops-hero__scan");
+  const scanButton = qrSimulatorRoot.querySelector("[data-qr-scan-action]");
+  if (!hand || !visual || !scanTarget || !scanButton) {
+    return;
+  }
+
+  let offsetX = 0;
+  let offsetY = 0;
+
+  hand.addEventListener("pointerdown", (event) => {
+    if (scanButton.disabled || qrSimulatorRoot.dataset.qrCode !== "created") {
+      return;
+    }
+
+    const handRect = hand.getBoundingClientRect();
+    hand.setPointerCapture(event.pointerId);
+    hand.classList.add("is-dragging");
+    hand.style.right = "auto";
+    hand.style.bottom = "auto";
+    offsetX = event.clientX - handRect.left;
+    offsetY = event.clientY - handRect.top;
+  });
+
+  hand.addEventListener("pointermove", (event) => {
+    if (!hand.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+
+    const visualRect = visual.getBoundingClientRect();
+    const handWidth = hand.offsetWidth;
+    const handHeight = hand.offsetHeight;
+    const left = Math.max(0, Math.min(event.clientX - visualRect.left - offsetX, visualRect.width - handWidth));
+    const top = Math.max(0, Math.min(event.clientY - visualRect.top - offsetY, visualRect.height - handHeight));
+    hand.style.left = `${left}px`;
+    hand.style.top = `${top}px`;
+  });
+
+  hand.addEventListener("pointerup", (event) => {
+    if (!hand.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+
+    const handRect = hand.getBoundingClientRect();
+    const targetRect = scanTarget.getBoundingClientRect();
+    const handCenterX = handRect.left + handRect.width / 2;
+    const handCenterY = handRect.top + handRect.height / 2;
+    const reachedReader = handCenterX >= targetRect.left
+      && handCenterX <= targetRect.right
+      && handCenterY >= targetRect.top
+      && handCenterY <= targetRect.bottom;
+
+    hand.releasePointerCapture(event.pointerId);
+    hand.classList.remove("is-dragging");
+    if (reachedReader) {
+      scanButton.click();
+    }
+  });
+};
+
+const setupArmDragInteraction = () => {
+  if (!qrSimulatorRoot) {
+    return;
+  }
+
+  const arm = qrSimulatorRoot.querySelector("[data-qr-drag-arm]");
+  const readerTarget = qrSimulatorRoot.querySelector("[data-qr-reader-target]");
+  if (!arm || !readerTarget) {
+    return;
+  }
+
+  let offsetX = 0;
+  let offsetY = 0;
+  let isScanning = false;
+  let readerReached = false;
+
+  const scanQrFromDrag = async () => {
+    const scanUrl = qrSimulatorRoot.dataset.scanUrl;
+    if (!scanUrl || isScanning || qrSimulatorState.isBusy || qrSimulatorRoot.dataset.qrCode !== "created") {
+      return;
+    }
+
+    isScanning = true;
+    qrSimulatorState.isBusy = true;
+    try {
+      const snapshot = await postQrSimulatorAction(scanUrl);
+      renderQrSimulatorStatus(snapshot);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isScanning = false;
+      qrSimulatorState.isBusy = false;
+    }
+  };
+
+  arm.addEventListener("pointerdown", (event) => {
+    const armRect = arm.getBoundingClientRect();
+    arm.setPointerCapture(event.pointerId);
+    arm.classList.add("is-dragging");
+    readerReached = false;
+    arm.style.right = "auto";
+    arm.style.bottom = "auto";
+    offsetX = event.clientX - armRect.left;
+    offsetY = event.clientY - armRect.top;
+  });
+
+  arm.addEventListener("pointermove", (event) => {
+    if (!arm.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+
+    arm.style.left = `${event.clientX - offsetX}px`;
+    arm.style.top = `${event.clientY - offsetY}px`;
+
+    if (!readerReached) {
+      const armRect = arm.getBoundingClientRect();
+      const targetRect = readerTarget.getBoundingClientRect();
+      const phoneRect = {
+        left: armRect.left,
+        right: armRect.left + armRect.width * 0.36,
+        top: armRect.top + armRect.height * 0.25,
+        bottom: armRect.top + armRect.height * 0.78,
+      };
+      readerReached = phoneRect.left < targetRect.right
+        && phoneRect.right > targetRect.left
+        && phoneRect.top < targetRect.bottom
+        && phoneRect.bottom > targetRect.top;
+      if (readerReached) {
+        scanQrFromDrag();
+      }
+    }
+  });
+
+  arm.addEventListener("pointerup", (event) => {
+    if (!arm.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+
+    const armRect = arm.getBoundingClientRect();
+    const targetRect = readerTarget.getBoundingClientRect();
+    const phoneRect = {
+      left: armRect.left,
+      right: armRect.left + armRect.width * 0.36,
+      top: armRect.top + armRect.height * 0.25,
+      bottom: armRect.top + armRect.height * 0.78,
+    };
+    const reachedReader = phoneRect.left < targetRect.right
+      && phoneRect.right > targetRect.left
+      && phoneRect.top < targetRect.bottom
+      && phoneRect.bottom > targetRect.top;
+
+    arm.releasePointerCapture(event.pointerId);
+    arm.classList.remove("is-dragging");
+    if (reachedReader && !readerReached) {
+      scanQrFromDrag();
+    }
+  });
 };
 
 if (qrSimulatorRoot) {
   const simulatorStatusUrl = qrSimulatorRoot.dataset.statusUrl;
   const scanButton = qrSimulatorRoot.querySelector("[data-qr-scan-action]");
   const completeButton = qrSimulatorRoot.querySelector("[data-qr-complete-action]");
+  const cameraButton = qrSimulatorRoot.querySelector("[data-qr-camera-action]");
   const scanUrl = qrSimulatorRoot.dataset.scanUrl;
   const completeUrl = qrSimulatorRoot.dataset.completeUrl;
+
+  setupQrDragInteraction();
+  setupArmDragInteraction();
 
   scanButton?.addEventListener("click", async () => {
     if (!scanUrl || qrSimulatorState.isBusy) {
@@ -2405,6 +2791,8 @@ if (qrSimulatorRoot) {
       updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
     }
   });
+
+  cameraButton?.addEventListener("click", startQrCamera);
 
   if (simulatorStatusUrl) {
     let qrSimulatorPollId = null;
@@ -2742,13 +3130,23 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!hamburger || !sidebar || !overlay) return;
 
   hamburger.addEventListener("click", () => {
-    sidebar.classList.toggle("is-open");
-    overlay.classList.toggle("is-open");
+    const isOpen = sidebar.classList.toggle("is-open");
+    overlay.classList.toggle("is-open", isOpen);
+    hamburger.setAttribute("aria-expanded", String(isOpen));
   });
 
   overlay.addEventListener("click", () => {
     sidebar.classList.remove("is-open");
     overlay.classList.remove("is-open");
+    hamburger.setAttribute("aria-expanded", "false");
+  });
+
+  sidebar.addEventListener("click", (event) => {
+    if (event.target.closest(".urb-nav-link")) {
+      sidebar.classList.remove("is-open");
+      overlay.classList.remove("is-open");
+      hamburger.setAttribute("aria-expanded", "false");
+    }
   });
 
 });

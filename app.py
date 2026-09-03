@@ -275,7 +275,7 @@ STATUS_MESSAGES = {
 DEFAULT_PASSAGE_VALUE = Decimal("5.40")
 INITIAL_TOPUP = Decimal("0.00")
 MONEY_QUANT = Decimal("0.00")
-QR_TOKEN_MAX_AGE_SECONDS = 600
+QR_TOKEN_MAX_AGE_SECONDS = 300
 GATE_PASSAGE_WINDOW_SECONDS = 20
 GATE_AUTO_COMPLETE_SECONDS = 4
 ACTIVE_QR_AUTHORIZATIONS: dict[int, dict[str, object]] = {}
@@ -1338,13 +1338,18 @@ def get_all_movements(db: Session, card_id: int) -> list[Movimentacao]:
     return list(db.scalars(statement))
 
 
-def build_qr_token(user: Usuario, amount: Decimal = DEFAULT_PASSAGE_VALUE) -> str:
+def build_qr_token(
+    user: Usuario,
+    amount: Decimal = DEFAULT_PASSAGE_VALUE,
+    card: Cartao | None = None,
+) -> str:
+    selected_card = card or user.cartao
     issued_at = datetime.utcnow()
     expires_at = issued_at + timedelta(seconds=QR_TOKEN_MAX_AGE_SECONDS)
     nonce = secrets.token_hex(16)
     payload = {
         "user_id": user.id_usuario,
-        "card_id": user.cartao.id_cartao if user.cartao else None,
+        "card_id": selected_card.id_cartao if selected_card else None,
         "amount": str(amount),
         "issued_at": issued_at.isoformat(),
         "nonce": nonce,
@@ -1353,12 +1358,13 @@ def build_qr_token(user: Usuario, amount: Decimal = DEFAULT_PASSAGE_VALUE) -> st
     ACTIVE_QR_AUTHORIZATIONS[user.id_usuario] = {
         "token": token,
         "nonce": nonce,
-        "card_id": user.cartao.id_cartao if user.cartao else None,
+        "card_id": selected_card.id_cartao if selected_card else None,
         "amount": str(amount),
         "issued_at": issued_at,
         "expires_at": expires_at,
         "status": "created",
         "opened_at": None,
+        "opened_source": None,
         "released_at": None,
         "processed_at": None,
         "completed_at": None,
@@ -1414,6 +1420,7 @@ def restore_qr_authorization(payload: dict[str, object]) -> dict[str, object] | 
         "expires_at": expires_at,
         "status": restored_status,
         "opened_at": None,
+        "opened_source": None,
         "released_at": None,
         "processed_at": None,
         "completed_at": None,
@@ -1426,19 +1433,26 @@ def restore_qr_authorization(payload: dict[str, object]) -> dict[str, object] | 
     return ACTIVE_QR_AUTHORIZATIONS[user_id]
 
 
-def get_or_create_active_qr_token(user: Usuario) -> str:
+def get_or_create_active_qr_token(user: Usuario, card: Cartao | None = None) -> str:
     authorization = ACTIVE_QR_AUTHORIZATIONS.get(user.id_usuario)
     now = datetime.utcnow()
+    selected_card = card or user.cartao
+    selected_card_id = selected_card.id_cartao if selected_card else None
 
     if authorization:
         expires_at = authorization.get("expires_at")
         is_expired = isinstance(expires_at, datetime) and now > expires_at
-        if not is_expired and not authorization.get("used") and authorization.get("status") in {"created", "opened"}:
+        if (
+            not is_expired
+            and not authorization.get("used")
+            and authorization.get("status") in {"created", "opened"}
+            and int(authorization.get("card_id") or 0) == int(selected_card_id or 0)
+        ):
             token = str(authorization.get("token") or "").strip()
             if token:
                 return token
 
-    return build_qr_token(user)
+    return build_qr_token(user, card=selected_card)
 
 
 def validate_qr_authorization(payload: dict) -> dict:
@@ -1640,6 +1654,7 @@ def build_qr_status_snapshot(user: Usuario | None, token: str) -> dict[str, obje
         "balance": currency(balance_value),
         "expires_at": expires_at.isoformat() if isinstance(expires_at, datetime) else None,
         "opened_at": opened_at.isoformat() if isinstance(opened_at, datetime) else None,
+        "opened_source": authorization.get("opened_source") if authorization else None,
         "released_at": released_at.isoformat() if isinstance(released_at, datetime) else None,
         "processed_at": processed_at.isoformat() if isinstance(processed_at, datetime) else None,
         "completed_at": completed_at.isoformat() if isinstance(completed_at, datetime) else None,
@@ -1777,7 +1792,7 @@ def build_dashboard_context(
     profile_identity = build_profile_identity(user, card)
 
     if not qr_token:
-        qr_token = get_or_create_active_qr_token(user)
+        qr_token = get_or_create_active_qr_token(user, card=card)
 
     qr_url = str(request.url_for("passage_gateway", token=qr_token))
     qr_image_url = str(request.url_for("dashboard_qr_image")) + f"?token={qr_token}"
@@ -2219,7 +2234,7 @@ def refresh_dashboard_qr(request: Request, db: Session = Depends(get_db)) -> Red
     if not user:
         return RedirectResponse(url="/", status_code=303)
 
-    build_qr_token(user)
+    build_qr_token(user, card=get_primary_user_card(db, user.id_usuario))
     return RedirectResponse(url="/dashboard?status=qr-ready", status_code=303)
 
 
@@ -2256,7 +2271,13 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
     if int(payload["user_id"]) != user.id_usuario:
         raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
 
-    card = get_primary_user_card(db, user.id_usuario)
+    card_id = int(payload.get("card_id") or 0)
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == card_id,
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
     if not card:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
@@ -2267,6 +2288,13 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
         "profile_image": user.foto_perfil or "imgs/Default.png",
         "amount": currency(payload["amount"]),
         "card_number": format_card_number(card.numero_cartao),
+        "card_number_masked": format_card_number(mask_sensitive(card.numero_cartao, visible_digits=4)),
+        "card_digits": str(card.numero_cartao)[-4:],
+        "card_model": (getattr(card, "modelo", None) or "cartao-verde.png").replace("imgs/", "").replace("/static/", ""),
+        "card_display_name": card.nome_impresso or user.nome,
+        "card_validity": card.data_validade.strftime("%m/%Y") if card.data_validade else "--/--",
+        "card_cvv": str(card.cvv),
+        "card_badge": infer_card_badge(user, card)["label"],
         "current_balance": currency(card.saldo),
         "qr_status": {
             **build_qr_status_snapshot(user, token),
@@ -2292,7 +2320,12 @@ def dashboard_qr_status(token: str, request: Request, db: Session = Depends(get_
         raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
 
     snapshot = build_qr_status_snapshot(user, token)
-    card = get_primary_user_card(db, user.id_usuario)
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == int(payload.get("card_id") or 0),
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
     balance_text = currency(card.saldo if card else Decimal("0.00"))
     snapshot["balance"] = balance_text
     snapshot["current_balance"] = balance_text
@@ -2318,11 +2351,17 @@ def dashboard_qr_scan(token: str, request: Request, db: Session = Depends(get_db
             user.id_usuario,
             status="opened",
             opened_at=authorization.get("opened_at") or now,
+            opened_source="simulator",
             updated_at=now,
         )
 
     snapshot = build_qr_status_snapshot(user, token)
-    card = get_primary_user_card(db, user.id_usuario)
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == int(payload.get("card_id") or 0),
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
     balance_text = currency(card.saldo if card else Decimal("0.00"))
     snapshot["balance"] = balance_text
     snapshot["current_balance"] = balance_text
@@ -2339,7 +2378,12 @@ def dashboard_qr_validate(token: str, request: Request, db: Session = Depends(ge
     if int(payload["user_id"]) != user.id_usuario:
         raise HTTPException(status_code=403, detail="Este QR Code nao pertence a este usuario.")
 
-    card = get_primary_user_card(db, user.id_usuario)
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == int(payload.get("card_id") or 0),
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
     if not card:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
@@ -2375,7 +2419,12 @@ def dashboard_qr_complete(token: str, request: Request, db: Session = Depends(ge
         finalize_qr_authorization(user.id_usuario)
 
     snapshot = build_qr_status_snapshot(user, token)
-    card = get_primary_user_card(db, user.id_usuario)
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == int(payload.get("card_id") or 0),
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
     balance_text = currency(card.saldo if card else Decimal("0.00"))
     snapshot["balance"] = balance_text
     snapshot["current_balance"] = balance_text
@@ -2410,6 +2459,7 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
             user.id_usuario,
             status="opened",
             opened_at=opened_at,
+            opened_source="cellphone",
             updated_at=datetime.utcnow(),
         )
 
