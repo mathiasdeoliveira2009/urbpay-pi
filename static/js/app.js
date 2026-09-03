@@ -2233,6 +2233,7 @@ const updateQrSimulatorConsole = (snapshot, copy) => {
   }
 
   const apiResponse = qrSimulatorRoot.querySelector("[data-qr-api-response]");
+  const apiStatus = qrSimulatorRoot.querySelector("[data-qr-api-status]");
   if (apiResponse) {
     const isApproved = snapshot.code === "approved" || snapshot.code === "completed";
     apiResponse.textContent = JSON.stringify({
@@ -2241,6 +2242,9 @@ const updateQrSimulatorConsole = (snapshot, copy) => {
       status: snapshot.code,
       balance: snapshot.current_balance || snapshot.balance || "0,00",
     }, null, 2);
+  }
+  if (apiStatus) {
+    apiStatus.textContent = snapshot.code === "failed" ? "402 NEGADO" : snapshot.code === "expired" ? "410 EXPIRADO" : "200 OK";
   }
 };
 
@@ -2254,26 +2258,30 @@ const updateQrSimulatorControls = (snapshot) => {
   const passengerLink = qrSimulatorRoot.querySelector("[data-qr-passenger-link]");
   const dashboardLink = qrSimulatorRoot.querySelector("[data-qr-dashboard-link]");
 
-  if (!scanButton || !completeButton || !passengerLink || !dashboardLink) {
-    return;
-  }
-
   const isWaitingScan = snapshot.code === "created";
   const isValidating = snapshot.code === "opened";
   const isReleased = snapshot.code === "approved";
   const isTerminal = ["completed", "failed", "expired", "replaced", "inactive", "invalid"].includes(snapshot.code);
 
-  scanButton.hidden = !isWaitingScan && !isValidating;
-  scanButton.disabled = !isWaitingScan || qrSimulatorState.isBusy;
-  scanButton.textContent = isValidating ? "Validando bilhete..." : "Simular leitura do QR";
+  if (scanButton) {
+    scanButton.hidden = !isWaitingScan && !isValidating;
+    scanButton.disabled = !isWaitingScan || qrSimulatorState.isBusy;
+    scanButton.textContent = isValidating ? "Validando bilhete..." : "Ler QR Code";
+  }
 
-  completeButton.hidden = !isReleased;
-  completeButton.disabled = !isReleased || qrSimulatorState.isBusy;
-  completeButton.textContent = "Simular passagem na catraca";
+  if (completeButton) {
+    completeButton.hidden = !isReleased;
+    completeButton.disabled = !isReleased || qrSimulatorState.isBusy;
+    completeButton.textContent = "Simular passagem na catraca";
+  }
 
-  passengerLink.hidden = isReleased || isTerminal;
-  dashboardLink.textContent = isTerminal ? "Gerar novo QR no painel" : "Voltar ao painel";
-  dashboardLink.setAttribute("href", "/dashboard");
+  if (passengerLink) {
+    passengerLink.hidden = isReleased || isTerminal;
+  }
+  if (dashboardLink) {
+    dashboardLink.textContent = isTerminal ? "Gerar novo QR no painel" : "Voltar ao painel";
+    dashboardLink.setAttribute("href", "/dashboard");
+  }
 };
 
 const postQrSimulatorAction = async (url) => {
@@ -2411,6 +2419,7 @@ const renderQrSimulatorStatus = (snapshot) => {
   const turnstileNode = qrSimulatorRoot.querySelector("[data-qr-turnstile]");
   const turnstileImage = qrSimulatorRoot.querySelector("[data-qr-turnstile-image]");
   const turnstileForeground = qrSimulatorRoot.querySelector("[data-qr-turnstile-foreground]");
+  const qrDisplay = qrSimulatorRoot.querySelector("[data-qr-display]");
   const appearances = ["pending", "active", "success", "error", "warning", "muted"];
   const copy = getQrSimulatorCopy(snapshot);
 
@@ -2472,10 +2481,18 @@ const renderQrSimulatorStatus = (snapshot) => {
     turnstileNode.classList.add(`gate-turnstile--${snapshot.appearance || "muted"}`);
   }
 
+  if (qrDisplay) {
+    qrDisplay.hidden = !qrSimulatorRoot.classList.contains("is-qr-focus")
+      || snapshot.code !== "created";
+  }
+
   if (turnstileImage) {
+    const waitingTurnstileImage = qrSimulatorRoot.dataset.simulatorMode === "qr"
+      ? "UrbPay_Customizada_leia_QR_Code.png"
+      : "UrbPay_Customizada_Aproxime_QR_Code.png";
     const imageState = {
-      created: ["UrbPay_Customizada_Aproxime_QR_Code.png", "Catraca aguardando aproximacao do QR Code"],
-      opened: ["UrbPay_Customizada_Aproxime_QR_Code.png", "Catraca lendo o QR Code"],
+      created: [waitingTurnstileImage, "Catraca aguardando leitura"],
+      opened: [waitingTurnstileImage, "Catraca lendo o QR Code"],
       approved: ["UrbPay_Customizada_Passagem_Liberada.png", "Catraca liberada para passagem"],
       completed: ["UrbPay_Customizada_Passagem_Liberada.png", "Passagem liberada e concluida"],
       failed: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada"],
@@ -2483,7 +2500,7 @@ const renderQrSimulatorStatus = (snapshot) => {
       replaced: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR substituido"],
       inactive: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada"],
       invalid: ["UrbPay_Customizada_Passagem_Bloqueada.png", "Passagem bloqueada por QR invalido"],
-    }[snapshot.code] || ["UrbPay_Customizada_Aproxime_QR_Code.png", "Catraca aguardando aproximacao do QR Code"];
+    }[snapshot.code] || [waitingTurnstileImage, "Catraca aguardando leitura"];
 
     const nextImageUrl = `/static/imgs/${imageState[0]}`;
     if (turnstileImage.getAttribute("src") !== nextImageUrl) {
@@ -2658,6 +2675,16 @@ const setupArmDragInteraction = () => {
   let isScanning = false;
   let readerReached = false;
 
+  const getPhoneRect = () => {
+    const armRect = arm.getBoundingClientRect();
+    return {
+      left: armRect.left + armRect.width * 0.34,
+      right: armRect.left + armRect.width * 0.69,
+      top: armRect.top,
+      bottom: armRect.top + armRect.height * 0.42,
+    };
+  };
+
   const scanQrFromDrag = async () => {
     const scanUrl = qrSimulatorRoot.dataset.scanUrl;
     if (!scanUrl || isScanning || qrSimulatorState.isBusy || qrSimulatorRoot.dataset.qrCode !== "created") {
@@ -2697,14 +2724,8 @@ const setupArmDragInteraction = () => {
     arm.style.top = `${event.clientY - offsetY}px`;
 
     if (!readerReached) {
-      const armRect = arm.getBoundingClientRect();
       const targetRect = readerTarget.getBoundingClientRect();
-      const phoneRect = {
-        left: armRect.left,
-        right: armRect.left + armRect.width * 0.36,
-        top: armRect.top + armRect.height * 0.25,
-        bottom: armRect.top + armRect.height * 0.78,
-      };
+      const phoneRect = getPhoneRect();
       readerReached = phoneRect.left < targetRect.right
         && phoneRect.right > targetRect.left
         && phoneRect.top < targetRect.bottom
@@ -2720,14 +2741,8 @@ const setupArmDragInteraction = () => {
       return;
     }
 
-    const armRect = arm.getBoundingClientRect();
     const targetRect = readerTarget.getBoundingClientRect();
-    const phoneRect = {
-      left: armRect.left,
-      right: armRect.left + armRect.width * 0.36,
-      top: armRect.top + armRect.height * 0.25,
-      bottom: armRect.top + armRect.height * 0.78,
-    };
+    const phoneRect = getPhoneRect();
     const reachedReader = phoneRect.left < targetRect.right
       && phoneRect.right > targetRect.left
       && phoneRect.top < targetRect.bottom
@@ -2748,15 +2763,36 @@ if (qrSimulatorRoot) {
   const cameraButton = qrSimulatorRoot.querySelector("[data-qr-camera-action]");
   const scanUrl = qrSimulatorRoot.dataset.scanUrl;
   const completeUrl = qrSimulatorRoot.dataset.completeUrl;
+  const layoutToggle = qrSimulatorRoot.querySelector("[data-layout-toggle]");
+  const qrFocusToggle = qrSimulatorRoot.querySelector("[data-qr-focus-toggle]");
+  const qrDisplay = qrSimulatorRoot.querySelector("[data-qr-display]");
+
+  layoutToggle?.addEventListener("click", () => {
+    const isSplit = qrSimulatorRoot.classList.toggle("is-split");
+    layoutToggle.textContent = isSplit ? "Tela cheia" : "70/30";
+    layoutToggle.setAttribute("aria-label", isSplit ? "Voltar para tela cheia" : "Alternar para o layout 70/30");
+  });
+
+  qrFocusToggle?.addEventListener("click", () => {
+    const isFocused = qrSimulatorRoot.classList.toggle("is-qr-focus");
+    qrFocusToggle.textContent = isFocused ? "Leitura normal" : "Modo leitura";
+    qrFocusToggle.setAttribute("aria-pressed", String(isFocused));
+    if (qrDisplay) {
+      qrDisplay.hidden = !isFocused || qrSimulatorRoot.dataset.qrCode !== "created";
+    }
+  });
 
   setupQrDragInteraction();
   setupArmDragInteraction();
 
-  scanButton?.addEventListener("click", async () => {
+  const triggerQrScan = async () => {
     if (!scanUrl || qrSimulatorState.isBusy) {
       return;
     }
 
+    if (qrDisplay) {
+      qrDisplay.hidden = true;
+    }
     qrSimulatorState.isBusy = true;
     updateQrSimulatorControls({ code: "created" });
 
@@ -2770,7 +2806,10 @@ if (qrSimulatorRoot) {
       qrSimulatorState.isBusy = false;
       updateQrSimulatorControls({ code: qrSimulatorRoot.dataset.qrCode || "inactive" });
     }
-  });
+  };
+
+  scanButton?.addEventListener("click", triggerQrScan);
+  qrDisplay?.addEventListener("click", triggerQrScan);
 
   completeButton?.addEventListener("click", async () => {
     if (!completeUrl || qrSimulatorState.isBusy) {

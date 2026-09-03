@@ -5,16 +5,49 @@
 {% block head %}
   <style>
     html, body, .device-mode-shell, .device-mode-screen { width: 100%; height: 100%; min-height: 100%; margin: 0; overflow: hidden; background: #000 !important; }
-    .gate-only-screen { position: fixed; inset: 0; width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: #000; }
+    .gate-only-screen { position: fixed; inset: 0; display: flex; width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: #000; }
+    .gate-only-screen__stage { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; transition: width .35s ease; }
     .gate-only-screen__image { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
-    .gate-only-screen__arm { position: absolute; z-index: 2; top: 0; right: 0; width: auto; height: 100%; max-width: none; cursor: grab; touch-action: none; user-select: none; }
+    .gate-only-screen__arm { position: absolute; z-index: 2; top: 0; right: 0; width: auto; height: min(100%, 88vw); max-width: none; cursor: grab; touch-action: none; user-select: none; }
     .gate-only-screen__arm.is-dragging { cursor: grabbing; }
     .gate-only-screen__reader-target { position: absolute; left: 5%; top: 12%; width: 38%; height: 76%; pointer-events: none; }
+    .gate-only-screen__qr { position: absolute; z-index: 2; left: 14%; top: 19%; width: 28%; max-width: 360px; padding: 1.2%; background: #fff; border-radius: 12px; box-shadow: 0 0 0 5px rgba(255, 255, 255, .18), 0 12px 35px rgba(0, 0, 0, .35); }
+    .gate-only-screen__qr[hidden] { display: none; }
+    .gate-only-screen__qr { cursor: pointer; }
+    .gate-only-screen__qr-focus-toggle { position: absolute; z-index: 5; top: 18px; left: 18px; padding: 9px 12px; border: 1px solid rgba(255, 255, 255, .72); border-radius: 999px; background: rgba(246, 252, 247, .9); color: #214b31; box-shadow: 0 5px 16px rgba(0, 0, 0, .2); font: 700 11px/1 ui-monospace, SFMono-Regular, Consolas, monospace; cursor: pointer; backdrop-filter: blur(8px); }
+    .gate-only-screen__qr-focus-toggle:hover { background: #fff; color: #123d23; }
+    .gate-only-screen.is-qr-focus .gate-only-screen__image { opacity: .28; filter: brightness(.7) saturate(.7); }
+    .gate-only-screen.is-qr-focus .gate-only-screen__stage::after { position: absolute; z-index: 1; inset: 0; background: rgba(2, 14, 9, .38); content: ""; pointer-events: none; }
+    .gate-only-screen.is-qr-focus .gate-only-screen__qr { left: 50%; top: 50%; width: min(58%, 560px); max-width: none; padding: 2%; transform: translate(-50%, -50%); box-shadow: 0 0 0 7px rgba(255, 255, 255, .85), 0 0 0 14px rgba(41, 198, 90, .7), 0 18px 45px rgba(0, 0, 0, .5); }
+    .gate-only-screen.is-qr-focus .gate-only-screen__scan { left: 50%; top: auto; bottom: 8%; transform: translateX(-50%); }
+    .gate-only-screen__layout-toggle { position: fixed; z-index: 10; top: 10px; right: 12px; min-width: 52px; height: 26px; padding: 0 8px; border: 1px solid rgba(255, 255, 255, .42); border-radius: 5px; background: rgba(0, 0, 0, .62); color: rgba(255, 255, 255, .9); font: 700 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; cursor: pointer; opacity: .82; transition: opacity .2s ease, background .2s ease; }
+    .gate-only-screen__layout-toggle:hover, .gate-only-screen__layout-toggle:focus-visible { opacity: 1; background: rgba(0, 0, 0, .86); }
+    .gate-only-screen__response { display: none; width: 0; min-width: 0; padding: 0; overflow: auto; background: #f4f7f4; color: #20352b; }
+    .gate-only-screen.is-split .gate-only-screen__stage { width: 70%; }
+    .gate-only-screen.is-split .gate-only-screen__response { display: block; width: 30%; min-width: 260px; padding: clamp(22px, 3vw, 46px) clamp(18px, 3vw, 42px); }
+    .gate-only-screen__response-kicker { margin: 0 0 10px; color: #6f8a7b; font: 700 11px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .12em; text-transform: uppercase; }
+    .gate-only-screen__response h1 { margin: 0 0 26px; font: 700 clamp(24px, 2.3vw, 38px)/1.05 Georgia, serif; }
+    .gate-only-screen__status { margin-bottom: 28px; padding-bottom: 22px; border-bottom: 1px solid #d9e5dc; }
+    .gate-only-screen__status-label { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; font: 700 12px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace; text-transform: uppercase; }
+    .gate-only-screen__status-label::before { width: 8px; height: 8px; border-radius: 50%; background: #e0a321; content: ""; }
+    .gate-only-screen__status h2 { margin: 0 0 8px; font: 700 clamp(20px, 1.8vw, 28px)/1.1 Georgia, serif; }
+    .gate-only-screen__status p { margin: 0; color: #61756a; font: 500 14px/1.55 Arial, sans-serif; }
+    .gate-only-screen__response-meta { display: grid; gap: 13px; margin-bottom: 28px; }
+    .gate-only-screen__response-meta div { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid #d9e5dc; font: 500 13px/1.3 Arial, sans-serif; }
+    .gate-only-screen__response-meta strong { text-align: right; }
+    .gate-only-screen__api { margin: 0; padding: 14px; overflow: auto; background: #e9f0eb; border: 1px solid #d4e2d8; border-radius: 8px; color: #365244; font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
+    @media (max-width: 680px) {
+      .gate-only-screen.is-split .gate-only-screen__stage { width: 62%; }
+      .gate-only-screen.is-split .gate-only-screen__response { width: 38%; min-width: 0; padding: 20px 12px; }
+      .gate-only-screen__response h1 { font-size: 20px; }
+      .gate-only-screen__status h2 { font-size: 17px; }
+      .gate-only-screen__status p, .gate-only-screen__response-meta div { font-size: 11px; }
+    }
   </style>
 {% endblock %}
 
 {% block content %}
-  <main class="gate-only-screen" data-qr-simulator-root
+  <main class="gate-only-screen" data-qr-simulator-root data-simulator-mode="{{ qr_simulator_mode }}"
     data-status-url="{{ qr_status_url }}"
     data-scan-url="{{ qr_scan_url }}"
     data-validate-url="{{ qr_validate_url }}"
@@ -23,11 +56,40 @@
     data-qr-token="{{ token }}"
     data-qr-appearance="{{ qr_status.appearance }}"
     data-qr-code="{{ qr_status.code }}">
-    <img class="gate-only-screen__image" data-qr-turnstile-image
-      src="{{ url_for('static', path='imgs/UrbPay_Customizada_Aproxime_QR_Code.png') }}" alt="Catraca" />
+    <button type="button" class="gate-only-screen__layout-toggle" data-layout-toggle aria-label="Alternar para o layout 70/30" title="Alternar layout">70/30</button>
+    <section class="gate-only-screen__stage">
+      <img class="gate-only-screen__image" data-qr-turnstile-image
+        src="{{ url_for('static', path='imgs/' ~ ('UrbPay_Customizada_leia_QR_Code.png' if qr_simulator_mode == 'qr' else 'UrbPay_Customizada_Aproxime_QR_Code.png')) }}" alt="Catraca" />
+    {% if qr_simulator_mode == "arm" %}
     <img class="gate-only-screen__arm" data-qr-drag-arm
       src="{{ url_for('static', path='imgs/mão_e_celular.png') }}" alt="" draggable="false" />
-    <span class="gate-only-screen__reader-target" data-qr-reader-target aria-hidden="true"></span>
+    {% endif %}
+      {% if qr_simulator_mode == "qr" %}
+      <button type="button" class="gate-only-screen__qr-focus-toggle" data-qr-focus-toggle
+        aria-pressed="false">Modo leitura</button>
+      <img class="gate-only-screen__qr" data-qr-display hidden
+        src="{{ qr_image_url }}" alt="QR Code da passagem" />
+      {% endif %}
+      <span class="gate-only-screen__reader-target" data-qr-reader-target aria-hidden="true"></span>
+    </section>
+    <aside class="gate-only-screen__response" aria-live="polite">
+      <p class="gate-only-screen__response-kicker">Resposta da catraca</p>
+      <h1>Status da passagem</h1>
+      <div class="gate-only-screen__status">
+        <div class="gate-only-screen__status-label" data-qr-status-label>QR pronto</div>
+        <h2 data-qr-status-title>Aguardando leitura</h2>
+        <p data-qr-status-message>O leitor está aguardando a aproximação do QR Code ou do celular.</p>
+      </div>
+      <div class="gate-only-screen__response-meta">
+        <div><span>API</span><strong data-qr-api-status>200 OK</strong></div>
+        <div><span>Valor</span><strong>R$ {{ amount }}</strong></div>
+        <div><span>Validade</span><strong data-qr-status-expiry>{{ "%02d:%02d"|format(qr_status.remaining_seconds // 60, qr_status.remaining_seconds % 60) }}</strong></div>
+      </div>
+      <pre class="gate-only-screen__api" data-qr-api-response>{
+  "success": false,
+  "status": "{{ qr_status.code }}"
+}</pre>
+    </aside>
   </main>
 {% endblock %}
 {#

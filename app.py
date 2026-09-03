@@ -1652,7 +1652,7 @@ def build_qr_status_snapshot(user: Usuario | None, token: str) -> dict[str, obje
         "can_poll": status_code in {"created", "opened", "approved"},
         "amount": currency(amount),
         "balance": currency(balance_value),
-        "expires_at": expires_at.isoformat() if isinstance(expires_at, datetime) else None,
+        "expires_at": f"{expires_at.isoformat()}Z" if isinstance(expires_at, datetime) else None,
         "opened_at": opened_at.isoformat() if isinstance(opened_at, datetime) else None,
         "opened_source": authorization.get("opened_source") if authorization else None,
         "released_at": released_at.isoformat() if isinstance(released_at, datetime) else None,
@@ -1799,7 +1799,7 @@ def build_dashboard_context(
     qr_simulator_url = str(request.url_for("dashboard_qr_simulator", token=qr_token))
     qr_authorization = ACTIVE_QR_AUTHORIZATIONS.get(user.id_usuario, {})
     expires_at = qr_authorization.get("expires_at")
-    expires_iso = expires_at.isoformat() if isinstance(expires_at, datetime) else None
+    expires_iso = f"{expires_at.isoformat()}Z" if isinstance(expires_at, datetime) else None
     issued_at = qr_authorization.get("issued_at")
     issued_iso = issued_at.isoformat() if isinstance(issued_at, datetime) else None
     request_items = build_dashboard_requests(user, recent_movements)
@@ -2262,7 +2262,7 @@ def dashboard_qr_image(token: str, request: Request, db: Session = Depends(get_d
 
 
 @app.get("/dashboard/qr/simulador/{token}", response_class=HTMLResponse, name="dashboard_qr_simulator")
-def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(get_db), mode: str = "arm") -> HTMLResponse:
     user = get_user_from_session(request, db)
     if not user:
         return RedirectResponse(url="/", status_code=303)
@@ -2305,6 +2305,8 @@ def dashboard_qr_simulator(token: str, request: Request, db: Session = Depends(g
         "qr_validate_url": str(request.url_for("dashboard_qr_validate", token=token)),
         "qr_complete_url": str(request.url_for("dashboard_qr_complete", token=token)),
         "qr_customer_url": str(request.url_for("passage_gateway", token=token)),
+        "qr_image_url": str(request.url_for("dashboard_qr_image")) + f"?token={token}",
+        "qr_simulator_mode": "qr" if mode == "qr" else "arm",
     }
     return templates.TemplateResponse("passage_simulator.html", context)
 

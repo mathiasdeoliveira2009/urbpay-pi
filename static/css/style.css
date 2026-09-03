@@ -1236,8 +1236,8 @@ img {
 .urb-qr-modal__dialog {
   position: relative;
   z-index: 1;
-  width: min(100%, 940px);
-  padding: 28px;
+  width: min(100%, 760px);
+  padding: clamp(28px, 4vw, 44px);
   border-radius: 30px;
   border: 1px solid rgba(43, 72, 60, 0.12);
   background: rgba(251, 253, 250, 0.98);
@@ -1258,9 +1258,9 @@ img {
 
 .urb-qr-modal__content {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
-  gap: 24px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 660px;
+  margin: 0 auto;
 }
 
 .urb-qr-modal__code {
@@ -1334,11 +1334,47 @@ img {
 .urb-qr-modal__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
   gap: 12px;
+  padding-top: 2px;
 }
 
 .urb-qr-modal__actions form {
   margin: 0;
+}
+
+.urb-qr-modal__actions .primary-action,
+.urb-qr-modal__actions .secondary-action {
+  min-height: 44px;
+  padding: 11px 17px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.urb-qr-modal__actions .secondary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(43, 72, 60, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+}
+
+.urb-qr-modal__actions .primary-action:hover,
+.urb-qr-modal__actions .secondary-action:hover {
+  transform: translateY(-1px);
+}
+
+.urb-qr-modal__actions .primary-action:focus-visible,
+.urb-qr-modal__actions .secondary-action:focus-visible,
+.urb-qr-modal__close:focus-visible {
+  outline: 3px solid rgba(46, 128, 63, 0.26);
+  outline-offset: 3px;
 }
 
 html[data-theme="dark"] .urb-qr-modal__dialog {

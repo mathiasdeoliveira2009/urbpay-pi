@@ -369,7 +369,7 @@
                 <circle cx="12" cy="10" r="2.5"></circle>
               </svg>
             </span>
-            <span>LOCALIZAR</span>
+            <span>Localizar</span>
           </button>
 
           <button type="button" class="urb-quick-action" onclick="openUrbModal()">
@@ -516,7 +516,7 @@
       <section class="urb-panel urb-workspace__panel urb-locate-panel" data-dashboard-panel="locate" hidden>
         <div class="urb-panel__head urb-panel__head--inline">
           <div>
-            <h2>LOCALIZAR</h2>
+            <h2>Localizar</h2>
             <p>Mapa ao vivo com sua posicao e estacoes de trem e metro proximas.</p>
           </div>
           <span class="urb-pill-muted" data-locate-status>Carregando mapa</span>
@@ -1949,20 +1949,13 @@
 <div class="urb-qr-modal" data-qr-modal hidden aria-hidden="true">
   <div class="urb-qr-modal__backdrop" data-qr-modal-close></div>
   <div class="urb-qr-modal__dialog" role="dialog" aria-modal="true" aria-label="QR Code da passagem digital">
-    <button type="button" class="urb-qr-modal__close" data-qr-modal-close aria-label="Fechar QR Code">Fechar</button>
+    <button type="button" class="urb-qr-modal__close" data-qr-modal-close aria-label="Fechar detalhes da passagem">Fechar</button>
 
     <div class="urb-qr-modal__content">
-      <div class="urb-qr-modal__code">
-        <a href="{{ qr_url }}" target="_blank" rel="noopener" aria-label="Abrir pagina do QR Code">
-          <img src="{{ qr_image_url }}" alt="QR Code UrbPay" class="qr-simulator__image" />
-        </a>
-      </div>
-
       <div class="urb-qr-modal__info">
         <span class="eyebrow">Passagem digital</span>
-        <h2>QR Code da sua passagem</h2>
-        <p>Abra o codigo somente quando for usar. Se precisar, gere um novo token ou acompanhe a simulacao de
-          leitura.</p>
+        <h2>Detalhes da passagem</h2>
+        <p>Confira os dados da passagem e escolha uma simulação para acompanhar a validação na catraca.</p>
 
         <div class="urb-qr-modal__stats">
           <div>
@@ -1982,10 +1975,10 @@
 
         <div class="urb-qr-modal__actions">
           <form action="/dashboard/qr/new" method="post">
-            <button type="submit" class="primary-action">Gerar novo</button>
+            <button type="submit" class="primary-action">Gerar novo QR</button>
           </form>
-          <a href="{{ qr_simulator_url }}" class="secondary-action" target="_blank" rel="noopener">Simulacao de
-            catraca</a>
+          <a href="{{ qr_simulator_url }}" class="secondary-action" target="_blank" rel="noopener">Simular NFC</a>
+          <a href="{{ qr_simulator_url }}?mode=qr" class="secondary-action" target="_blank" rel="noopener">Simular QR Code</a>
         </div>
       </div>
     </div>
