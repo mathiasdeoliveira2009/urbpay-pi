@@ -3273,19 +3273,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const openTerms = document.getElementById("openTerms");
   const cancelTerms = document.getElementById("cancelTerms");
+  const termsBackdrop = document.getElementById("termsBackdrop");
   const confirmTerms = document.getElementById("confirmTerms");
   const acceptTerms = document.getElementById("acceptTerms");
 
+  const setTermsState = (open) => {
+    if (!termsModal) {
+      return;
+    }
+
+    termsModal.classList.toggle("show", open);
+    termsModal.setAttribute("aria-hidden", String(!open));
+  };
+
   if (openTerms) {
     openTerms.addEventListener("click", () => {
-      termsModal.classList.add("show");
+      setTermsState(true);
     });
   }
 
   if (cancelTerms) {
     cancelTerms.addEventListener("click", () => {
-      termsModal.classList.remove("show");
+      setTermsState(false);
     });
+  }
+
+  if (termsBackdrop) {
+    termsBackdrop.addEventListener("click", () => setTermsState(false));
   }
 
   if (confirmTerms) {
@@ -3296,7 +3310,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      termsModal.classList.remove("show");
+      setTermsState(false);
 
       if (form) {
         form.submit();
