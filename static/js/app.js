@@ -203,6 +203,10 @@ const defaultUiSettings = {
   reducedMotion: false,
   focusHighlight: true,
   readableMode: false,
+  largeCursor: false,
+  cursorContrast: false,
+  explainMode: false,
+  colorVision: "default",
 };
 
 const i18n = {
@@ -346,6 +350,9 @@ const applyUiSettingsToDocument = (settings) => {
   root.dataset.uiMotion = settings.reducedMotion ? "reduced" : "full";
   root.dataset.uiFocus = settings.focusHighlight ? "strong" : "default";
   root.dataset.uiReadable = settings.readableMode ? "true" : "false";
+  root.dataset.uiCursor = settings.largeCursor || settings.cursorContrast ? "large" : "default";
+  root.dataset.uiCursorContrast = settings.cursorContrast ? "high" : "default";
+  root.dataset.uiColorblind = settings.colorVision;
 };
 
 const updateSettingsSummary = (settings = uiSettingsState) => {
@@ -1444,9 +1451,12 @@ profileActionButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const action = button.dataset.profileAction;
 
-    if (action === "account" || action === "password" || action === "security") {
+    if (action === "account" || action === "password" || action === "security" || action === "accessibility") {
+      openUrbModal();
       setDashboardView("profile");
-      setSettingsTab(action === "account" ? "account" : "security");
+      setSettingsTab(
+        action === "account" ? "account" : action === "accessibility" ? "appearance" : "security"
+      );
       syncSettingsControls();
       closeToolbarPanels();
       return;
@@ -1834,6 +1844,7 @@ creditConfirmButton?.addEventListener("click", async () => {
   try {
     const response = await window.fetch(creditRechargeEndpoint, {
       method: "POST",
+      credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -2007,6 +2018,86 @@ languageOptionButtons.forEach((button) => {
     syncSettingsControls();
   });
 });
+
+document.querySelectorAll("[data-settings-reset]").forEach((button) => {
+  button.addEventListener("click", () => {
+    applyTheme("light");
+    applyLanguage("pt-BR");
+    applyUiSettings({ ...defaultUiSettings });
+    setSettingsTab("appearance");
+    showToolbarToast("Acessibilidade restaurada.");
+  });
+});
+
+const showAccessibilityExplanation = (message) => {
+  let panel = document.querySelector("[data-accessibility-explanation]");
+  if (!panel) {
+    panel = document.createElement("aside");
+    panel.className = "accessibility-explanation";
+    panel.dataset.accessibilityExplanation = "true";
+    panel.setAttribute("role", "status");
+    panel.setAttribute("aria-live", "polite");
+    document.body.appendChild(panel);
+  }
+  panel.textContent = message;
+  panel.classList.add("is-visible");
+};
+
+document.addEventListener("click", (event) => {
+  if (!uiSettingsState.explainMode) {
+    return;
+  }
+
+  const target = event.target.closest("[data-a11y-explain]");
+  if (!target || target.closest("#settings-modal")) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  showAccessibilityExplanation(target.dataset.a11yExplain);
+}, true);
+
+const speechStartButton = document.querySelector("[data-speech-start]");
+const speechStopButton = document.querySelector("[data-speech-stop]");
+const speechOutput = document.querySelector("[data-speech-output]");
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let speechRecognition = null;
+
+if (speechStartButton && speechStopButton && speechOutput) {
+  if (SpeechRecognition) {
+    speechRecognition = new SpeechRecognition();
+    speechRecognition.continuous = true;
+    speechRecognition.interimResults = true;
+    speechRecognition.lang = root.lang || "pt-BR";
+
+    speechRecognition.addEventListener("result", (event) => {
+      speechOutput.textContent = Array.from(event.results)
+        .map((result) => result[0].transcript)
+        .join(" ");
+    });
+    speechRecognition.addEventListener("start", () => {
+      speechStartButton.disabled = true;
+      speechStopButton.disabled = false;
+      speechOutput.textContent = "Ouvindo...";
+    });
+    speechRecognition.addEventListener("end", () => {
+      speechStartButton.disabled = false;
+      speechStopButton.disabled = true;
+    });
+    speechRecognition.addEventListener("error", () => {
+      speechOutput.textContent = "Não foi possível acessar o microfone ou reconhecer a fala.";
+      speechStartButton.disabled = false;
+      speechStopButton.disabled = true;
+    });
+
+    speechStartButton.addEventListener("click", () => speechRecognition.start());
+    speechStopButton.addEventListener("click", () => speechRecognition.stop());
+  } else {
+    speechStartButton.disabled = true;
+    speechOutput.textContent = "A transcrição de voz não é suportada neste navegador.";
+  }
+}
 
 settingsToggleInputs.forEach((input) => {
   input.addEventListener("change", () => {
@@ -3228,6 +3319,7 @@ function closeUrbModal() {
     modal.setAttribute('hidden', 'true');
     modal.style.setProperty('display', 'none', 'important');
     document.body.style.overflow = '';
+    setDashboardView('home', { scrollIntoView: false });
   }
 }
 

@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" href="{{ url_for('static', path='imgs/logo_urbpay.png') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=20260902-13" />
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=20260903-15" />
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -36,7 +36,38 @@
       {% block content %}{% endblock %}
     </div>
   </div>
-  <script src="{{ url_for('static', path='js/app.js') }}?v=20260903-2" defer></script>
+  <div vw class="enabled" aria-label="Tradutor UrbLibras">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <p class="urblibras-description" data-urblibras-description>
+    UrbLibras traduz o conteúdo da página para Libras com um avatar 3D.
+  </p>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    window.addEventListener("load", function () {
+      if (window.VLibras) new window.VLibras.Widget("https://vlibras.gov.br/app");
+
+      function brandUrbLibras() {
+        document.querySelectorAll("[vw-access-button] span").forEach(function (label) {
+          if (label.textContent.trim() === "VLibras") label.textContent = "UrbLibras";
+        });
+        var widget = document.querySelector("[vw]");
+        var description = document.querySelector("[data-urblibras-description]");
+        if (widget && description) {
+          description.classList.toggle("is-widget-open", Boolean(widget.querySelector("[vw-plugin-wrapper].active")));
+        }
+      }
+
+      brandUrbLibras();
+      var widgetRoot = document.querySelector("[vw]");
+      if (widgetRoot) widgetRoot.addEventListener("click", function () { setTimeout(brandUrbLibras, 0); }, true);
+      new MutationObserver(brandUrbLibras).observe(document.body, { childList: true, subtree: true });
+    });
+  </script>
+  <script src="{{ url_for('static', path='js/app.js') }}?v=20260903-4" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

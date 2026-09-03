@@ -18,7 +18,8 @@
       </button>
 
       <nav class="urb-sidebar__nav" aria-label="Navegacao principal">
-        <button type="button" class="urb-nav-link is-active" data-dashboard-view="home">
+        <button type="button" class="urb-nav-link is-active" data-dashboard-view="home"
+          data-a11y-explain="Este é o início, com o resumo da sua conta e os principais atalhos.">
           <span class="urb-nav-link__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round">
@@ -69,7 +70,8 @@
           <span>Adicionar saldo</span>
         </button>
 
-        <button type="button" class="urb-nav-link" data-dashboard-view="analytics">
+        <button type="button" class="urb-nav-link" data-dashboard-view="analytics"
+          data-a11y-explain="Este é o dashboard de movimentações, com gráficos e indicadores do seu cartão.">
           <span class="urb-nav-link__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round">
@@ -83,7 +85,8 @@
           <span>Dashboard</span>
         </button>
 
-        <button type="button" class="urb-nav-link" data-dashboard-view="statement">
+        <button type="button" class="urb-nav-link" data-dashboard-view="statement"
+          data-a11y-explain="Este é o extrato, onde você consulta as entradas e saídas da sua conta.">
           <span class="urb-nav-link__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round">
@@ -96,7 +99,8 @@
           <span>Extrato</span>
         </button>
 
-        <button type="button" class="urb-nav-link" data-dashboard-view="requests">
+        <button type="button" class="urb-nav-link" data-dashboard-view="requests"
+          data-a11y-explain="Aqui ficam suas solicitações e o acompanhamento de cada atendimento.">
           <span class="urb-nav-link__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round">
@@ -177,7 +181,8 @@
       <!-- 1. Estilo do Leaflet (Coloque no topo do bloco) -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <section class="urb-main-grid" data-dashboard-home-section>
+    <section class="urb-main-grid" data-dashboard-home-section
+      data-a11y-explain="Este é o resumo da sua conta, com seu cartão e o saldo disponível.">
 
   <!-- COLUNA ESQUERDA: Envolto em div flexível para forçar altura total de 100% -->
   <div class="urb-main-grid__card-column">
@@ -262,7 +267,8 @@
 <div class="urb-right-column">
   
   <!-- BLOCO 1: SALDO -->
-  <article class="urb-card urb-card--compact-balance" data-sensitive style="flex: 0 0 auto !important;">
+  <article class="urb-card urb-card--compact-balance" data-sensitive style="flex: 0 0 auto !important;"
+    data-a11y-explain="Este é o saldo disponível da sua carteira UrbPay.">
     <div class="urb-balance-top">
       <div>
         <span class="urb-label">Saldo disponível</span>
@@ -284,7 +290,8 @@
     </div>
   </article>
 
-  <article class="urb-card urb-month-summary">
+  <article class="urb-card urb-month-summary"
+    data-a11y-explain="Este é o resumo das recargas e passagens realizadas no mês.">
     <div class="urb-panel__head urb-panel__head--inline">
       <div>
         <h2>Resumo do mês</h2>
@@ -391,7 +398,8 @@
 
       <section class="urb-workspace">
 
-        <section class="urb-panel urb-workspace__panel urb-analytics-panel" data-dashboard-panel="analytics" hidden>
+        <section class="urb-panel urb-workspace__panel urb-analytics-panel" data-dashboard-panel="analytics" hidden
+          data-a11y-explain="Este é o dashboard de movimentações, com gráficos e indicadores do uso do seu cartão.">
           <div class="urb-panel__head urb-panel__head--inline">
             <div>
               <h2>Dashboard</h2>
@@ -471,7 +479,8 @@
           </div>
         </section>
 
-        <section class="urb-panel urb-workspace__panel" data-dashboard-panel="statement" hidden>
+        <section class="urb-panel urb-workspace__panel" data-dashboard-panel="statement" hidden
+          data-a11y-explain="Este é o extrato da sua conta, com o histórico de entradas e saídas.">
           <div class="urb-panel__head urb-panel__head--inline">
             <div>
               <h2>Extrato</h2>
@@ -2001,6 +2010,19 @@
                           </div>
 
                           <div class="urb-settings-list">
+                            <div class="urb-settings-subhead">
+                              <h4>Visual</h4>
+                            </div>
+                            <div class="urb-settings-row">
+                              <div class="urb-settings-row__copy">
+                                <h4>Modo explicativo</h4>
+                                <p>Ao clicar em uma área do painel, mostra uma explicação curta sobre sua função.</p>
+                              </div>
+                              <label class="urb-switch" aria-label="Modo explicativo">
+                                <input type="checkbox" data-setting-toggle="explainMode" />
+                                <span class="urb-switch__track"></span>
+                              </label>
+                            </div>
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
                                 <h4>Tema visual</h4>
@@ -2073,6 +2095,29 @@
 
                             <div class="urb-settings-row">
                               <div class="urb-settings-row__copy">
+                                <h4>Modo daltônico</h4>
+                                <p>Adapta as cores de estados e indicadores para melhorar a distinção visual.</p>
+                              </div>
+                              <div class="urb-settings-choice-group">
+                                <button type="button" class="urb-settings-choice" data-setting-choice="colorVision"
+                                  data-setting-value="default">Padrão</button>
+                                <button type="button" class="urb-settings-choice" data-setting-choice="colorVision"
+                                  data-setting-value="red-green">Verde/vermelho</button>
+                                <button type="button" class="urb-settings-choice" data-setting-choice="colorVision"
+                                  data-setting-value="blue-yellow">Azul/amarelo</button>
+                                <button type="button" class="urb-settings-choice" data-setting-choice="colorVision"
+                                  data-setting-value="red-green-2">Vermelho/verde 2</button>
+                                <button type="button" class="urb-settings-choice" data-setting-choice="colorVision"
+                                  data-setting-value="grayscale">Escala de cinza</button>
+                                <button type="button" class="urb-settings-choice" data-setting-choice="colorVision"
+                                  data-setting-value="inverted">Invertido</button>
+                                <button type="button" class="urb-settings-choice" data-setting-choice="colorVision"
+                                  data-setting-value="grayscale-inverted">Cinza invertido</button>
+                              </div>
+                            </div>
+
+                            <div class="urb-settings-row">
+                              <div class="urb-settings-row__copy">
                                 <h4>Reduzir animações</h4>
                                 <p>Minimiza transições e movimentos para pessoas com vestibulopatia, fadiga visual ou
                                   preferência por interfaces estáveis.</p>
@@ -2106,6 +2151,52 @@
                                 <input type="checkbox" data-setting-toggle="readableMode" />
                                 <span class="urb-switch__track"></span>
                               </label>
+                            </div>
+
+                            <div class="urb-settings-row urb-settings-row--stacked">
+                              <div class="urb-settings-row__copy">
+                                <h4>Restaurar configurações</h4>
+                                <p>Volta as opções de acessibilidade para o padrão original.</p>
+                              </div>
+                              <button type="button" class="secondary-action" data-settings-reset>
+                                Resetar acessibilidade
+                              </button>
+                            </div>
+
+                            <div class="urb-settings-row">
+                              <div class="urb-settings-row__copy">
+                                <h4>Cursor maior</h4>
+                                <p>Aumenta o indicador visual do ponteiro para facilitar sua localização.</p>
+                              </div>
+                              <label class="urb-switch" aria-label="Cursor maior">
+                                <input type="checkbox" data-setting-toggle="largeCursor" />
+                                <span class="urb-switch__track"></span>
+                              </label>
+                            </div>
+
+                            <div class="urb-settings-row">
+                              <div class="urb-settings-row__copy">
+                                <h4>Cursor de alto contraste</h4>
+                                <p>Usa um cursor escuro com contorno claro para destacar o movimento.</p>
+                              </div>
+                              <label class="urb-switch" aria-label="Cursor de alto contraste">
+                                <input type="checkbox" data-setting-toggle="cursorContrast" />
+                                <span class="urb-switch__track"></span>
+                              </label>
+                            </div>
+
+                            <div class="urb-settings-row urb-settings-row--stacked">
+                              <div class="urb-settings-row__copy">
+                                <h4>Voz para texto</h4>
+                                <p>Converte fala do microfone em texto na tela. Depende do suporte do navegador.</p>
+                              </div>
+                              <div class="urb-settings-inline-actions">
+                                <button type="button" class="secondary-action" data-speech-start>Iniciar voz</button>
+                                <button type="button" class="secondary-action" data-speech-stop disabled>Parar</button>
+                              </div>
+                              <output class="urb-accessibility-speech-output" data-speech-output aria-live="polite">
+                                A transcrição aparecerá aqui.
+                              </output>
                             </div>
                           </div>
                         </article>
