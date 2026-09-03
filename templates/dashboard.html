@@ -155,7 +155,6 @@
       <header class="urb-header">
 
 
-        <button type="button" class="urb-hamburger" id="urbHamburger" aria-label="Abrir menu"> ☰ </button>
         <div class="urb-header__copy">
           <h1>Ola, {{ current_user.nome.split(' ')[0] }}</h1>
           <p>Aqui esta o resumo da sua conta UrbPay.</p>
@@ -273,6 +272,26 @@
       <button type="button" class="urb-btn urb-btn--fill" data-dashboard-view="services"
         data-service-trigger="credit-home">Adicionar saldo</button>
       <button type="button" class="urb-btn urb-btn--outline" data-qr-modal-open>Ver passagem</button>
+    </div>
+  </article>
+
+  <article class="urb-card urb-month-summary">
+    <div class="urb-panel__head urb-panel__head--inline">
+      <div>
+        <h2>Resumo do mes</h2>
+        <p>Movimentacoes do seu cartao</p>
+      </div>
+      <span class="urb-month-summary__icon" aria-hidden="true">R$</span>
+    </div>
+    <div class="urb-month-summary__grid">
+      <div>
+        <span>Recargas</span>
+        <strong>{{ topup_total }}</strong>
+      </div>
+      <div>
+        <span>Passagens</span>
+        <strong>{{ debit_total }}</strong>
+      </div>
     </div>
   </article>
 

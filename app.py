@@ -2386,14 +2386,20 @@ def dashboard_qr_complete(token: str, request: Request, db: Session = Depends(ge
 def passage_gateway(token: str, request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     payload = decode_qr_token(token)
     validate_qr_authorization(payload)
+    card_id = int(payload.get("card_id") or 0)
     user = db.scalar(
         select(Usuario)
         .options(joinedload(Usuario.cartao))
         .where(Usuario.id_usuario == int(payload["user_id"]))
     )
-    if not user or not user.cartao:
+    if not user or not card_id:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
-    card = get_primary_user_card(db, user.id_usuario)
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == card_id,
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
     if not card:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
@@ -2430,14 +2436,20 @@ def passage_gateway(token: str, request: Request, db: Session = Depends(get_db))
 def confirm_passage(token: str, request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     payload = decode_qr_token(token)
     validate_qr_authorization(payload)
+    card_id = int(payload.get("card_id") or 0)
     user = db.scalar(
         select(Usuario)
         .options(joinedload(Usuario.cartao))
         .where(Usuario.id_usuario == int(payload["user_id"]))
     )
-    if not user or not user.cartao:
+    if not user or not card_id:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
-    card = get_primary_user_card(db, user.id_usuario)
+    card = db.scalar(
+        select(Cartao).where(
+            Cartao.id_cartao == card_id,
+            Cartao.id_usuario == user.id_usuario,
+        )
+    )
     if not card:
         raise HTTPException(status_code=404, detail="Cartao nao encontrado.")
 
